@@ -50,10 +50,6 @@ export default function AppEntry() {
         }}
       ></Stack.Screen>
       <Stack.Screen
-        name="(add)/browseRecipe"
-        options={{ title: "Browse recipe", presentation: "modal" }}
-      ></Stack.Screen>
-      <Stack.Screen
         name="(generate)"
         options={{
           title: "PanPal Assistant",

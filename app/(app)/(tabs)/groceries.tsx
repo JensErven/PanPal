@@ -1,7 +1,7 @@
 import { View, Text } from "react-native";
 import React from "react";
 
-const Page = () => {
+const GroceriesScreen = () => {
   return (
     <View>
       <Text>groceries</Text>
@@ -9,4 +9,4 @@ const Page = () => {
   );
 };
 
-export default Page;
+export default GroceriesScreen;

@@ -15,7 +15,7 @@ import { router } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { useSession } from "@/context/auth";
 
-const customRecipeScreen = () => {
+const CustomRecipeScreen = () => {
   const { session } = useSession();
   const baseUrl = "https://www.themealdb.com/";
   const [title, setTitle] = useState<string>("");
@@ -197,7 +197,7 @@ const customRecipeScreen = () => {
   );
 };
 
-export default customRecipeScreen;
+export default CustomRecipeScreen;
 
 const styles = StyleSheet.create({
   container: {

@@ -1,17 +1,44 @@
-import { View, Text, Pressable, StyleSheet } from "react-native";
+import {
+  View,
+  Text,
+  Pressable,
+  StyleSheet,
+  TouchableOpacity,
+} from "react-native";
 import React from "react";
-import { Stack } from "expo-router";
+import { Stack, router } from "expo-router";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
-import { useColorScheme } from "@/components/useColorScheme";
-import Colors from "@/constants/Colors";
+import { SCREEN_WIDTH } from "@/constants/ScreenParams";
+
 const Generatelayout = () => {
-  const colorScheme = useColorScheme();
+  const screenTitle = "PanPal";
   return (
     <Stack>
       <Stack.Screen
-        name="generate"
+        name="index"
         options={{
-          title: "PanPal Assistant",
+          headerShown: true,
+
+          header: () => (
+            <SafeAreaView style={styles.container}>
+              <View style={styles.headerContainer}>
+                <TouchableOpacity
+                  style={styles.goBackButtonContainer}
+                  activeOpacity={1}
+                  onPress={() => router.back()}
+                >
+                  <Ionicons name="arrow-back" size={25} color="black" />
+                </TouchableOpacity>
+                <Text className="text-xl font-bold">{screenTitle}</Text>
+              </View>
+              <View style={styles.creditsCounterContainer}>
+                <Text className="font-bold text-md text-slate-800">
+                  3 credits
+                </Text>
+              </View>
+            </SafeAreaView>
+          ),
         }}
       />
     </Stack>
@@ -21,8 +48,68 @@ const Generatelayout = () => {
 export default Generatelayout;
 
 const styles = StyleSheet.create({
-  headerRightContainer: {
+  container: {
+    backgroundColor: "#dde1e7",
+    paddingVertical: 8,
+    paddingHorizontal: 15,
+    width: SCREEN_WIDTH,
+    display: "flex",
+    alignItems: "center",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 3,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    elevation: 4,
+  },
+  headerContainer: {
+    display: "flex",
+    height: "auto",
+    justifyContent: "flex-start",
     flexDirection: "row",
     alignItems: "center",
+    columnGap: 15,
+  },
+  goBackButtonContainer: {
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "center",
+    alignItems: "center",
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: "#dde1e7",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 3,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    elevation: 4,
+  },
+  creditsCounterContainer: {
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: "lightblue",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 3,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    elevation: 4,
+    columnGap: 5,
+    paddingHorizontal: 10,
   },
 });

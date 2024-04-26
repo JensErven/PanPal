@@ -1,12 +1,12 @@
 import { View, Text } from "react-native";
 import React from "react";
 
-const search = () => {
+const NotificationsScreen = () => {
   return (
     <View>
-      <Text>search</Text>
+      <Text>NotificationsScreen</Text>
     </View>
   );
 };
 
-export default search;
+export default NotificationsScreen;

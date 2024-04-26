@@ -6,22 +6,56 @@ import { Ionicons } from "@expo/vector-icons";
 import Colors from "@/constants/Colors";
 import { useColorScheme } from "@/components/useColorScheme";
 import { useClientOnlyValue } from "@/components/useClientOnlyValue";
+import CustomNavbar from "@/components/navigation/customNavbar/CustomNavbar";
+import { useSharedValue, withTiming, Easing } from "react-native-reanimated";
+import { SafeAreaView } from "react-native-safe-area-context";
 
-// You can explore the built-in icon families and icons on the web at https://icons.expo.fyi/
-function TabBarIcon(props: {
-  name: React.ComponentProps<typeof FontAwesome>["name"];
-  color: string;
-}) {
-  return <FontAwesome size={28} style={{ marginBottom: -3 }} {...props} />;
-}
+export type Tab = {
+  index: number;
+  routeName: string;
+  title: string;
+  icon: "home" | "notifications" | "bookmark" | "basket";
+};
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
 
+  const tabs: Tab[] = [
+    {
+      index: 0,
+      routeName: "(home)",
+      title: "Home",
+      icon: "home",
+    },
+    {
+      index: 1,
+      routeName: "saved",
+      title: "Saved",
+      icon: "bookmark",
+    },
+    {
+      index: 2,
+      routeName: "groceries",
+      title: "Groceries",
+      icon: "basket",
+    },
+    {
+      index: 3,
+      routeName: "notifications",
+      title: "Notifications",
+      icon: "notifications",
+    },
+  ];
+
+  // ...
+
+  const selectedTab = useSharedValue("(home)");
+
   return (
     <Tabs
+      initialRouteName="(home)"
+      tabBar={(props) => <CustomNavbar tabs={tabs} {...props} />}
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? "light"].tint,
         // Disable the static render of the header on web
         // to prevent a hydration error in React Navigation v6.
         headerShown: useClientOnlyValue(false, true),
@@ -38,11 +72,11 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="search"
+        name="notifications"
         options={{
-          title: "Search",
+          title: "Notifications",
           tabBarIcon: ({ color }) => (
-            <Ionicons name="search" size={28} color={color} />
+            <Ionicons name="notifications" size={28} color={color} />
           ),
         }}
       />
@@ -68,20 +102,3 @@ export default function TabLayout() {
     </Tabs>
   );
 }
-
-const styles = StyleSheet.create({
-  headerRightContainer: {
-    flexDirection: "row",
-  },
-  addButton: {
-    position: "absolute",
-    bottom: 20,
-    right: 20,
-    backgroundColor: Colors.light.tint,
-    width: 60,
-    height: 60,
-    borderRadius: 50,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-});

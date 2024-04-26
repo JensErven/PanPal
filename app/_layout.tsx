@@ -50,11 +50,37 @@ export default function RootLayout() {
   return <RootLayoutNav />;
 }
 
+const customLightTheme = {
+  ...DefaultTheme,
+  colors: {
+    ...DefaultTheme.colors,
+    background: "#caedf5",
+    text: "#000",
+    tint: "#2f95dc",
+    tabIconDefault: "#ccc",
+    tabIconSelected: "#2f95dc",
+  },
+};
+
+const customDarkTheme = {
+  ...DarkTheme,
+  colors: {
+    ...DarkTheme.colors,
+    background: "#121212",
+    text: "#fff",
+    tint: "#fff",
+    tabIconDefault: "#ccc",
+    tabIconSelected: "#fff",
+  },
+};
+
 function RootLayoutNav() {
   const colorScheme = useColorScheme();
 
   return (
-    <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
+    <ThemeProvider
+      value={colorScheme === "dark" ? customDarkTheme : customLightTheme}
+    >
       <SessionProvider>
         <Slot />
       </SessionProvider>

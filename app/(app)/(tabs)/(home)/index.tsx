@@ -2,8 +2,11 @@ import { View, Text, StyleSheet } from "react-native";
 import React, { useState } from "react";
 import { Link, router } from "expo-router";
 import RoundButton from "@/components/shared/roundButton";
+import { Svg, Path } from "react-native-svg";
+import { line, curveBasis } from "d3-shape";
+import PanPalButtonRounded from "@/components/shared/panpal/PanPalButtonRounded";
 
-const Page = () => {
+const HomeScreen = () => {
   const [buttonClicked, setButtonClicked] = useState(false);
   useState(false);
   const [showAddOptionButtons, setShowAddOptionButtons] = useState(false);
@@ -16,7 +19,7 @@ const Page = () => {
     // Perform different actions based on buttonId
     if (buttonId === "generate") {
       setButtonClicked(!buttonClicked);
-      router.push("/(app)/(generate)/generate");
+      router.push("/(app)/(generate)");
       // Handle generate button click
       console.log("Generate button clicked");
     } else if (buttonId === "add") {
@@ -24,8 +27,6 @@ const Page = () => {
       setShowAddOptionButtons(!showAddOptionButtons);
     } else if (buttonId === "custom recipe") {
       router.push("/(app)/(add)/customRecipe");
-    } else if (buttonId === "browse recipe") {
-      router.push("/(app)/(add)/browseRecipe");
     } else return;
   };
   return (
@@ -34,7 +35,8 @@ const Page = () => {
       <Link href={"/(app)/modal"}>
         <Text>Go to profile</Text>
       </Link>
-      <View style={styles.roundedButtonContainer}>
+
+      {/* <View style={styles.roundedButtonContainer}>
         {!showAddOptionButtons && (
           <RoundButton
             size={50}
@@ -53,13 +55,6 @@ const Page = () => {
               onButtonClick={handleButtonClick}
               icon="pencil"
             />
-            <RoundButton
-              type="dependent"
-              size={40}
-              buttonId="browse recipe"
-              onButtonClick={handleButtonClick}
-              icon="globe"
-            />
           </>
         )}
         <RoundButton
@@ -69,12 +64,12 @@ const Page = () => {
           onButtonClick={handleButtonClick}
           icon="add"
         />
-      </View>
+      </View> */}
     </View>
   );
 };
 
-export default Page;
+export default HomeScreen;
 
 const styles = StyleSheet.create({
   container: {

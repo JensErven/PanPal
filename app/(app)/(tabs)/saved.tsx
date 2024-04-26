@@ -13,7 +13,8 @@ import { collection, onSnapshot } from "firebase/firestore";
 import { useSession } from "@/context/auth";
 import { Ionicons } from "@expo/vector-icons";
 import { updateRecipe } from "@/services/db/recipe.service";
-const saved = () => {
+import { SCREEN_HEIGHT } from "@/constants/ScreenParams";
+const SavedScreen = () => {
   const [recipes, setRecipes] = useState<any>([]);
   const { session } = useSession();
   const [isLoading, setIsLoading] = useState(false);
@@ -83,7 +84,7 @@ const saved = () => {
   );
 };
 
-export default saved;
+export default SavedScreen;
 
 const styles = StyleSheet.create({
   pageContainer: {
@@ -94,6 +95,7 @@ const styles = StyleSheet.create({
   },
   scrollView: {
     padding: 20,
+    paddingBottom: SCREEN_HEIGHT * 0.15,
     flexDirection: "row",
     flexWrap: "wrap",
     justifyContent: "space-between",

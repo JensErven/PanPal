@@ -1,11 +1,11 @@
-import { View, Pressable, StyleSheet } from "react-native";
+import { View, Pressable, StyleSheet, Text } from "react-native";
 import React from "react";
 import { Stack, router } from "expo-router";
 
 import { Ionicons } from "@expo/vector-icons";
 import { useColorScheme } from "@/components/useColorScheme";
 import Colors from "@/constants/Colors";
-
+const NAVIGATION_BOTTOM_TABS_HEIGHT = 67; // Adjust as needed
 const HomeLayout = () => {
   const colorScheme = useColorScheme();
 
@@ -15,6 +15,12 @@ const HomeLayout = () => {
         name="index"
         options={{
           title: "Home",
+          headerShown: true,
+          header: () => (
+            <View style={styles.headerContainer}>
+              <Text>Home</Text>
+            </View>
+          ),
           headerRight: () => (
             <View style={styles.headerRightContainer}>
               <Pressable
@@ -46,5 +52,14 @@ const styles = StyleSheet.create({
   headerRightContainer: {
     flexDirection: "row",
     alignItems: "center",
+  },
+  headerContainer: {
+    backgroundColor: "#dde1e7",
+    paddingHorizontal: 15,
+    justifyContent: "space-between",
+    flexDirection: "row",
+    alignItems: "center",
+    width: "100%",
+    height: NAVIGATION_BOTTOM_TABS_HEIGHT,
   },
 });
