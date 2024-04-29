@@ -65,6 +65,35 @@ const getUserTastes = async () => {
   }
 };
 
+const getThreadId = async (): Promise<string | null> => {
+  try {
+    const thread = await AsyncStorage.getItem("threadId");
+
+    return thread ? JSON.parse(thread) : [];
+  } catch (error) {
+    console.error("Error getting thread:", error);
+    throw new Error("Failed to get thread");
+  }
+};
+
+const storeThreadId = async (threadId: string) => {
+  try {
+    await AsyncStorage.setItem("threadId", JSON.stringify(threadId));
+  } catch (error) {
+    console.error("Error storing thread:", error);
+    throw new Error("Failed to store thread");
+  }
+};
+
+const deleteThreadId = async () => {
+  try {
+    await AsyncStorage.removeItem("threadId");
+  } catch (error) {
+    console.error("Error deleting thread:", error);
+    throw new Error("Failed to delete thread");
+  }
+};
+
 export const storedPreferencesService = {
   storeUserAllergies,
   getUserAllergies,
@@ -72,4 +101,7 @@ export const storedPreferencesService = {
   getUserCuisines,
   storeUserTastes,
   getUserTastes,
+  getThreadId,
+  storeThreadId,
+  deleteThreadId,
 };

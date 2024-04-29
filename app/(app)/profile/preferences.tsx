@@ -12,6 +12,9 @@ import { cuisineTypes } from "@/constants/CuisineTypes";
 import { tastePreferences } from "@/constants/TastePreferences";
 import PreferenceTypeCard from "@/components/profile/PreferenceTypeCard";
 import { storedPreferencesService } from "@/services/async-storage/stored-preferences.service";
+import ButtonStandard from "@/components/shared/ButtonStandard";
+import Colors from "@/constants/Colors";
+import Divider from "@/components/shared/Divider";
 
 type Preference = {
   id: number;
@@ -144,11 +147,12 @@ const preferences = () => {
           for sure!
         </Text>
       </View>
-      <View style={styles.divider}></View>
+      <Divider />
 
       <View style={styles.contentContainer}>
         <PreferenceTypeCard
           title="I'm allergic to..."
+          placeholder="Enter an allergy"
           selected={userAllergies}
           options={allergyTypesOptions}
           optionSelect={handleAllergyOptionSelect}
@@ -156,6 +160,7 @@ const preferences = () => {
         />
         <PreferenceTypeCard
           title="My favorite cuisines are..."
+          placeholder="Enter a favorite cuisine"
           selected={userCuisines}
           options={cuisineTypesOptions}
           optionSelect={handleCuisineOptionSelect}
@@ -163,27 +168,30 @@ const preferences = () => {
         />
         <PreferenceTypeCard
           title="My favorite taste preferences are..."
+          placeholder="Enter a favorite taste preference"
           selected={userTastes}
           options={tasteTypesOptions}
           optionSelect={handleTasteOptionSelect}
           deleteSelected={deleteUserTaste}
         />
       </View>
-      <View style={styles.divider}></View>
+      <Divider />
 
       <View style={styles.cancelOrSaveContainer}>
-        <TouchableOpacity
-          style={styles.cancelButton}
-          onPress={() => router.back()}
-        >
-          <Text style={styles.buttonText}>Cancel</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.saveButton}
-          onPress={() => handleSavePreferences()}
-        >
-          <Text style={styles.buttonText}>Save</Text>
-        </TouchableOpacity>
+        <View style={styles.cancelButton}>
+          <ButtonStandard
+            title="Cancel"
+            backgroundColor={Colors.midnight}
+            clicked={() => router.back()}
+          />
+        </View>
+        <View style={styles.saveButton}>
+          <ButtonStandard
+            title="Save"
+            backgroundColor={Colors.terracotta}
+            clicked={() => handleSavePreferences()}
+          />
+        </View>
       </View>
     </ScrollView>
   );
@@ -197,7 +205,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   scrollView: {
-    rowGap: 10,
+    rowGap: 32,
     padding: 20,
     flexDirection: "row",
     flexWrap: "wrap",
@@ -205,7 +213,7 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     width: "100%",
-    rowGap: 10,
+    rowGap: 16,
   },
   preferenceTypeCard: {
     display: "flex",
@@ -223,14 +231,10 @@ const styles = StyleSheet.create({
     width: "100%",
     flexDirection: "row",
     justifyContent: "space-between",
+    gap: 16,
   },
   cancelButton: {
-    backgroundColor: "red",
-    width: "45%",
-    height: 50,
-    borderRadius: 10,
-    justifyContent: "center",
-    alignItems: "center",
+    flex: 1 / 2,
   },
   userAllergiesContainer: {
     flexDirection: "row",
@@ -239,12 +243,7 @@ const styles = StyleSheet.create({
     columnGap: 5,
   },
   saveButton: {
-    backgroundColor: "blue",
-    width: "45%",
-    height: 50,
-    borderRadius: 10,
-    justifyContent: "center",
-    alignItems: "center",
+    flex: 1 / 2,
   },
   buttonText: {
     color: "white",

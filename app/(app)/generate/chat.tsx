@@ -1,5 +1,5 @@
 import { View, Text, KeyboardAvoidingView, StyleSheet } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import BottomInputfield from "@/components/generateScreen/BottomInputfield";
 import Messages from "@/components/generateScreen/Messages";
 import {
@@ -8,34 +8,63 @@ import {
   NAVIGATION_BOTTOM_TABS_HEIGHT,
 } from "@/constants/ScreenParams";
 import { message } from "@/models/message";
+import {
+  createThread,
+  fetchPanPalResponse,
+  runAssistant,
+  submitMessageToThread,
+} from "@/services/api/openai-api.service";
+import { storedPreferencesService } from "@/services/async-storage/stored-preferences.service";
 
-const GenerateScreen = () => {
+const ChatScreen = () => {
   const [messages, setMessages] = useState<message[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isInputDisabled, setIsInputDisabled] = useState<boolean>(false);
-  const handleSentMessageData = async (message: message) => {
-    setMessages((prevMessages) => [...prevMessages, message]);
-    const panPalMessage = await fetchPanPalResponse(message.message);
-    setMessages((prevMessages) => [...prevMessages, panPalMessage]);
-  };
+  const [threadId, setThreadId] = useState<string | null>(null);
 
-  const fetchPanPalResponse = async (message: string): Promise<message> => {
-    setIsInputDisabled(true);
+  const handleSentMessageData = async (message: message) => {
+    // setMessages((prevMessages) => [...prevMessages, message]);
     setIsLoading(true);
-    const newResponse = new Promise<message>((resolve) => {
-      setTimeout(() => {
-        const response = {
-          message: "I am PanPal, I will get back to you shortly",
-          role: "panpal",
-        } as message;
-        setIsLoading(false);
-        setIsInputDisabled(false);
-        resolve(response);
-      }, 1500);
+    const threadId = await createThread();
+    submitMessageToThread(threadId, message.message).then((messageId) => {
+      if (messageId) {
+        runAssistant(threadId).then((messages) => {
+          setIsLoading(false);
+          setMessages((prevMessages) => [...prevMessages, ...messages]);
+        });
+      }
     });
 
+    // const panPalMessage = await handleFetchPanpalResponse(message.message);
+    // const newMessage: message = { ...panPalMessage, role: "panpal" };
+
+    // setMessages((prevMessages) => [...prevMessages, newMessage]);
+  };
+
+  const handleFetchPanpalResponse = async (
+    message: string
+  ): Promise<message> => {
+    setIsInputDisabled(true);
+    setIsLoading(true);
+    const newResponse = await fetchPanPalResponse(message);
+    console.log(newResponse);
+    setIsLoading(false);
+    setIsInputDisabled(false);
     return newResponse;
   };
+
+  useEffect(() => {
+    // get threadid from async storage, if there is none then create a new thread
+    // storedPreferencesService.getThreadId().then(async (threadId) => {
+    //   if (!threadId) {
+    //     console.log("No thread found, creating a new thread...");
+    //     const newThreadId = await createThread();
+    //     console.log(newThreadId);
+    //     storedPreferencesService.storeThreadId(newThreadId);
+    //   }
+    //   console.log("Thread found:", threadId);
+    // });
+  }, []);
 
   return (
     <KeyboardAvoidingView style={styles.container}>
@@ -63,7 +92,7 @@ const GenerateScreen = () => {
   );
 };
 
-export default GenerateScreen;
+export default ChatScreen;
 
 const styles = StyleSheet.create({
   container: {

@@ -2,11 +2,13 @@ import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import React, { useState } from "react";
 import { router } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
+import { BUTTON_HEIGHT_LARGE } from "@/constants/ScreenParams";
+import Colors from "@/constants/Colors";
 
 const PanPalButtonRounded = () => {
   const [hasMessage, setHasMessage] = useState(true);
   const handlePanPalButtonPress = () => {
-    router.navigate("(generate)");
+    router.navigate("generate/chat");
   };
 
   return (
@@ -17,8 +19,8 @@ const PanPalButtonRounded = () => {
     >
       {/* Add a conditional rendering for the message icon */}
       <View style={styles.panPalButtonContent}>
-        <Text className="font-extrabold text-lg">PP</Text>
-        {hasMessage && <View style={styles.messageAlertContainer}></View>}
+        <Text style={styles.panPalButtonText}>PP</Text>
+        {!hasMessage && <View style={styles.messageAlertContainer}></View>}
       </View>
     </TouchableOpacity>
   );
@@ -31,18 +33,17 @@ const styles = StyleSheet.create({
     position: "relative",
   },
   panPalButtonContent: {
-    backgroundColor: "#dde1e7",
     display: "flex",
     flexDirection: "column",
     justifyContent: "center",
     alignItems: "center",
-    width: 58,
-    height: 58,
-    borderRadius: 29,
+    width: BUTTON_HEIGHT_LARGE,
+    height: BUTTON_HEIGHT_LARGE,
+    borderRadius: BUTTON_HEIGHT_LARGE / 2,
     borderStyle: "solid",
     borderWidth: 1,
-    borderColor: "#ECF0F3",
-    shadowColor: "#000",
+    borderColor: Colors.porcelain,
+    shadowColor: Colors.slate,
     shadowOffset: {
       width: 0,
       height: 3,
@@ -50,6 +51,13 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 3,
     elevation: 4,
+    zIndex: 1,
+    backgroundColor: Colors.midnight,
+  },
+  panPalButtonText: {
+    color: Colors.pearl,
+    fontWeight: "bold",
+    fontSize: 18,
   },
   messageAlertContainer: {
     zIndex: 1,

@@ -21,40 +21,28 @@ export default function AppEntry() {
     <Stack>
       <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
       <Stack.Screen
-        name="modal"
+        name="add"
         options={{
-          headerShown: true,
-          title: "Modal",
-          presentation: "modal",
-        }}
-      />
-      <Stack.Screen
-        name="(add)/customRecipe"
-        options={{
+          headerShown: false,
           title: "Add custom recipe",
           presentation: "modal",
-          headerRight: () => (
-            <View style={styles.headerRightContainer}>
-              <Pressable onPress={() => console.log("save recipe")}>
-                {({ pressed }) => (
-                  <Ionicons
-                    name="checkmark-circle-outline"
-                    size={25}
-                    color={Colors[colorScheme ?? "light"].text}
-                    style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
-                  />
-                )}
-              </Pressable>
-            </View>
-          ),
+          animation: "slide_from_bottom",
         }}
       ></Stack.Screen>
       <Stack.Screen
-        name="(generate)"
+        name="generate"
         options={{
-          title: "PanPal Assistant",
           presentation: "modal",
           headerShown: false,
+          animation: "slide_from_bottom",
+        }}
+      ></Stack.Screen>
+      <Stack.Screen
+        name="profile"
+        options={{
+          presentation: "modal",
+          headerShown: false,
+          animation: "slide_from_right",
         }}
       ></Stack.Screen>
     </Stack>

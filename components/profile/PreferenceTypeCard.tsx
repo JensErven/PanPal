@@ -7,6 +7,12 @@ import {
 } from "react-native";
 import React, { useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
+import Colors from "@/constants/Colors";
+import {
+  BORDER_RADIUS_LARGE,
+  BORDER_RADIUS_MEDIUM,
+  BORDER_RADIUS_SMALL,
+} from "@/constants/ScreenParams";
 
 type Preference = {
   id: number;
@@ -17,10 +23,12 @@ const PreferenceTypeCard = ({
   title,
   selected,
   options,
+  placeholder,
   optionSelect,
   deleteSelected,
 }: {
   title: string;
+  placeholder: string;
   selected: Preference[];
   options: Preference[];
   optionSelect: (option: Preference) => void;
@@ -46,10 +54,11 @@ const PreferenceTypeCard = ({
       <View style={styles.userAllergiesContainer}>
         {selected.map((item) => (
           <View style={styles.selectedOptionTag} key={item.id}>
-            <Text>{item.name}</Text>
+            <Text style={{ color: Colors.midnight }}>{item.name}</Text>
             <Ionicons
               name="close"
               size={20}
+              color={Colors.midnight}
               onPress={() => {
                 deleteSelected(item);
               }}
@@ -58,7 +67,7 @@ const PreferenceTypeCard = ({
         ))}
         <TextInput
           onFocus={handleDropdownToggle}
-          placeholder="Enter your allergies"
+          placeholder={placeholder + "..."}
           keyboardType="default"
           value={searchText}
           onChangeText={handleSearchTextChange}
@@ -90,16 +99,28 @@ export default PreferenceTypeCard;
 
 const styles = StyleSheet.create({
   preferenceTypeCard: {
+    backgroundColor: Colors.pearl,
     display: "flex",
     rowGap: 5,
-    borderColor: "black",
-    borderWidth: 1,
-    borderRadius: 10,
+    borderRadius: BORDER_RADIUS_SMALL,
     padding: 10,
+    borderStyle: "solid",
+    borderWidth: 1,
+    borderColor: Colors.pearl,
+
+    shadowColor: Colors.midnight,
+    shadowOffset: {
+      width: 0,
+      height: -2,
+    },
+    shadowOpacity: 0.23,
+    shadowRadius: 2.62,
+    elevation: 4,
   },
   preferenceTitle: {
     fontSize: 16,
     fontWeight: "bold",
+    color: Colors.midnight,
   },
   dropdownButton: {
     backgroundColor: "lightgrey",
@@ -122,7 +143,7 @@ const styles = StyleSheet.create({
     display: "flex",
     flexDirection: "row",
     rowGap: 5,
-    backgroundColor: "lightgrey",
+    backgroundColor: Colors.frost,
     padding: 5,
     borderRadius: 5,
   },

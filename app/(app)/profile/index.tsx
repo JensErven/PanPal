@@ -3,6 +3,9 @@ import React from "react";
 import { useSession } from "@/context/auth";
 import { Ionicons } from "@expo/vector-icons";
 import { Router, router } from "expo-router";
+import ButtonStandard from "@/components/shared/ButtonStandard";
+import Colors from "@/constants/Colors";
+import { BORDER_RADIUS_SMALL } from "@/constants/ScreenParams";
 
 const ProfileScreen = () => {
   const { signOut, session } = useSession();
@@ -20,17 +23,20 @@ const ProfileScreen = () => {
           Profile, so PanPal can create really delicious recipes made just for
           you. Update it and change it anytime.
         </Text>
-        <TouchableOpacity
-          style={styles.buttonContainer}
-          onPress={() => router.navigate("/preferences")}
-        >
-          <Text style={styles.buttonText}>Add A Preferences Profile</Text>
-        </TouchableOpacity>
+        <View>
+          <ButtonStandard
+            backgroundColor={Colors.midnight}
+            title="Add A Preferences Profile"
+            clicked={() => router.push("/(app)/profile/preferences")}
+          />
+        </View>
       </View>
-      <TouchableOpacity onPress={signOut} style={styles.signOutContainer}>
-        <Text style={styles.signOutText}>Sign Out</Text>
-        <Ionicons name="log-out-outline" size={24} color="white" />
-      </TouchableOpacity>
+
+      <ButtonStandard
+        backgroundColor={Colors.terracotta}
+        title="Sign Out"
+        clicked={signOut}
+      />
     </View>
   );
 };
@@ -45,11 +51,23 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   preferencesContainer: {
-    rowGap: 10,
-    padding: 25,
-    borderColor: "black",
+    backgroundColor: Colors.pearl,
+    display: "flex",
+    rowGap: 16,
+    borderRadius: BORDER_RADIUS_SMALL,
+    padding: 16,
+    borderStyle: "solid",
     borderWidth: 1,
-    borderRadius: 10,
+    borderColor: Colors.pearl,
+
+    shadowColor: Colors.midnight,
+    shadowOffset: {
+      width: 0,
+      height: -2,
+    },
+    shadowOpacity: 0.23,
+    shadowRadius: 2.62,
+    elevation: 4,
   },
   titleText: {
     fontSize: 20,

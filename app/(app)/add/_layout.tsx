@@ -5,39 +5,30 @@ import {
   StyleSheet,
   TouchableOpacity,
 } from "react-native";
-import React from "react";
+import React, { useState } from "react";
 import { Stack, router } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { SCREEN_WIDTH } from "@/constants/ScreenParams";
+import HeaderStandard from "@/components/shared/HeaderStandard";
 
-const Generatelayout = () => {
-  const screenTitle = "PanPal";
+const AddLayout = () => {
+  const screenTitle = "Add custom recipe";
+
+  const children = null;
   return (
     <Stack>
       <Stack.Screen
-        name="index"
+        name="customRecipe"
         options={{
           headerShown: true,
 
           header: () => (
-            <SafeAreaView style={styles.container}>
-              <View style={styles.headerContainer}>
-                <TouchableOpacity
-                  style={styles.goBackButtonContainer}
-                  activeOpacity={1}
-                  onPress={() => router.back()}
-                >
-                  <Ionicons name="arrow-back" size={25} color="black" />
-                </TouchableOpacity>
-                <Text className="text-xl font-bold">{screenTitle}</Text>
-              </View>
-              <View style={styles.creditsCounterContainer}>
-                <Text className="font-bold text-md text-slate-800">
-                  3 credits
-                </Text>
-              </View>
-            </SafeAreaView>
+            <HeaderStandard
+              screenTitle={"Add custom recipe"}
+              hasGoBackButton={true}
+              children={children}
+            ></HeaderStandard>
           ),
         }}
       />
@@ -45,7 +36,7 @@ const Generatelayout = () => {
   );
 };
 
-export default Generatelayout;
+export default AddLayout;
 
 const styles = StyleSheet.create({
   container: {
@@ -91,25 +82,5 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 3,
     elevation: 4,
-  },
-  creditsCounterContainer: {
-    display: "flex",
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
-
-    height: 48,
-    borderRadius: 24,
-    backgroundColor: "lightblue",
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 3,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 3,
-    elevation: 4,
-    columnGap: 5,
-    paddingHorizontal: 10,
   },
 });

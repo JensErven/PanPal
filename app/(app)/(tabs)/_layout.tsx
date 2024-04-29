@@ -1,14 +1,20 @@
 import React from "react";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { Link, Tabs, router } from "expo-router";
-import { Pressable, View, StyleSheet, TouchableOpacity } from "react-native";
+import {
+  Pressable,
+  View,
+  StyleSheet,
+  TouchableOpacity,
+  Text,
+} from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import Colors from "@/constants/Colors";
 import { useColorScheme } from "@/components/useColorScheme";
 import { useClientOnlyValue } from "@/components/useClientOnlyValue";
 import CustomNavbar from "@/components/navigation/customNavbar/CustomNavbar";
 import { useSharedValue, withTiming, Easing } from "react-native-reanimated";
-import { SafeAreaView } from "react-native-safe-area-context";
+import HeaderStandard from "@/components/shared/HeaderStandard";
 
 export type Tab = {
   index: number;
@@ -18,8 +24,6 @@ export type Tab = {
 };
 
 export default function TabLayout() {
-  const colorScheme = useColorScheme();
-
   const tabs: Tab[] = [
     {
       index: 0,
@@ -56,8 +60,6 @@ export default function TabLayout() {
       initialRouteName="(home)"
       tabBar={(props) => <CustomNavbar tabs={tabs} {...props} />}
       screenOptions={{
-        // Disable the static render of the header on web
-        // to prevent a hydration error in React Navigation v6.
         headerShown: useClientOnlyValue(false, true),
       }}
     >
@@ -78,6 +80,13 @@ export default function TabLayout() {
           tabBarIcon: ({ color }) => (
             <Ionicons name="notifications" size={28} color={color} />
           ),
+          headerShown: true,
+          header: () => (
+            <HeaderStandard
+              screenTitle={"Notifications"}
+              hasGoBackButton={false}
+            ></HeaderStandard>
+          ),
         }}
       />
 
@@ -88,6 +97,13 @@ export default function TabLayout() {
           tabBarIcon: ({ color }) => (
             <Ionicons name="bookmark" size={28} color={color} />
           ),
+          headerShown: true,
+          header: () => (
+            <HeaderStandard
+              screenTitle={"Saved"}
+              hasGoBackButton={false}
+            ></HeaderStandard>
+          ),
         }}
       />
       <Tabs.Screen
@@ -97,8 +113,17 @@ export default function TabLayout() {
           tabBarIcon: ({ color }) => (
             <Ionicons name="cart" size={28} color={color} />
           ),
+          headerShown: true,
+          header: () => (
+            <HeaderStandard
+              screenTitle={"Groceries"}
+              hasGoBackButton={false}
+            ></HeaderStandard>
+          ),
         }}
       />
     </Tabs>
   );
 }
+
+const styles = StyleSheet.create({});

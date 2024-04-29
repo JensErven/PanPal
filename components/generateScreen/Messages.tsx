@@ -29,6 +29,7 @@ const Messages = ({
       scrollViewRef.current.scrollToEnd({ animated: true });
     }
   }, [messages]);
+
   return (
     <View style={styles.container}>
       <ScrollView
@@ -45,19 +46,21 @@ const Messages = ({
                 styles.messageContainer,
                 {
                   alignSelf:
-                    message.role === "panpal" ? "flex-start" : "flex-end",
+                    message.role === "assistant" ? "flex-start" : "flex-end",
                   backgroundColor:
-                    message.role === "panpal" ? "#ECF0F3" : "#11263C",
+                    message.role === "assistant" ? "#ECF0F3" : "#11263C",
                   marginTop: index === 0 ? 10 : 0,
                   marginBottom: index === messages.length - 1 ? 10 : 0,
                 },
               ]}
-              key={index}
+              key={message.id}
             >
               <Text
                 style={[
                   {
-                    color: message.role === "panpal" ? "#11263C" : "#ECF0F3",
+                    alignSelf:
+                      message.role === "assistant" ? "flex-start" : "flex-end",
+                    color: message.role === "assistant" ? "grey" : "grey",
                   },
                 ]}
               >
@@ -66,7 +69,7 @@ const Messages = ({
               <Text
                 style={[
                   {
-                    color: message.role === "panpal" ? "#11263C" : "#ECF0F3",
+                    color: message.role === "assistant" ? "#11263C" : "#ECF0F3",
                   },
                 ]}
               >
@@ -99,8 +102,6 @@ const styles = StyleSheet.create({
   },
   messageContainer: {
     alignSelf: "flex-end",
-    maxHeight: NAVIGATION_BOTTOM_TABS_HEIGHT,
-    minHeight: "auto",
     maxWidth: (SCREEN_WIDTH * 3) / 4,
     padding: 10,
     borderRadius: 10,

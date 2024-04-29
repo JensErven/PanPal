@@ -1,13 +1,29 @@
-import { View, Pressable, StyleSheet, Text } from "react-native";
+import { View, StyleSheet, Text, TouchableOpacity } from "react-native";
 import React from "react";
 import { Stack, router } from "expo-router";
-
+import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
-import { useColorScheme } from "@/components/useColorScheme";
+import {
+  BUTTON_HEIGHT_LARGE,
+  BUTTON_HEIGHT_MEDIUM,
+  ICON_SIZE_MEDIUM,
+  NAVIGATION_BOTTOM_TABS_HEIGHT,
+  SCREEN_WIDTH,
+} from "@/constants/ScreenParams";
+import HeaderStandard from "@/components/shared/HeaderStandard";
 import Colors from "@/constants/Colors";
-const NAVIGATION_BOTTOM_TABS_HEIGHT = 67; // Adjust as needed
 const HomeLayout = () => {
-  const colorScheme = useColorScheme();
+  // give components to the header as content prop
+  const children = (
+    <View style={styles.headerContainer}>
+      <TouchableOpacity
+        style={styles.profileButtonContainer}
+        onPress={() => router.navigate("profile")}
+      >
+        <Ionicons name="person" size={ICON_SIZE_MEDIUM} color={Colors.steel} />
+      </TouchableOpacity>
+    </View>
+  );
 
   return (
     <Stack>
@@ -17,31 +33,14 @@ const HomeLayout = () => {
           title: "Home",
           headerShown: true,
           header: () => (
-            <View style={styles.headerContainer}>
-              <Text>Home</Text>
-            </View>
-          ),
-          headerRight: () => (
-            <View style={styles.headerRightContainer}>
-              <Pressable
-                onPress={() => router.push("/(app)/(tabs)/(home)/profile")}
-              >
-                {({ pressed }) => (
-                  <Ionicons
-                    name="person-circle"
-                    size={25}
-                    color={Colors[colorScheme ?? "light"].text}
-                    style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
-                  />
-                )}
-              </Pressable>
-            </View>
+            <HeaderStandard
+              screenTitle={"home"}
+              hasGoBackButton={false}
+              children={children}
+            ></HeaderStandard>
           ),
         }}
       />
-      <Stack.Screen name="settings" options={{ title: "Settings" }} />
-      <Stack.Screen name="profile" options={{ title: "Profile" }} />
-      <Stack.Screen name="preferences" options={{ title: "Preferences" }} />
     </Stack>
   );
 };
@@ -49,17 +48,40 @@ const HomeLayout = () => {
 export default HomeLayout;
 
 const styles = StyleSheet.create({
-  headerRightContainer: {
-    flexDirection: "row",
+  container: {
+    backgroundColor: "transparent",
+    paddingHorizontal: 15,
+    width: SCREEN_WIDTH,
+    display: "flex",
     alignItems: "center",
+    flexDirection: "row",
+    justifyContent: "space-between",
   },
   headerContainer: {
-    backgroundColor: "#dde1e7",
-    paddingHorizontal: 15,
+    width: "100%",
+    display: "flex",
+    height: NAVIGATION_BOTTOM_TABS_HEIGHT,
     justifyContent: "space-between",
     flexDirection: "row",
     alignItems: "center",
-    width: "100%",
-    height: NAVIGATION_BOTTOM_TABS_HEIGHT,
+    columnGap: 15,
+  },
+  profileButtonContainer: {
+    display: "flex",
+
+    justifyContent: "center",
+    alignItems: "center",
+    width: BUTTON_HEIGHT_MEDIUM,
+    height: BUTTON_HEIGHT_MEDIUM,
+    borderRadius: BUTTON_HEIGHT_MEDIUM / 2,
+    shadowColor: Colors.midnight,
+    backgroundColor: Colors.pearl,
+    shadowOffset: {
+      width: 0,
+      height: 7,
+    },
+    shadowOpacity: 0.5,
+    shadowRadius: 25,
+    elevation: 2,
   },
 });

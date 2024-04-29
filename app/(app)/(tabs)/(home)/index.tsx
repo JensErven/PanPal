@@ -1,10 +1,6 @@
 import { View, Text, StyleSheet } from "react-native";
 import React, { useState } from "react";
-import { Link, router } from "expo-router";
-import RoundButton from "@/components/shared/roundButton";
-import { Svg, Path } from "react-native-svg";
-import { line, curveBasis } from "d3-shape";
-import PanPalButtonRounded from "@/components/shared/panpal/PanPalButtonRounded";
+import { router } from "expo-router";
 
 const HomeScreen = () => {
   const [buttonClicked, setButtonClicked] = useState(false);
@@ -19,22 +15,19 @@ const HomeScreen = () => {
     // Perform different actions based on buttonId
     if (buttonId === "generate") {
       setButtonClicked(!buttonClicked);
-      router.push("/(app)/(generate)");
+      router.navigate("generate");
       // Handle generate button click
       console.log("Generate button clicked");
     } else if (buttonId === "add") {
       // Handle add button click
       setShowAddOptionButtons(!showAddOptionButtons);
     } else if (buttonId === "custom recipe") {
-      router.push("/(app)/(add)/customRecipe");
+      router.navigate("customRecipe");
     } else return;
   };
   return (
     <View style={styles.container}>
       <Text>Page</Text>
-      <Link href={"/(app)/modal"}>
-        <Text>Go to profile</Text>
-      </Link>
 
       {/* <View style={styles.roundedButtonContainer}>
         {!showAddOptionButtons && (
