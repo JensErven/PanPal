@@ -71,7 +71,7 @@ const Home = () => {
       <CustomHeader
         isTransparent={true}
         hasGoBack={false}
-        headerTitle={"Saved"}
+        headerTitle={"Home"}
         children={tastPreferencesChildren()}
       />
       <LinearGradient

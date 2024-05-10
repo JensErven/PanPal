@@ -1,50 +1,32 @@
+import { View, Text, TouchableOpacity } from "react-native";
 import React from "react";
-import { Stack } from "expo-router";
-import HeaderStandard from "@/components/shared/HeaderStandard";
+import { Stack, router } from "expo-router";
+import CustomHeader from "@/components/CustomHeader";
+import { Ionicons } from "@expo/vector-icons";
 
-const AddLayout = () => {
+const _layout = () => {
   return (
-    <Stack initialRouteName="index">
+    <Stack screenOptions={{ headerShown: true }}>
+      <Stack.Screen
+        name="tastePreferences"
+        options={{
+          headerShown: false,
+        }}
+      />
       <Stack.Screen
         name="index"
         options={{
-          presentation: "modal",
-          animation: "slide_from_right",
-          headerShown: true,
-
-          header: () => (
-            <HeaderStandard screenTitle={"profile"} hasGoBackButton={true} />
-          ),
+          headerShown: false,
         }}
       />
       <Stack.Screen
-        name="preferences"
+        name="edit"
         options={{
-          presentation: "modal",
-          animation: "slide_from_right",
-          headerShown: true,
-          header: () => (
-            <HeaderStandard
-              screenTitle={"preferences"}
-              hasGoBackButton={true}
-            />
-          ),
-        }}
-      />
-      <Stack.Screen
-        name="settings"
-        options={{
-          presentation: "modal",
-          animation: "slide_from_right",
-          headerShown: true,
-
-          header: () => (
-            <HeaderStandard screenTitle={"settings"} hasGoBackButton={true} />
-          ),
+          headerShown: false,
         }}
       />
     </Stack>
   );
 };
 
-export default AddLayout;
+export default _layout;

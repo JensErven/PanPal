@@ -1,57 +1,38 @@
-import { View, Text, Pressable, StyleSheet } from "react-native";
+import { View, Text } from "react-native";
 import React from "react";
-import { useSession } from "@/context/auth";
-import { Stack, Redirect, router } from "expo-router";
-import { Ionicons } from "@expo/vector-icons";
-import { useColorScheme } from "@/components/useColorScheme";
-import Colors from "@/constants/Colors";
-export default function AppEntry() {
-  const { session, isLoading } = useSession();
-  const colorScheme = useColorScheme();
+import { Stack } from "expo-router";
+import CustomHeader from "@/components/CustomHeader";
 
-  if (isLoading) {
-    return <Text>Loading....</Text>;
-  }
-
-  if (!session) {
-    return <Redirect href="/login" />;
-  }
-
+const _layout = () => {
   return (
     <Stack>
-      <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
       <Stack.Screen
-        name="add"
+        name="(tabs)"
         options={{
           headerShown: false,
-          title: "Add custom recipe",
-          presentation: "modal",
-          animation: "slide_from_bottom",
         }}
-      ></Stack.Screen>
+      />
       <Stack.Screen
-        name="generate"
+        name="panpal"
         options={{
-          presentation: "modal",
           headerShown: false,
-          animation: "slide_from_bottom",
         }}
-      ></Stack.Screen>
+      />
       <Stack.Screen
-        name="profile"
+        name="recipe"
         options={{
-          presentation: "modal",
           headerShown: false,
-          animation: "slide_from_right",
         }}
-      ></Stack.Screen>
+      />
+      <Stack.Screen
+        name="(welcome)"
+        options={{
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen name="profile" options={{ headerShown: false }} />
     </Stack>
   );
-}
+};
 
-const styles = StyleSheet.create({
-  headerRightContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-});
+export default _layout;
