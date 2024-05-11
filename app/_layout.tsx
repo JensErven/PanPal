@@ -14,6 +14,11 @@ import { View, StyleSheet } from "react-native";
 import { AuthContextProvider, useAuth } from "@/context/authContext";
 import { LinearGradient } from "expo-linear-gradient";
 import Colors from "@/constants/Colors";
+import { PlusButtonProvider } from "@/context/PlusButtonContext";
+import BottomSheet from "@gorhom/bottom-sheet/lib/typescript/components/bottomSheet/BottomSheet";
+import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { ActiveTabContextProvider } from "@/context/activeTabContext";
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -87,7 +92,13 @@ function RootLayoutNav() {
 
   return (
     <AuthContextProvider>
-      <MainLayout />
+      <ActiveTabContextProvider>
+        <GestureHandlerRootView>
+          <PlusButtonProvider>
+            <MainLayout />
+          </PlusButtonProvider>
+        </GestureHandlerRootView>
+      </ActiveTabContextProvider>
     </AuthContextProvider>
   );
 }

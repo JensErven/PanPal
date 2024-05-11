@@ -1,11 +1,10 @@
-import React, { useState } from "react";
-import { View, StyleSheet, TouchableOpacity, Text } from "react-native";
+import React, { useEffect } from "react";
+import { View, StyleSheet, TouchableOpacity } from "react-native";
 import { router } from "expo-router";
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
   withSpring,
-  withTiming,
 } from "react-native-reanimated";
 import { TabBarItem } from "@/models/TabBarItem";
 import { Ionicons } from "@expo/vector-icons";
@@ -15,24 +14,40 @@ import {
 } from "react-native-responsive-screen";
 import Colors from "@/constants/Colors";
 import { LinearGradient } from "expo-linear-gradient";
+import { usePlusButton } from "@/context/PlusButtonContext";
+
+import { useActiveTab } from "@/context/activeTabContext";
 
 const CustomTabBar = ({ tabs }: { tabs: TabBarItem[] }) => {
-  const [activeTab, setActiveTab] = useState<number>(0);
-  const [isPlusButtonPressed, setIsPlusButtonPressed] =
-    useState<boolean>(false);
+  const { setActiveTab, activeTab } = useActiveTab();
+  const { isPlusButtonPressed, setIsPlusButtonPressed } = usePlusButton();
+
+  // animating values
   const rotation = useSharedValue(0);
+
+  // function to handle tab press
   const handleTabPress = (index: number) => {
     router.navigate(tabs[index].routeName);
     setActiveTab(index);
   };
 
+  // function to handle plus button press
   const handlePlusButtonPress = () => {
-    setIsPlusButtonPressed(!isPlusButtonPressed);
+    setIsPlusButtonPressed((prev) => !prev);
     rotation.value = withSpring(isPlusButtonPressed ? 0 : 1, {
       damping: 10,
       stiffness: 100,
     });
   };
+
+  useEffect(() => {
+    rotation.value = withSpring(isPlusButtonPressed ? 1 : 0, {
+      damping: 10,
+      stiffness: 100,
+    });
+  }, [isPlusButtonPressed]);
+
+  // animated styles
   const rotateCross = useAnimatedStyle(() => {
     return {
       transform: [
@@ -41,8 +56,9 @@ const CustomTabBar = ({ tabs }: { tabs: TabBarItem[] }) => {
       ],
     };
   });
+
   return (
-    <View style={styles.container}>
+    <Animated.View style={[styles.container]}>
       <LinearGradient
         colors={[
           Colors.light.components.button.purple.background[0],
@@ -63,6 +79,7 @@ const CustomTabBar = ({ tabs }: { tabs: TabBarItem[] }) => {
           </Animated.View>
         </TouchableOpacity>
       </LinearGradient>
+
       <View style={styles.tabContainer}>
         {tabs.map((tab, index) => (
           <LinearGradient
@@ -115,18 +132,21 @@ const CustomTabBar = ({ tabs }: { tabs: TabBarItem[] }) => {
           </LinearGradient>
         ))}
       </View>
-    </View>
+    </Animated.View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
+    borderTopWidth: 1,
+    borderColor: Colors.secondaryWhite,
+    backgroundColor: Colors.white,
     flexDirection: "row",
     justifyContent: "space-between",
-    backgroundColor: Colors.white,
     paddingHorizontal: wp(4),
     height: hp(8),
     width: wp(100),
+    zIndex: 50,
   },
   tabContainer: {
     backgroundColor: "transparent",

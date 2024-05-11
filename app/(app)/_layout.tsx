@@ -21,6 +21,7 @@ const _layout = () => {
       <Stack.Screen
         name="recipe"
         options={{
+          animation: "slide_from_bottom",
           headerShown: false,
         }}
       />
@@ -30,7 +31,10 @@ const _layout = () => {
           headerShown: false,
         }}
       />
-      <Stack.Screen name="profile" options={{ headerShown: false }} />
+      <Stack.Screen
+        name="profile"
+        options={{ headerShown: false, animation: "slide_from_right" }}
+      />
     </Stack>
   );
 };

@@ -26,7 +26,7 @@ const StandardButton = ({
   textColor?: string;
   borderColor?: string;
   icon?: React.ReactNode;
-  shadowColor: string;
+  shadowColor?: string;
   isDisabled?: boolean;
   loading?: boolean;
   clickHandler: () => void;
@@ -67,6 +67,7 @@ const StandardButton = ({
                 color: textColor,
                 fontFamily: Fonts.text_1.fontFamily,
                 fontSize: Fonts.text_1.fontSize,
+                textTransform: "capitalize",
               }}
             >
               {textValue}

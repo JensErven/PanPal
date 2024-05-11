@@ -2,17 +2,14 @@ import { View, Text } from "react-native";
 import React from "react";
 import { Slot } from "expo-router";
 import CustomHeader from "@/components/CustomHeader";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 
 const _layout = () => {
   return (
-    <>
-      <CustomHeader
-        headerTitle={"add"}
-        hasGoBack={true}
-        isTransparent={false}
-      />
+    <BottomSheetModalProvider>
       <Slot initialRouteName="add" />
-    </>
+    </BottomSheetModalProvider>
   );
 };
 

@@ -18,7 +18,7 @@ import { StatusBar } from "expo-status-bar";
 import { blurhash } from "@/utils/common";
 import { Ionicons } from "@expo/vector-icons";
 
-const Home = () => {
+const Saved = () => {
   const { user } = useContext<any>(AuthContext);
 
   // const handleLogout = async () => {
@@ -90,7 +90,7 @@ const Home = () => {
   );
 };
 
-export default Home;
+export default Saved;
 
 const styles = StyleSheet.create({
   gradientBackground: {
