@@ -7,14 +7,13 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
-import StandardButton from "@/components/StandardButton";
+import StandardButton from "@/components/buttons/StandardButton";
 import ComponentParams from "@/constants/ComponentParams";
 import { router } from "expo-router";
 import Fonts from "@/constants/Fonts";
 import CircularProgress from "@/components/ProgressBar";
-import PreferencesSelectCard from "@/components/PreferencesSelectCard";
+import PreferencesSelectCard from "@/components/cards/PreferencesSelectCard";
 import CustomKeyBoardView from "@/components/CustomKeyBoardView";
-import { storedUser } from "@/services/async-storage/user.services";
 import { allergyTypes } from "@/constants/tastePreferences/AllergyTypes";
 import { cuisineTypes } from "@/constants/tastePreferences/CuisineTypes";
 import { dislikedIngredientTypes } from "@/constants/tastePreferences/DislikedIngredientTypes";

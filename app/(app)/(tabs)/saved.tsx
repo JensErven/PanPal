@@ -1,11 +1,10 @@
-import { View, Text, Button, TouchableOpacity, StyleSheet } from "react-native";
-import React, { useContext, useEffect, useState } from "react";
+import { View, TouchableOpacity, StyleSheet } from "react-native";
+import React, { useContext } from "react";
 import { AuthContext } from "@/context/authContext";
 import { router } from "expo-router";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import CustomKeyBoardView from "@/components/CustomKeyBoardView";
 import { LinearGradient } from "expo-linear-gradient";
-import CustomHeader from "@/components/CustomHeader";
+import CustomHeader from "@/components/navigation/CustomHeader";
 import Colors from "@/constants/Colors";
 import { Image } from "expo-image";
 import Fonts from "@/constants/Fonts";
@@ -20,12 +19,6 @@ import { Ionicons } from "@expo/vector-icons";
 
 const Saved = () => {
   const { user } = useContext<any>(AuthContext);
-
-  // const handleLogout = async () => {
-  //   await storeUserTastePreferencesToFirebase(user.uid);
-  //   await AsyncStorage.removeItem("userTastePreferences");
-  //   await logout();
-  // };
 
   const handleNavigateToRecipe = async (recipeId: string) => {
     router.push({ pathname: `/recipe/details/`, params: { recipeId } });

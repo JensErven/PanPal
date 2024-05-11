@@ -1,8 +1,5 @@
-import { View, Text, TouchableOpacity } from "react-native";
 import React from "react";
-import { Stack, router } from "expo-router";
-import CustomHeader from "@/components/CustomHeader";
-import { Ionicons } from "@expo/vector-icons";
+import { Stack } from "expo-router";
 
 const _layout = () => {
   return (

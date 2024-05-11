@@ -1,22 +1,11 @@
-import {
-  View,
-  Text,
-  TextInput,
-  Image,
-  Pressable,
-  StyleSheet,
-  TouchableOpacity,
-  Alert,
-  ActivityIndicator,
-} from "react-native";
-import React, { useContext, useEffect } from "react";
+import { View, Text, TextInput, Image, StyleSheet, Alert } from "react-native";
+import React, { useContext } from "react";
 import { LinearGradient } from "expo-linear-gradient";
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
 import { StatusBar } from "expo-status-bar";
-import { SCREEN_HEIGHT, SCREEN_WIDTH } from "@/constants/ScreenParams";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import CustomKeyBoardView from "@/components/CustomKeyBoardView";
@@ -24,9 +13,8 @@ import { AuthContext } from "@/context/authContext";
 import Colors from "@/constants/Colors";
 import ComponentParams from "@/constants/ComponentParams";
 import Fonts from "@/constants/Fonts";
-import CustomHeader from "@/components/CustomHeader";
-import StandardButton from "@/components/StandardButton";
-import { auth } from "@/firebaseConfig";
+import CustomHeader from "@/components/navigation/CustomHeader";
+import StandardButton from "@/components/buttons/StandardButton";
 
 const ForgotPassword = () => {
   const { handleSendPasswordResetEmail } = useContext<any>(AuthContext);

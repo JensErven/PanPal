@@ -10,17 +10,15 @@ import {
 import React, { useContext, useMemo } from "react";
 import { LinearGradient } from "expo-linear-gradient";
 import CustomKeyBoardView from "@/components/CustomKeyBoardView";
-import StandardButton from "@/components/StandardButton";
 import Colors from "@/constants/Colors";
 import ComponentParams from "@/constants/ComponentParams";
 import Fonts from "@/constants/Fonts";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
 import { StatusBar } from "expo-status-bar";
-import CustomHeader from "@/components/CustomHeader";
+import CustomHeader from "@/components/navigation/CustomHeader";
 import { router } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { AuthContext } from "@/context/authContext";

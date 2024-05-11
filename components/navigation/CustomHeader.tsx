@@ -5,7 +5,7 @@ import {
   StyleSheet,
   TouchableOpacity,
 } from "react-native";
-import React, { useContext } from "react";
+import React from "react";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import {
   widthPercentageToDP as wp,
@@ -14,8 +14,6 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import Colors from "@/constants/Colors";
-import Svg, { Path } from "react-native-svg";
-import ComponentParams from "@/constants/ComponentParams";
 
 const ios = Platform.OS === "ios";
 

@@ -27,7 +27,7 @@ import CustomKeyBoardView from "@/components/CustomKeyBoardView";
 import { AuthContext } from "@/context/authContext";
 import { Image } from "expo-image";
 import { blurhash } from "@/utils/common";
-import CustomHeader from "@/components/CustomHeader";
+import CustomHeader from "@/components/navigation/CustomHeader";
 import { StatusBar } from "expo-status-bar";
 import { RecipeType } from "@/models/RecipeType";
 import BottomSheet, {
@@ -35,7 +35,7 @@ import BottomSheet, {
   BottomSheetModalProvider,
   BottomSheetView,
 } from "@gorhom/bottom-sheet";
-import StandardButton from "@/components/StandardButton";
+import StandardButton from "@/components/buttons/StandardButton";
 import { Picker } from "@react-native-picker/picker";
 import { recipeService } from "@/services/db/recipe.services";
 import { router } from "expo-router";

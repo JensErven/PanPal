@@ -1,11 +1,10 @@
-import { View, Text, Button, TouchableOpacity, StyleSheet } from "react-native";
+import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import React, { useContext, useEffect, useRef, useState } from "react";
 import { AuthContext } from "@/context/authContext";
 import { router } from "expo-router";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import CustomKeyBoardView from "@/components/CustomKeyBoardView";
 import { LinearGradient } from "expo-linear-gradient";
-import CustomHeader from "@/components/CustomHeader";
+import CustomHeader from "@/components/navigation/CustomHeader";
 import Colors from "@/constants/Colors";
 import { Image } from "expo-image";
 import Fonts from "@/constants/Fonts";
@@ -17,17 +16,10 @@ import {
 import { StatusBar } from "expo-status-bar";
 import { blurhash } from "@/utils/common";
 import { Ionicons } from "@expo/vector-icons";
-import {
-  BottomSheetModal,
-  BottomSheetModalProvider,
-} from "@gorhom/bottom-sheet";
-import {
-  GestureHandlerRootView,
-  TextInput,
-} from "react-native-gesture-handler"; // Import GestureHandlerRootView
-import bottomSheet from "@gorhom/bottom-sheet/lib/typescript/components/bottomSheet";
+import { BottomSheetModal } from "@gorhom/bottom-sheet";
+import { TextInput } from "react-native-gesture-handler"; // Import GestureHandlerRootView
 import { usePlusButton } from "@/context/PlusButtonContext";
-import StandardButton from "@/components/StandardButton";
+import StandardButton from "@/components/buttons/StandardButton";
 import PlusButtonContentView from "@/components/navigation/PlusButtonContentView";
 
 const Home = () => {
