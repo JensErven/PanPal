@@ -53,6 +53,18 @@ const _layout = () => {
           headerShown: false,
         }}
       />
+      <Tabs.Screen
+        name="groceries"
+        options={{
+          headerShown: false,
+        }}
+      />
+      <Tabs.Screen
+        name="notifications"
+        options={{
+          headerShown: false,
+        }}
+      />
     </Tabs>
   );
 };

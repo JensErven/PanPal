@@ -1,12 +1,16 @@
-import { View, TouchableOpacity, StyleSheet } from "react-native";
-import React, { useContext } from "react";
+import { View, StyleSheet, Text, ActivityIndicator } from "react-native";
+import React, {
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+  useCallback,
+  useRef,
+} from "react";
 import { AuthContext } from "@/context/authContext";
-import { router } from "expo-router";
 import CustomKeyBoardView from "@/components/CustomKeyBoardView";
 import { LinearGradient } from "expo-linear-gradient";
-import CustomHeader from "@/components/navigation/CustomHeader";
 import Colors from "@/constants/Colors";
-import { Image } from "expo-image";
 import Fonts from "@/constants/Fonts";
 import ComponentParams from "@/constants/ComponentParams";
 import {
@@ -14,42 +18,135 @@ import {
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
 import { StatusBar } from "expo-status-bar";
-import { blurhash } from "@/utils/common";
-import { Ionicons } from "@expo/vector-icons";
+import { RecipeType } from "@/models/RecipeType";
+import { collection, onSnapshot } from "firebase/firestore";
+import { db } from "@/firebaseConfig";
+import SearchBarHeader from "@/components/headers/SearchBarHeader";
+import FilterOptionButton from "@/components/buttons/FilterOptionButton";
+import { BottomSheetModal } from "@gorhom/bottom-sheet";
+import RecipesFilterSheetModal from "@/components/modals/RecipesFilterSheetModal";
+import { testRecipes as testRecipesData } from "@/constants/testData/testRecipes";
+import RecipeCard from "@/components/cards/RecipeCard";
+
+export type SavedRecipeType = {
+  id: string;
+  data: RecipeType;
+};
 
 const Saved = () => {
   const { user } = useContext<any>(AuthContext);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [initialRecipes, setInitialRecipes] = useState<SavedRecipeType[]>([]);
+  const [testRecipes, setTestRecipes] =
+    useState<SavedRecipeType[]>(testRecipesData);
+  const [filterOptions, setFilterOptions] = useState<string[]>([
+    "Meal types",
+    "Cuisines",
+    "Cook time",
+  ]);
+  const [selectedCuisineTypes, setSelectedCuisineTypes] = useState<string[]>(
+    []
+  );
+  const [selectedMealTypes, setSelectedMealTypes] = useState<string[]>([]);
+  const [selectedCookTime, setSelectedCookTime] = useState<string[]>([]);
+  const [searchInputValue, setSearchInputValue] = useState<string>("");
+  const recipesFilterSheetModal = useRef<BottomSheetModal>(null);
+  const filteredRecipes = useMemo(() => {
+    const joinesRecipesLists = [...initialRecipes];
+    return joinesRecipesLists.filter((recipe) => {
+      const cuisineType = recipe.data.cuisineType?.toLowerCase() ?? "";
+      const mealType = recipe.data.mealType?.toLowerCase() ?? "";
 
-  const handleNavigateToRecipe = async (recipeId: string) => {
-    router.push({ pathname: `/recipe/details/`, params: { recipeId } });
+      // transform all selected to lowercase
+
+      // Transform all selected options to lowercase
+
+      const selectedMealTypesLowerCase = selectedMealTypes.map((option) =>
+        option.toLowerCase()
+      );
+
+      const selectedCuisineTypesLowerCase = selectedCuisineTypes.map((option) =>
+        option.toLowerCase()
+      );
+
+      const isCuisineMatch =
+        selectedCuisineTypesLowerCase.length === 0 ||
+        selectedCuisineTypesLowerCase.includes(cuisineType);
+
+      const isMealMatch =
+        selectedMealTypesLowerCase.length === 0 ||
+        selectedMealTypesLowerCase.includes(mealType);
+
+      const isTitleMatch =
+        recipe.data && recipe.data.title
+          ? recipe.data.title
+              .toLowerCase()
+              .includes(searchInputValue.toLowerCase())
+          : false;
+
+      return isCuisineMatch && isMealMatch && isTitleMatch;
+    });
+  }, [
+    initialRecipes,
+    searchInputValue,
+    selectedCuisineTypes,
+    selectedMealTypes,
+  ]);
+
+  const handleOpenRecipesFilterModal = useCallback(() => {
+    recipesFilterSheetModal.current?.present();
+  }, []);
+
+  useEffect(() => {
+    const recipesRef = collection(db, "recipes");
+    setIsLoading(true);
+    const subscriber = onSnapshot(recipesRef, {
+      next: (querySnapshot) => {
+        const recipes: SavedRecipeType[] = [];
+        querySnapshot.forEach((doc) => {
+          recipes.push({ id: doc.id, data: doc.data() as RecipeType });
+        });
+        setInitialRecipes(recipes);
+        setIsLoading(false);
+      },
+    });
+    return () => subscriber();
+  }, []);
+
+  // useEffect(() => {
+  //   console.log("filteredRecipes", filteredRecipes);
+  // }, [filteredRecipes]);
+
+  const returnSelectedOptions = (option: string) => {
+    if (option === "Cuisines") {
+      return selectedCuisineTypes;
+    } else if (option === "Meal types") {
+      return selectedMealTypes;
+    } else if (option === "Cook time") {
+      return selectedCookTime;
+    }
+    return [];
   };
-
-  const tastPreferencesChildren = () => {
+  const searchBarHeaderChildren = () => {
     return (
       <>
-        {user && (
-          <TouchableOpacity
-            style={styles.headerRightButton}
-            onPress={() => {
-              router.push("/profile");
-            }}
-          >
-            {user.profileUrl ? (
-              <Image
-                style={styles.profileImage}
-                source={user.profileUrl ? user.profileUrl : blurhash}
-                placeholder={blurhash}
-                contentFit="cover"
-                transition={1000}
-              />
-            ) : (
-              <Ionicons name="person" size={hp(2.7)} color={Colors.white} />
-            )}
-          </TouchableOpacity>
-        )}
+        {filterOptions.map((option, index) => (
+          <FilterOptionButton
+            selectedOptions={returnSelectedOptions(option)}
+            key={index}
+            index={index}
+            option={option}
+            clickHandler={handleOpenRecipesFilterModal}
+          />
+        ))}
       </>
     );
   };
+
+  const handleSheetChanges = useCallback((index: number) => {
+    console.log("handleSheetChanges", index);
+  }, []);
+
   return (
     <LinearGradient
       style={styles.gradientBackground}
@@ -61,12 +158,23 @@ const Saved = () => {
       start={[0, 0]}
       end={[1, 0]}
     >
-      <CustomHeader
-        isTransparent={true}
-        hasGoBack={false}
-        headerTitle={"Saved"}
-        children={tastPreferencesChildren()}
+      <SearchBarHeader
+        searchInputValue={searchInputValue}
+        setSearchInputValue={setSearchInputValue}
+        children={searchBarHeaderChildren()}
       />
+      <RecipesFilterSheetModal
+        snapPoints={[hp(100)]}
+        bottomSheetModalRef={recipesFilterSheetModal}
+        handleSheetChanges={handleSheetChanges}
+        selectedCuisineTypes={selectedCuisineTypes}
+        setSelectedCuisineTypes={setSelectedCuisineTypes}
+        selectedMealTypes={selectedMealTypes}
+        setSelectedMealTypes={setSelectedMealTypes}
+        selectedCookTime={selectedCookTime}
+        setSelectedCookTime={setSelectedCookTime}
+      />
+
       <LinearGradient
         style={styles.container}
         colors={[Colors.white, "#DDEBF3"]}
@@ -75,8 +183,25 @@ const Saved = () => {
       >
         <CustomKeyBoardView>
           <StatusBar style="light" />
-
-          <View style={styles.content}></View>
+          {isLoading ? (
+            <ActivityIndicator
+              size={wp(15)}
+              style={{ padding: wp(5) }}
+              color={Colors.mediumBlue}
+            />
+          ) : (
+            <View style={styles.content}>
+              <>
+                {filteredRecipes.length === 0 ? (
+                  <Text style={styles.noContentText}>No recipes found</Text>
+                ) : (
+                  filteredRecipes?.map((recipe: SavedRecipeType) => (
+                    <RecipeCard key={recipe.id} recipe={recipe} />
+                  ))
+                )}
+              </>
+            </View>
+          )}
         </CustomKeyBoardView>
       </LinearGradient>
     </LinearGradient>
@@ -89,6 +214,7 @@ const styles = StyleSheet.create({
   gradientBackground: {
     flex: 1,
   },
+
   container: {
     overflow: "hidden",
     borderTopLeftRadius: hp(ComponentParams.button.height.medium),
@@ -96,11 +222,19 @@ const styles = StyleSheet.create({
     borderTopColor: Colors.darkBlue,
     borderTopWidth: wp(1),
   },
+  noContentText: {
+    fontFamily: Fonts.text_2.fontFamily,
+    fontSize: Fonts.text_2.fontSize,
+    color: Colors.lightGrey,
+    lineHeight: Fonts.text_2.lineHeight,
+    textAlign: "center",
+  },
   content: {
     borderTopLeftRadius: hp(ComponentParams.button.height.medium),
     flex: 1,
-    padding: wp(5),
-    gap: hp(4),
+    padding: wp(4),
+    gap: hp(2),
+    paddingBottom: hp(10),
   },
   headerRightButton: {
     backgroundColor: Colors.darkBlue,
@@ -121,84 +255,28 @@ const styles = StyleSheet.create({
     aspectRatio: 1,
     width: "100%",
     height: "100%",
-    borderRadius: hp(ComponentParams.button.height.small),
+    borderRadius: hp(ComponentParams.button.height.medium / 2),
   },
-  userName: {
-    fontSize: Fonts.heading_3.fontSize,
-    fontFamily: Fonts.heading_3.fontFamily,
-    lineHeight: Fonts.heading_3.lineHeight,
-    color: Colors.light.text,
-  },
-  userEmail: {
-    fontSize: Fonts.text_2.fontSize,
-    fontFamily: Fonts.text_2.fontFamily,
-    lineHeight: Fonts.text_2.lineHeight,
-    color: Colors.light.text,
-  },
-  tastePreferenceNoteContainer: {
+
+  inputGradientContainer: {
+    gap: wp(2),
     width: "100%",
-    padding: hp(2),
     display: "flex",
-    flexDirection: "column",
+    flexDirection: "row",
     justifyContent: "space-between",
-    alignItems: "flex-start",
-    borderRadius: hp(ComponentParams.button.height.small),
-    elevation: 5,
+    alignItems: "center",
+    minHeight: hp(ComponentParams.button.height.large),
+    paddingHorizontal: wp(4),
+    borderRadius: hp(ComponentParams.button.height.large),
+
+    // borderColor: Colors.white, // "#DDEBF3"
+    // borderWidth: 1,
   },
-  tastePreferenceNoteContent: {
-    width: "100%",
-    gap: hp(2.5),
-  },
-  title: {
-    fontFamily: Fonts.text_1.fontFamily,
-    fontSize: Fonts.text_1.fontSize,
-    color: Colors.light.text,
-    lineHeight: Fonts.text_1.lineHeight,
-  },
-  subTitle: {
-    lineHeight: Fonts.text_2.lineHeight,
+  input: {
     fontFamily: Fonts.text_2.fontFamily,
+    lineHeight: Fonts.text_2.lineHeight,
     fontSize: Fonts.text_2.fontSize,
-    color: Colors.darkBlue,
-  },
-  titleContainer: {
-    paddingLeft: hp(1),
-    width: "100%",
-    flexDirection: "column",
-    justifyContent: "flex-start",
-    display: "flex",
-    gap: wp(1),
-  },
-  alertButtonContainer: {
-    backgroundColor: Colors.darkBlue,
-    borderRadius: hp(ComponentParams.button.height.small / 2),
-    width: hp(ComponentParams.button.height.small),
-    height: hp(ComponentParams.button.height.small),
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  panpalCreditsButtonContainer: {
-    backgroundColor: Colors.light.components.button.gold.background[0], // Set the background color to represent a coin
-    borderRadius: hp(ComponentParams.button.height.small / 2), // Rounded border
-    width: hp(ComponentParams.button.height.small),
-    height: hp(ComponentParams.button.height.small),
-    justifyContent: "center",
-    alignItems: "center",
-    borderWidth: 2, // Border width
-    borderColor: Colors.light.components.button.gold.border, // Border color
-  },
-  panpalCreditsText: {
-    fontFamily: Fonts.text_1.fontFamily,
-    fontSize: Fonts.text_1.fontSize,
-    lineHeight: Fonts.text_1.lineHeight,
+    flex: 1,
     color: Colors.light.text,
-  },
-  panpalCreditsButtonText: {
-    textAlign: "center",
-    textTransform: "uppercase",
-    fontFamily: Fonts.text_1.fontFamily,
-    fontSize: Fonts.text_3.fontSize,
-    lineHeight: Fonts.text_3.lineHeight,
-    color: Colors.darkGold,
   },
 });

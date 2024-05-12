@@ -69,17 +69,19 @@ const tastePreferencesScreen = () => {
     const getPreferences = async () => {
       setIsLoading(true);
       const preferences = await AsyncStorage.getItem("userTastePreferences");
-      if (preferences) {
-        const parsedPreferences = JSON.parse(preferences);
-        setContentSteps((prev) =>
-          prev.map((step) => {
-            const selectedOptions = parsedPreferences.find(
-              (preference: preferenceType) => preference.title === step.title
-            )?.selectedOptions;
-            return { ...step, selectedOptions };
-          })
-        );
-      }
+      console.log("Preferences found:", preferences);
+      // if (preferences) {
+      //   console.log("Preferences found:", preferences);
+      //   const parsedPreferences = JSON.parse(preferences);
+      //   setContentSteps((prev) =>
+      //     prev.map((step) => {
+      //       const selectedOptions = parsedPreferences.find(
+      //         (preference: preferenceType) => preference.title === step.title
+      //       )?.selectedOptions;
+      //       return { ...step, selectedOptions };
+      //     })
+      //   );
+      // }
       setTimeout(() => {
         setIsLoading(false);
       }, 1000);

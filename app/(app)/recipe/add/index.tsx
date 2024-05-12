@@ -5,6 +5,7 @@ import {
   StyleSheet,
   TextInput,
   ActivityIndicator,
+  Alert,
 } from "react-native";
 import React, {
   useCallback,
@@ -62,6 +63,8 @@ const AddCustomRecipeScreen = () => {
     isCustom: true,
     isGenerated: false,
     uuid: user.userId,
+    mealType: "",
+    cuisineType: "",
   });
 
   // useStates and useMemos
@@ -89,25 +92,27 @@ const AddCustomRecipeScreen = () => {
     RecipeSelectOptions.servings,
     RecipeSelectOptions.prepTime,
     RecipeSelectOptions.cookTime,
+    RecipeSelectOptions.mealType,
+    RecipeSelectOptions.cuisineType,
   ]);
 
   const handleRecipeCreate = async () => {
     setIsLoading(true);
     const validateRecipe = () => {
       if (recipe.title === "") {
-        console.log("Title is required");
+        Alert.alert("Title is required");
         return false;
       }
       if (recipe.description === "") {
-        console.log("Description is required");
+        Alert.alert("Description is required");
         return false;
       }
       if (recipe.ingredients.length === 0) {
-        console.log("Ingredients are required");
+        Alert.alert("Ingredients are required");
         return false;
       }
       if (recipe.steps.length === 0) {
-        console.log("Steps are required");
+        Alert.alert("Steps are required");
         return false;
       }
       return true;
@@ -810,6 +815,34 @@ const AddCustomRecipeScreen = () => {
 
                 <Text style={styles.contentCardParagraph}>
                   How long does it take to cook this recipe?
+                </Text>
+              </View>
+
+              <View style={[styles.contentCardContainer, { display: "none" }]}>
+                <View className="flex flex-row justify-between items-center w-full">
+                  <Text style={styles.inputLabel}>
+                    {sheetModalContent[3].title}
+                  </Text>
+                  <TouchableOpacity
+                    className="flex flex-row items-center gap-x-1"
+                    onPress={() => {
+                      setSelectedSheetIndex(3);
+                      handlePresentModalPress();
+                    }}
+                  >
+                    <Text style={styles.servingCountText}>
+                      {recipe.mealType || "Select Meal Type"}
+                    </Text>
+                    <Ionicons
+                      name="chevron-down"
+                      size={hp(2.7)}
+                      color={Colors.darkBlue}
+                    />
+                  </TouchableOpacity>
+                </View>
+
+                <Text style={styles.contentCardParagraph}>
+                  {sheetModalContent[3].info}
                 </Text>
               </View>
             </View>

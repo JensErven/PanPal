@@ -17,6 +17,10 @@ import { LinearGradient } from "expo-linear-gradient";
 import { usePlusButton } from "@/context/PlusButtonContext";
 
 import { useActiveTab } from "@/context/activeTabContext";
+import StandardButton from "../buttons/StandardButton";
+import ComponentParams from "@/constants/ComponentParams";
+import PlusButtonContentView from "./PlusButtonContentView";
+import FloatingPanPalButton from "../buttons/FloatingPanPalButton";
 
 const CustomTabBar = ({ tabs }: { tabs: TabBarItem[] }) => {
   const { setActiveTab, activeTab } = useActiveTab();
@@ -57,82 +61,111 @@ const CustomTabBar = ({ tabs }: { tabs: TabBarItem[] }) => {
     };
   });
 
-  return (
-    <Animated.View style={[styles.container]}>
-      <LinearGradient
-        colors={[
-          Colors.light.components.button.purple.background[0],
-          Colors.light.components.button.purple.background[1],
-          Colors.light.components.button.purple.background[2],
-        ]}
-        start={[0, 0]}
-        end={[0.5, 1]}
-        style={styles.plusButtonGradientcontainer}
-      >
-        <TouchableOpacity
-          activeOpacity={1}
-          style={styles.plusButton}
-          onPress={handlePlusButtonPress}
-        >
-          <Animated.View style={rotateCross}>
-            <Ionicons name="add" size={hp(3.5)} color="white" />
-          </Animated.View>
-        </TouchableOpacity>
-      </LinearGradient>
-
-      <View style={styles.tabContainer}>
-        {tabs.map((tab, index) => (
-          <LinearGradient
-            style={[
-              styles.tabGradientContainer,
-              activeTab === tab.index
-                ? {
-                    borderColor:
-                      Colors.light.components.button.purple.background[0],
-                    borderWidth: 2,
-                    backgroundColor:
-                      Colors.light.components.button.purple.background[0],
-                  }
-                : {
-                    borderColor: Colors.light.components.button.white.border,
-                    borderWidth: 2,
-                    backgroundColor:
-                      Colors.light.components.button.white.background[1],
-                  },
-              index === 1 ? { marginRight: wp(7) } : null,
-              index === tabs.length - 2 ? { marginLeft: wp(7) } : null,
-            ]}
-            start={[0.5, 0]}
-            end={[0.5, 1]}
-            key={tab.index}
-            colors={
-              activeTab === tab.index
-                ? [
-                    Colors.light.components.button.purple.background[0],
-                    Colors.light.components.button.purple.background[1],
-                    Colors.light.components.button.purple.background[2],
-                  ]
-                : [
-                    Colors.light.components.button.white.background[1],
-                    Colors.light.components.button.white.background[0],
-                  ]
-            }
-          >
-            <TouchableOpacity
-              key={tab.index}
-              style={[styles.tab]}
-              onPress={() => handleTabPress(tab.index)}
-            >
-              <Ionicons
-                name={tab.icon}
-                size={hp(3)}
-                color={activeTab === tab.index ? Colors.white : "#A0B7D6"}
-              />
-            </TouchableOpacity>
-          </LinearGradient>
-        ))}
+  const plusButtonContent = () => {
+    return (
+      <View style={styles.plusButtonContentContainer}>
+        <StandardButton
+          icon={<Ionicons name="add" size={hp(3.5)} color={Colors.white} />}
+          textValue="add custom recipe"
+          clickHandler={() => {
+            setIsPlusButtonPressed(false);
+            router.push("/recipe/add");
+          }}
+          colors={[
+            Colors.light.components.button.purple.background[0],
+            Colors.light.components.button.purple.background[1],
+            Colors.light.components.button.purple.background[2],
+          ]}
+          textColor={Colors.white}
+          height={ComponentParams.button.height.medium}
+          borderColor={Colors.light.components.button.purple.border}
+        />
       </View>
-    </Animated.View>
+    );
+  };
+
+  return (
+    <>
+      {isPlusButtonPressed && (
+        <PlusButtonContentView children={plusButtonContent()} />
+      )}
+      <FloatingPanPalButton />
+      <View style={[styles.container]}>
+        <LinearGradient
+          colors={[
+            Colors.light.components.button.purple.background[0],
+            Colors.light.components.button.purple.background[1],
+            Colors.light.components.button.purple.background[2],
+          ]}
+          start={[0, 0]}
+          end={[0.5, 1]}
+          style={styles.plusButtonGradientcontainer}
+        >
+          <TouchableOpacity
+            activeOpacity={1}
+            style={styles.plusButton}
+            onPress={handlePlusButtonPress}
+          >
+            <Animated.View style={rotateCross}>
+              <Ionicons name="add" size={hp(3.5)} color="white" />
+            </Animated.View>
+          </TouchableOpacity>
+        </LinearGradient>
+
+        <View style={styles.tabContainer}>
+          {tabs.map((tab, index) => (
+            <LinearGradient
+              style={[
+                styles.tabGradientContainer,
+                activeTab === tab.index
+                  ? {
+                      borderColor:
+                        Colors.light.components.button.purple.background[0],
+                      borderWidth: 2,
+                      backgroundColor:
+                        Colors.light.components.button.purple.background[0],
+                    }
+                  : {
+                      borderColor: Colors.light.components.button.white.border,
+                      borderWidth: 2,
+                      backgroundColor:
+                        Colors.light.components.button.white.background[1],
+                    },
+                index === 1 ? { marginRight: wp(7) } : null,
+                index === tabs.length - 2 ? { marginLeft: wp(7) } : null,
+              ]}
+              start={[0.5, 0]}
+              end={[0.5, 1]}
+              key={tab.index}
+              colors={
+                activeTab === tab.index
+                  ? [
+                      Colors.light.components.button.purple.background[0],
+                      Colors.light.components.button.purple.background[1],
+                      Colors.light.components.button.purple.background[2],
+                    ]
+                  : [
+                      Colors.light.components.button.white.background[1],
+                      Colors.light.components.button.white.background[0],
+                    ]
+              }
+            >
+              <TouchableOpacity
+                key={tab.index}
+                style={[styles.tab]}
+                onPress={() => handleTabPress(tab.index)}
+              >
+                <Ionicons
+                  name={tab.icon}
+                  size={hp(3)}
+                  color={activeTab === tab.index ? Colors.white : "#A0B7D6"}
+                />
+              </TouchableOpacity>
+            </LinearGradient>
+          ))}
+        </View>
+      </View>
+    </>
   );
 };
 
@@ -196,6 +229,11 @@ const styles = StyleSheet.create({
     borderTopWidth: 0,
     borderLeftWidth: 1,
     backgroundColor: Colors.light.components.button.purple.background[0],
+  },
+  // plusButtonContent
+  plusButtonContentContainer: {
+    padding: wp(4),
+    gap: hp(2),
   },
 });
 

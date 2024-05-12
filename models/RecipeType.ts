@@ -12,4 +12,7 @@ export type RecipeType = {
   isCustom?: boolean; // is the recipe custom or from the database
   isGenerated?: boolean; // is the recipe generated or not
   uuid?: string; // unique identifier
+  createdAt?: string; // date string
+  cuisineType?: string; // cuisine type
+  mealType?: string; // meal type
 };

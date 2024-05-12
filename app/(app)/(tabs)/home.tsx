@@ -1,5 +1,5 @@
-import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
-import React, { useContext, useEffect, useRef, useState } from "react";
+import { View, TouchableOpacity, StyleSheet } from "react-native";
+import React, { useContext, useState } from "react";
 import { AuthContext } from "@/context/authContext";
 import { router } from "expo-router";
 import CustomKeyBoardView from "@/components/CustomKeyBoardView";
@@ -16,34 +16,12 @@ import {
 import { StatusBar } from "expo-status-bar";
 import { blurhash } from "@/utils/common";
 import { Ionicons } from "@expo/vector-icons";
-import { BottomSheetModal } from "@gorhom/bottom-sheet";
-import { TextInput } from "react-native-gesture-handler"; // Import GestureHandlerRootView
-import { usePlusButton } from "@/context/PlusButtonContext";
-import StandardButton from "@/components/buttons/StandardButton";
-import PlusButtonContentView from "@/components/navigation/PlusButtonContentView";
 
 const Home = () => {
-  const { isPlusButtonPressed, setIsPlusButtonPressed } = usePlusButton(); // Use the usePlusButton hook
   const [searchInputValue, setSearchInputValue] = useState<string>("");
   const { user } = useContext<any>(AuthContext);
-  // bottom sheet modal
-  const bottomSheetModalRef = useRef<BottomSheetModal>(null);
 
-  const snapPoints = [hp(25)];
-
-  const handleNavigateToRecipe = async (recipeId: string) => {
-    router.push({ pathname: `/recipe/details/`, params: { recipeId } });
-  };
-
-  useEffect(() => {
-    if (isPlusButtonPressed) {
-      bottomSheetModalRef.current?.present();
-    } else {
-      bottomSheetModalRef.current?.dismiss();
-    }
-  }, [isPlusButtonPressed]);
-
-  const tastPreferencesChildren = () => {
+  const customHeaderChildren = () => {
     return (
       <>
         {user && (
@@ -70,35 +48,8 @@ const Home = () => {
     );
   };
 
-  const plusButtonContent = () => {
-    return (
-      <View style={styles.plusButtonContentContainer}>
-        <StandardButton
-          icon={<Ionicons name="add" size={hp(3.5)} color={Colors.white} />}
-          textValue="add custom recipe"
-          clickHandler={() => {
-            setIsPlusButtonPressed(false);
-            router.push("/recipe/add");
-          }}
-          colors={[
-            Colors.light.components.button.purple.background[0],
-            Colors.light.components.button.purple.background[1],
-            Colors.light.components.button.purple.background[2],
-          ]}
-          textColor={Colors.white}
-          height={ComponentParams.button.height.medium}
-          borderColor={Colors.light.components.button.purple.border}
-        />
-      </View>
-    );
-  };
-
   return (
     <>
-      {isPlusButtonPressed && (
-        <PlusButtonContentView children={plusButtonContent()} />
-      )}
-
       <LinearGradient
         style={styles.gradientBackground}
         colors={[
@@ -114,7 +65,7 @@ const Home = () => {
           isTransparent={true}
           hasGoBack={false}
           headerTitle={"Home"}
-          children={tastPreferencesChildren()}
+          children={customHeaderChildren()}
         />
         <LinearGradient
           style={styles.container}
@@ -122,7 +73,7 @@ const Home = () => {
           start={[0.5, 0]}
           end={[0.5, 1]}
         >
-          <LinearGradient
+          {/* <LinearGradient
             style={styles.inputGradientContainer}
             colors={["#DDEBF3", "#DDEBF3"]}
             start={[0.5, 0]}
@@ -141,11 +92,9 @@ const Home = () => {
               placeholderTextColor="#A0B7D6"
               placeholder="search for recipes"
             />
-          </LinearGradient>
+          </LinearGradient> */}
           <CustomKeyBoardView>
-            <View style={styles.content}>
-              <Text>Test</Text>
-            </View>
+            <View style={styles.content}></View>
           </CustomKeyBoardView>
         </LinearGradient>
       </LinearGradient>

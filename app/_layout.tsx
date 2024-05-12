@@ -10,6 +10,7 @@ import { AuthContextProvider, useAuth } from "@/context/authContext";
 import { PlusButtonProvider } from "@/context/PlusButtonContext";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { ActiveTabContextProvider } from "@/context/activeTabContext";
+import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -85,9 +86,11 @@ function RootLayoutNav() {
     <AuthContextProvider>
       <ActiveTabContextProvider>
         <GestureHandlerRootView>
-          <PlusButtonProvider>
-            <MainLayout />
-          </PlusButtonProvider>
+          <BottomSheetModalProvider>
+            <PlusButtonProvider>
+              <MainLayout />
+            </PlusButtonProvider>
+          </BottomSheetModalProvider>
         </GestureHandlerRootView>
       </ActiveTabContextProvider>
     </AuthContextProvider>
