@@ -7,11 +7,10 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
-import StandardButton from "@/components/StandardButton";
+import StandardButton from "@/components/buttons/StandardButton";
 import ComponentParams from "@/constants/ComponentParams";
 import { router } from "expo-router";
 import Fonts from "@/constants/Fonts";
-import { blurhash } from "@/utils/common";
 
 const setPreferencesIntro = () => {
   return (

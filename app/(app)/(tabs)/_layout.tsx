@@ -1,16 +1,11 @@
-import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
-import React, { useContext } from "react";
-import { Stack, Tabs, router } from "expo-router";
-import CustomHeader from "@/components/CustomHeader";
-import { Image } from "expo-image";
-import { blurhash } from "@/utils/common";
-
+import { StyleSheet } from "react-native";
+import React from "react";
+import { Tabs } from "expo-router";
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
-import { Ionicons } from "@expo/vector-icons";
-import { AuthContext } from "@/context/authContext";
+
 import CustomTabBar from "@/components/navigation/CustomTabBar";
 import { TabBarItem } from "@/models/TabBarItem";
 
@@ -54,6 +49,18 @@ const _layout = () => {
       />
       <Tabs.Screen
         name="saved"
+        options={{
+          headerShown: false,
+        }}
+      />
+      <Tabs.Screen
+        name="groceries"
+        options={{
+          headerShown: false,
+        }}
+      />
+      <Tabs.Screen
+        name="notifications"
         options={{
           headerShown: false,
         }}

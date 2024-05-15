@@ -1,24 +1,16 @@
 import FontAwesome from "@expo/vector-icons/FontAwesome";
-import {
-  DarkTheme,
-  DefaultTheme,
-  ThemeProvider,
-} from "@react-navigation/native";
 import { useFonts } from "expo-font";
-import { Slot, Stack, useRouter, useSegments } from "expo-router";
+import { Slot, useRouter, useSegments } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
 
 import { useColorScheme } from "@/components/useColorScheme";
-import { View, StyleSheet } from "react-native";
+import { StyleSheet } from "react-native";
 import { AuthContextProvider, useAuth } from "@/context/authContext";
-import { LinearGradient } from "expo-linear-gradient";
-import Colors from "@/constants/Colors";
 import { PlusButtonProvider } from "@/context/PlusButtonContext";
-import BottomSheet from "@gorhom/bottom-sheet/lib/typescript/components/bottomSheet/BottomSheet";
-import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { ActiveTabContextProvider } from "@/context/activeTabContext";
+import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -94,9 +86,11 @@ function RootLayoutNav() {
     <AuthContextProvider>
       <ActiveTabContextProvider>
         <GestureHandlerRootView>
-          <PlusButtonProvider>
-            <MainLayout />
-          </PlusButtonProvider>
+          <BottomSheetModalProvider>
+            <PlusButtonProvider>
+              <MainLayout />
+            </PlusButtonProvider>
+          </BottomSheetModalProvider>
         </GestureHandlerRootView>
       </ActiveTabContextProvider>
     </AuthContextProvider>

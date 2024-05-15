@@ -7,15 +7,13 @@ import {
   StyleSheet,
   TouchableOpacity,
   Alert,
-  ActivityIndicator,
 } from "react-native";
-import React, { useContext, useEffect } from "react";
+import React, { useContext } from "react";
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
 import { StatusBar } from "expo-status-bar";
-import { SCREEN_HEIGHT, SCREEN_WIDTH } from "@/constants/ScreenParams";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import CustomKeyBoardView from "@/components/CustomKeyBoardView";
@@ -24,8 +22,7 @@ import Colors from "@/constants/Colors";
 import ComponentParams from "@/constants/ComponentParams";
 import { LinearGradient } from "expo-linear-gradient";
 import Fonts from "@/constants/Fonts";
-import { storedUser } from "@/services/async-storage/user.services";
-import StandardButton from "@/components/StandardButton";
+import StandardButton from "@/components/buttons/StandardButton";
 
 const SignUp = () => {
   const { register } = useContext<any>(AuthContext);

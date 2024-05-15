@@ -1,18 +1,15 @@
 import {
   View,
-  Text,
   StyleSheet,
   ActivityIndicator,
   TouchableOpacity,
 } from "react-native";
 import React, { useEffect } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import PreferencesSelectCard from "@/components/PreferencesSelectCard";
 import { preferenceType } from "@/models/PreferenceType";
 import { allergyTypes } from "@/constants/tastePreferences/AllergyTypes";
 import { cuisineTypes } from "@/constants/tastePreferences/CuisineTypes";
 import { dislikedIngredientTypes } from "@/constants/tastePreferences/DislikedIngredientTypes";
-import { preferenceOption } from "@/models/PreferenceOption";
 import { StatusBar } from "expo-status-bar";
 import {
   widthPercentageToDP as wp,
@@ -22,7 +19,7 @@ import CustomKeyBoardView from "@/components/CustomKeyBoardView";
 import { LinearGradient } from "expo-linear-gradient";
 import Colors from "@/constants/Colors";
 import TastePreferencesCard from "@/components/TastePreferencesCard";
-import CustomHeader from "@/components/CustomHeader";
+import CustomHeader from "@/components/navigation/CustomHeader";
 import { Ionicons } from "@expo/vector-icons";
 import ComponentParams from "@/constants/ComponentParams";
 
@@ -72,17 +69,19 @@ const tastePreferencesScreen = () => {
     const getPreferences = async () => {
       setIsLoading(true);
       const preferences = await AsyncStorage.getItem("userTastePreferences");
-      if (preferences) {
-        const parsedPreferences = JSON.parse(preferences);
-        setContentSteps((prev) =>
-          prev.map((step) => {
-            const selectedOptions = parsedPreferences.find(
-              (preference: preferenceType) => preference.title === step.title
-            )?.selectedOptions;
-            return { ...step, selectedOptions };
-          })
-        );
-      }
+      console.log("Preferences found:", preferences);
+      // if (preferences) {
+      //   console.log("Preferences found:", preferences);
+      //   const parsedPreferences = JSON.parse(preferences);
+      //   setContentSteps((prev) =>
+      //     prev.map((step) => {
+      //       const selectedOptions = parsedPreferences.find(
+      //         (preference: preferenceType) => preference.title === step.title
+      //       )?.selectedOptions;
+      //       return { ...step, selectedOptions };
+      //     })
+      //   );
+      // }
       setTimeout(() => {
         setIsLoading(false);
       }, 1000);

@@ -16,7 +16,7 @@ import {
 import CustomKeyBoardView from "@/components/CustomKeyBoardView";
 import { LinearGradient } from "expo-linear-gradient";
 import Colors from "@/constants/Colors";
-import CustomHeader from "@/components/CustomHeader";
+import CustomHeader from "@/components/navigation/CustomHeader";
 import { Ionicons } from "@expo/vector-icons";
 import { AuthContext } from "@/context/authContext";
 import { router } from "expo-router";
@@ -25,7 +25,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Image } from "expo-image";
 import { blurhash } from "@/utils/common";
 import Fonts from "@/constants/Fonts";
-import StandardButton from "@/components/StandardButton";
+import StandardButton from "@/components/buttons/StandardButton";
 
 const ProfileScreen = () => {
   const { user, logout, storeUserTastePreferencesToFirebase } =

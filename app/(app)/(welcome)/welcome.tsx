@@ -4,7 +4,6 @@ import { LinearGradient } from "expo-linear-gradient";
 import Colors from "@/constants/Colors";
 import ComponentParams from "@/constants/ComponentParams";
 import { router } from "expo-router";
-import { blurhash } from "@/utils/common";
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -12,13 +11,11 @@ import {
 import { StatusBar } from "expo-status-bar";
 import Fonts from "@/constants/Fonts";
 import { AuthContext } from "@/context/authContext";
-import { storedUser } from "@/services/async-storage/user.services";
-import StandardButton from "@/components/StandardButton";
+import StandardButton from "@/components/buttons/StandardButton";
 import Animated, {
   useSharedValue,
   withTiming,
   useAnimatedStyle,
-  Easing,
 } from "react-native-reanimated";
 const WelcomeScreen = () => {
   const { user } = useContext<any>(AuthContext);

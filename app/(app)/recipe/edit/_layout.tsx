@@ -3,7 +3,11 @@ import { Slot } from "expo-router";
 import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 
 const _layout = () => {
-  return <Slot initialRouteName="add" />;
+  return (
+    <BottomSheetModalProvider>
+      <Slot initialRouteName="edit" />
+    </BottomSheetModalProvider>
+  );
 };
 
 export default _layout;

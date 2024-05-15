@@ -1,7 +1,7 @@
 import { View, Text } from "react-native";
 import React from "react";
 import { Stack } from "expo-router";
-import CustomHeader from "@/components/CustomHeader";
+import CustomHeader from "@/components/navigation/CustomHeader";
 
 const _layout = () => {
   return (
@@ -10,9 +10,7 @@ const _layout = () => {
         name="chat"
         options={{
           title: "PanPal Chat",
-          header: () => (
-            <CustomHeader headerTitle={"PanPal Chat"} hasGoBack={true} />
-          ),
+          headerShown: false,
         }}
       />
     </Stack>

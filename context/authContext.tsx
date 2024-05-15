@@ -7,6 +7,7 @@ import {
   sendPasswordResetEmail,
   signInWithEmailAndPassword,
   signOut,
+  User,
 } from "firebase/auth";
 import {
   addDoc,

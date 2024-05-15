@@ -1,17 +1,14 @@
-import { View, Text } from "react-native";
 import React from "react";
 import { Slot } from "expo-router";
-import CustomHeader from "@/components/CustomHeader";
+import CustomHeader from "@/components/navigation/CustomHeader";
+import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 
 const _layout = () => {
   return (
     <>
-      <CustomHeader
-        headerTitle={"details"}
-        hasGoBack={true}
-        isTransparent={false}
-      />
-      <Slot initialRouteName="Details" />
+      <BottomSheetModalProvider>
+        <Slot initialRouteName="details" />
+      </BottomSheetModalProvider>
     </>
   );
 };

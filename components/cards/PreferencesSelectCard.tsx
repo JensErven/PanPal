@@ -9,7 +9,6 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import Colors from "@/constants/Colors";
-import { opacity } from "react-native-reanimated/lib/typescript/reanimated2/Colors";
 import ComponentParams from "@/constants/ComponentParams";
 import {
   widthPercentageToDP as wp,
@@ -17,7 +16,6 @@ import {
 } from "react-native-responsive-screen";
 import Fonts from "@/constants/Fonts";
 import { LinearGradient } from "expo-linear-gradient";
-import { allergyTypes } from "@/constants/tastePreferences/AllergyTypes";
 import { preferenceOption } from "@/models/PreferenceOption";
 
 const PreferencesSelectCard = ({
