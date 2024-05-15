@@ -29,8 +29,6 @@ const RecipesFilterSheetModal = ({
   setSelectedCuisineTypes,
   selectedMealTypes,
   setSelectedMealTypes,
-  selectedCookTime,
-  setSelectedCookTime,
 }: {
   children?: React.ReactNode;
   snapPoints: number[];
@@ -40,8 +38,6 @@ const RecipesFilterSheetModal = ({
   setSelectedCuisineTypes: React.Dispatch<React.SetStateAction<string[]>>;
   selectedMealTypes: string[];
   setSelectedMealTypes: React.Dispatch<React.SetStateAction<string[]>>;
-  selectedCookTime: string[];
-  setSelectedCookTime: React.Dispatch<React.SetStateAction<string[]>>;
 }) => {
   return (
     <BottomSheetModal
@@ -113,18 +109,6 @@ const RecipesFilterSheetModal = ({
                 updatedSelectedCuisineTypes.push(option);
               }
               setSelectedCuisineTypes(updatedSelectedCuisineTypes);
-            }}
-          />
-          <FilterOptionsSelectCard
-            options={cookTimeOptions}
-            title="Cook Time"
-            selectedOptions={selectedCookTime}
-            selectOption={(option) => {
-              if (selectedCookTime[0] === option) {
-                setSelectedCookTime([]);
-              } else {
-                setSelectedCookTime([option]);
-              }
             }}
           />
         </ScrollView>

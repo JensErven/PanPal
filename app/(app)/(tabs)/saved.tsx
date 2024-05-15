@@ -42,13 +42,11 @@ const Saved = () => {
   const [filterOptions, setFilterOptions] = useState<string[]>([
     "Meal types",
     "Cuisines",
-    "Cook time",
   ]);
   const [selectedCuisineTypes, setSelectedCuisineTypes] = useState<string[]>(
     []
   );
   const [selectedMealTypes, setSelectedMealTypes] = useState<string[]>([]);
-  const [selectedCookTime, setSelectedCookTime] = useState<string[]>([]);
   const [searchInputValue, setSearchInputValue] = useState<string>("");
   const recipesFilterSheetModal = useRef<BottomSheetModal>(null);
   const filteredRecipes = useMemo(() => {
@@ -145,8 +143,6 @@ const Saved = () => {
       return selectedCuisineTypes;
     } else if (option === "Meal types") {
       return selectedMealTypes;
-    } else if (option === "Cook time") {
-      return selectedCookTime;
     }
     return [];
   };
@@ -194,8 +190,6 @@ const Saved = () => {
         setSelectedCuisineTypes={setSelectedCuisineTypes}
         selectedMealTypes={selectedMealTypes}
         setSelectedMealTypes={setSelectedMealTypes}
-        selectedCookTime={selectedCookTime}
-        setSelectedCookTime={setSelectedCookTime}
       />
 
       <LinearGradient
@@ -257,7 +251,7 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: wp(4),
     gap: hp(2),
-    paddingBottom: hp(10),
+    paddingBottom: hp(14),
   },
   headerRightButton: {
     backgroundColor: Colors.darkBlue,

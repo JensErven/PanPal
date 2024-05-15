@@ -16,6 +16,7 @@ import {
 import { StatusBar } from "expo-status-bar";
 import { blurhash } from "@/utils/common";
 import { Ionicons } from "@expo/vector-icons";
+import UnderDevelopmentCard from "@/components/cards/UnderDevelopmentCard";
 
 const Home = () => {
   const [searchInputValue, setSearchInputValue] = useState<string>("");
@@ -73,28 +74,10 @@ const Home = () => {
           start={[0.5, 0]}
           end={[0.5, 1]}
         >
-          {/* <LinearGradient
-            style={styles.inputGradientContainer}
-            colors={["#DDEBF3", "#DDEBF3"]}
-            start={[0.5, 0]}
-            end={[0.5, 1]}
-          >
-            <Ionicons
-              name="search"
-              size={hp(2.7)}
-              style={{ width: hp(2.7), height: hp(2.7) }}
-              color="#A0B7D6"
-            />
-            <TextInput
-              onChangeText={(text) => setSearchInputValue(text)}
-              value={searchInputValue}
-              style={styles.input}
-              placeholderTextColor="#A0B7D6"
-              placeholder="search for recipes"
-            />
-          </LinearGradient> */}
           <CustomKeyBoardView>
-            <View style={styles.content}></View>
+            <View style={styles.content}>
+              <UnderDevelopmentCard featureName="home" />
+            </View>
           </CustomKeyBoardView>
         </LinearGradient>
       </LinearGradient>
@@ -109,7 +92,6 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   container: {
-    padding: wp(4),
     overflow: "hidden",
     borderTopLeftRadius: hp(ComponentParams.button.height.medium),
     flex: 1,

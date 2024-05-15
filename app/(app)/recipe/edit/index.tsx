@@ -12,6 +12,7 @@ import CustomKeyBoardView from "@/components/CustomKeyBoardView";
 
 import CustomHeader from "@/components/navigation/CustomHeader";
 import { StatusBar } from "expo-status-bar";
+import UnderDevelopmentCard from "@/components/cards/UnderDevelopmentCard";
 
 const AddCustomRecipeScreen = () => {
   return (
@@ -40,7 +41,9 @@ const AddCustomRecipeScreen = () => {
         >
           <StatusBar style="light" />
 
-          <View style={styles.content}></View>
+          <View style={styles.content}>
+            <UnderDevelopmentCard />
+          </View>
         </LinearGradient>
       </CustomKeyBoardView>
     </LinearGradient>

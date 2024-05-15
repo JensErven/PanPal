@@ -10,9 +10,7 @@ const _layout = () => {
         name="chat"
         options={{
           title: "PanPal Chat",
-          header: () => (
-            <CustomHeader headerTitle={"PanPal Chat"} hasGoBack={true} />
-          ),
+          headerShown: false,
         }}
       />
     </Stack>
