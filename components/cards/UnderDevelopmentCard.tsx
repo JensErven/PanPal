@@ -22,13 +22,14 @@ const UnderDevelopmentCard = ({ featureName }: { featureName?: string }) => {
     >
       <View style={styles.content}>
         <View style={styles.titleContainer}>
+          <Ionicons name="construct" size={hp(2.7)} color={Colors.darkBlue} />
           <Text style={styles.title}>Under Development</Text>
-          <Text style={styles.subTitle}>
-            {featureName
-              ? `The "${featureName}" feature is currently under development. Please check back later.`
-              : "This feature is currently under development. Please check back later."}
-          </Text>
         </View>
+        <Text style={styles.subTitle}>
+          {featureName
+            ? `The "${featureName}" feature is currently under development. Please check back later.`
+            : "This feature is currently under development. Please check back later."}
+        </Text>
       </View>
     </LinearGradient>
   );
@@ -62,10 +63,11 @@ const styles = StyleSheet.create({
   titleContainer: {
     paddingLeft: hp(1),
     width: "100%",
-    flexDirection: "column",
+    flexDirection: "row",
     justifyContent: "flex-start",
+    alignItems: "center",
+    gap: wp(2), // 8px (2dp
     display: "flex",
-    gap: wp(1),
   },
   subTitle: {
     lineHeight: Fonts.text_2.lineHeight,

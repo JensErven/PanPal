@@ -1,5 +1,5 @@
-import { View, StyleSheet, Text } from "react-native";
-import React from "react";
+import { View, StyleSheet, Text, ActivityIndicator } from "react-native";
+import React, { useEffect } from "react";
 import { LinearGradient } from "expo-linear-gradient";
 import CustomKeyBoardView from "@/components/CustomKeyBoardView";
 import CustomHeader from "@/components/navigation/CustomHeader";
@@ -15,41 +15,28 @@ import { Ionicons } from "@expo/vector-icons";
 import Fonts from "@/constants/Fonts";
 import { Message } from "@/models/Message";
 import ChatInputBar from "@/components/ChatInputBar";
+import { openaiServices } from "@/services/api/openai.services";
+import MessageCard from "@/components/MessageCard";
+import { blurhash } from "@/utils/common";
+import { Image } from "expo-image";
+import panPalIcon from "@/assets/images/panpal-icon-medium.png";
 
 const PanPalChatScreen = () => {
-  const messages: Message[] = [
-    { role: "system", content: "You are a helpful assistant." },
-    { role: "user", content: "Who won the world series in 2020?" },
-    {
-      role: "assistant",
-      content: "The Los Angeles Dodgers won the World Series in 2020.",
-    },
-    { role: "user", content: "Where was it played?" },
-    {
-      role: "assistant",
-      content: "The World Series was played at Globe Life Field in Texas.",
-    },
-    { role: "user", content: "Who was the MVP?" },
-    {
-      role: "assistant",
-      content:
-        "Corey Seager was named the MVP of the 2020 World Series. He batted .400 with 2 home runs and 5 RBIs.",
-    },
-    { role: "user", content: "Who won the World Series in 2021?" },
-    {
-      role: "assistant",
-      content: "The Atlanta Braves won the World Series in 2021.",
-    },
-    { role: "user", content: "Who was the MVP?" },
-    {
-      role: "assistant",
-      content:
-        "Jorge Soler was named the MVP of the 2021 World Series. He hit 3 home runs and had 6 RBIs.",
-    },
-  ];
+  const [messages, setMessages] = React.useState<Message[]>([]);
+  const [isLoading, setIsLoading] = React.useState<boolean>(false);
 
   const handleSendMessage = (message: Message) => {
     console.log(message);
+    setIsLoading(true);
+    setMessages((prevMessages) => [...prevMessages, message]); // Using callback form of setMessages
+    openaiServices.createCompletion([...messages, message]).then((response) => {
+      const chatCompletionMessage: Message = {
+        role: response.role,
+        content: response.content || "", // Ensure content is always a string
+      };
+      setMessages((prevMessages) => [...prevMessages, chatCompletionMessage]);
+      setIsLoading(false);
+    });
   };
 
   return (
@@ -77,45 +64,30 @@ const PanPalChatScreen = () => {
       >
         <CustomKeyBoardView>
           <View style={styles.content}>
-            {messages.map((message, index) => (
-              <View key={index}>
-                {message.role === "system" ? (
-                  <Text style={{ textAlign: "center" }}>{message.content}</Text>
-                ) : message.role === "user" ? (
-                  <View
-                    style={{
-                      backgroundColor:
-                        Colors.light.components.button.purple.background[0],
-                      padding: wp(3),
-                      borderRadius: hp(5),
-                      alignSelf: "flex-end",
-                    }}
-                  >
-                    <Text style={[{ color: Colors.white }, styles.messageText]}>
-                      {message.content}
-                    </Text>
-                  </View>
-                ) : (
-                  <View
-                    style={{
-                      backgroundColor:
-                        Colors.light.components.button.white.background[1],
-                      padding: wp(3),
-                      borderRadius: hp(5),
-                      alignSelf: "flex-start",
-                    }}
-                  >
-                    <Text style={{ color: Colors.darkBlue }}>
-                      {message.content}
-                    </Text>
-                  </View>
-                )}
+            {messages.length === 0 && (
+              <View style={styles.panPalGreeting}>
+                <Image
+                  style={styles.panpalImage}
+                  source={panPalIcon}
+                  placeholder={blurhash}
+                  contentFit="cover"
+                />
+                <Text style={styles.title}>
+                  Hi! I'm PanPal, your personal cooking assistant. I can help
+                  you with recipes, tips, and more. What would you like to know?
+                </Text>
               </View>
+            )}
+            {messages.map((message, index) => (
+              <MessageCard message={message} index={index} />
             ))}
+            {isLoading && (
+              <ActivityIndicator size="large" color={Colors.darkBlue} />
+            )}
           </View>
         </CustomKeyBoardView>
       </LinearGradient>
-      <ChatInputBar sendMessage={handleSendMessage} />
+      <ChatInputBar sendMessage={handleSendMessage} isLoading={isLoading} />
     </LinearGradient>
   );
 };
@@ -144,5 +116,24 @@ const styles = StyleSheet.create({
     fontSize: Fonts.text_2.fontSize,
     fontFamily: Fonts.text_2.fontFamily,
     lineHeight: Fonts.text_2.lineHeight,
+  },
+  panpalImage: {
+    width: wp(30),
+    height: wp(30),
+    alignSelf: "center",
+  },
+  title: {
+    width: wp(80),
+    fontSize: Fonts.text_1.fontSize,
+    fontFamily: Fonts.text_1.fontFamily,
+    lineHeight: Fonts.text_1.lineHeight,
+    color: Colors.darkBlue,
+    textAlign: "center",
+  },
+  panPalGreeting: {
+    justifyContent: "center",
+    alignItems: "center",
+    gap: hp(1),
+    marginTop: hp(4),
   },
 });

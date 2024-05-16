@@ -9,7 +9,6 @@ export type RecipeType = {
   cookTime?: number; // in minutes
   difficulty?: number; // 1-5
   servings?: number; // number of servings
-  isCustom?: boolean; // is the recipe custom or from the database
   isGenerated?: boolean; // is the recipe generated or not
   uuid?: string; // unique identifier
   createdAt?: string; // date string

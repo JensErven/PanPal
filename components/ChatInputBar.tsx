@@ -19,8 +19,10 @@ import { Message } from "@/models/Message";
 
 const ChatInputBar = ({
   sendMessage,
+  isLoading,
 }: {
   sendMessage: (message: Message) => void;
+  isLoading?: boolean;
 }) => {
   const [inputValue, setInputValue] = useState<string>("");
 
@@ -30,27 +32,39 @@ const ChatInputBar = ({
     setInputValue("");
   };
 
+  const handleAddImagePress = () => {
+    console.log("Add image pressed");
+  };
+
   return (
     <View style={styles.bottomChatbarContainer}>
       <LinearGradient
-        colors={[Colors.white, "#DDEBF3"]}
+        colors={["#DDEBF3", "#DDEBF3"]}
         style={styles.bottomChatbar}
       >
         <TextInput
+          editable={!isLoading}
           style={styles.textInput}
           placeholder="Type a message..."
           value={inputValue}
           onChangeText={(text) => setInputValue(text)}
+          placeholderTextColor="#A0B7D6"
         />
       </LinearGradient>
       <LinearGradient
         style={styles.sendButton}
-        colors={Colors.light.components.button.purple.background}
+        colors={[
+          Colors.light.components.button.purple.background[0],
+          Colors.light.components.button.purple.background[1],
+        ]}
       >
         <TouchableOpacity
-          disabled={!inputValue}
           onPress={handleSend}
-          style={styles.sendButtonInnerContainer}
+          style={{
+            flex: 1,
+            justifyContent: "center",
+            alignItems: "center",
+          }}
         >
           <Ionicons name="send" size={hp(2.7)} color={Colors.white} />
         </TouchableOpacity>
@@ -94,20 +108,19 @@ const styles = StyleSheet.create({
     color: Colors.darkBlue,
   },
   sendButton: {
+    display: "flex",
+    width: hp(ComponentParams.button.height.medium),
+    height: hp(ComponentParams.button.height.medium),
+    borderRadius: hp(ComponentParams.button.height.medium / 2),
     justifyContent: "center",
     alignItems: "center",
-    borderRadius: hp(ComponentParams.button.height.medium),
-    height: hp(ComponentParams.button.height.medium),
-    width: hp(ComponentParams.button.height.medium),
-    borderWidth: 2,
-    borderLeftWidth: 0,
-    borderRightWidth: 2,
-    borderColor: Colors.light.components.button.purple.background[0],
-    backgroundColor: Colors.light.components.button.purple.background[0],
   },
   sendButtonInnerContainer: {
     justifyContent: "center",
     alignItems: "center",
     flex: 1,
+  },
+  imageIconContainer: {
+    marginLeft: wp(2),
   },
 });

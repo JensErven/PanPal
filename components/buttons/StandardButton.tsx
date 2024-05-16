@@ -33,7 +33,7 @@ const StandardButton = ({
 }) => {
   return (
     <TouchableOpacity
-      disabled={loading}
+      disabled={isDisabled || loading}
       onPress={clickHandler}
       style={{
         borderRadius: hp(height),

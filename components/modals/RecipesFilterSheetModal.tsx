@@ -1,23 +1,17 @@
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import React from "react";
-import {
-  BottomSheetModal,
-  BottomSheetScrollView,
-  BottomSheetView,
-} from "@gorhom/bottom-sheet";
+import { BottomSheetModal, BottomSheetView } from "@gorhom/bottom-sheet";
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
 import Colors from "@/constants/Colors";
 import Fonts from "@/constants/Fonts";
-import { LinearGradient } from "expo-linear-gradient";
 import StandardButton from "../buttons/StandardButton";
 import ComponentParams from "@/constants/ComponentParams";
 import { cuisineTypes } from "@/constants/tastePreferences/CuisineTypes";
 import { mealTypes } from "@/constants/tastePreferences/MealTypes";
-import { cookTimeOptions } from "@/constants/filterOptions/CookTime";
-import FilterOptionsSelectCard from "../FilterOptionsSelectCard";
+import FilterOptionsSelectCard from "../cards/FilterOptionsSelectCard";
 import { ScrollView } from "react-native-gesture-handler";
 
 const RecipesFilterSheetModal = ({
