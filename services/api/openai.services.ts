@@ -16,14 +16,17 @@ const recipeExampleJson: recipeExampleJsonType = {
     "Ingredient 1 (e.g. 1 cup of flour)",
     "Ingredient 2 (e.g. 2 eggs), Ingredient 3 (e.g. 1 tsp of salt",
   ],
-  steps: ["very detailed step instruction", "very detailed step instruction"],
+  steps: [
+    "very detailed step instruction (e.g., Preheat the oven to 350°F) VERY IMPORTANT!: never give a step number or bulletpoint in the string answer",
+    "very details step instruction (e.g., Mix the flour and eggs) VERY IMPORTANT!: never give a step number or bulletpoint in the string answer",
+  ],
   servings:
     "number of servings, representing the number of people the recipe serves (e.g., 4)",
   prepTime: "number of minutes, representing the preparation time (e.g., 10)",
   cookTime: "number of minutes, representing the cooking time (e.g., 20)",
   extraTime: "number of minutes, representing the extra time (e.g., 5)",
   cuisineType:
-    "a string value representing the cuisine type (e.g., 🇳🇱 Dutch, 🇸🇰 Slovak, 🇧🇪 Belgian). VERY IMPORTANT!: Should always be in English.",
+    "a string value representing the cuisine type (e.g., 🇳🇱 Dutch, 🇸🇰 Slovak, 🇧🇪 Belgian). VERY IMPORTANT!: Should always be in English AND should ALWAYS add the country flag before the country name.",
   mealType:
     "a string value representing the meal type (available options: Breakfast, Lunch, Dinner, Snack, Dessert, Beverage, Appetizer, Main Course, Side Dish, Salad, Bread, Soup, Sauce, Marinade, Fingerfood, Drink). VERY IMPORTANT!: Should always be in English even if user asks in another language.",
   tips: ["Tip 1", "Tip 2"],
@@ -71,7 +74,6 @@ export const openaiServices = {
       response_format: { type: "json_object" },
       messages: [roleSystemPrompt, ...prompt],
     });
-    console.log("openai first response:" + response);
     return response.choices[0].message;
   },
 };

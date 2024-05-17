@@ -24,10 +24,12 @@ const SearchBarHeader = ({
   children,
   searchInputValue,
   setSearchInputValue,
+  showFilterModal,
 }: {
   children?: React.ReactNode;
   searchInputValue: string;
   setSearchInputValue: React.Dispatch<React.SetStateAction<string>>;
+  showFilterModal: () => void;
 }) => {
   const { top } = useSafeAreaInsets();
 
@@ -41,7 +43,16 @@ const SearchBarHeader = ({
         styles.container,
       ]}
     >
-      <View style={{ paddingHorizontal: wp(4) }}>
+      <View
+        style={{
+          paddingHorizontal: wp(4),
+          justifyContent: "space-between",
+          flexDirection: "row",
+          alignItems: "center",
+          width: "100%",
+          gap: wp(2),
+        }}
+      >
         <LinearGradient
           style={styles.inputGradientContainer}
           colors={["rgba(0, 0, 0, 0.2)", "rgba(0, 0, 0, 0.2)"]}
@@ -75,6 +86,9 @@ const SearchBarHeader = ({
             </TouchableOpacity>
           )}
         </LinearGradient>
+        <TouchableOpacity style={styles.filterButton} onPress={showFilterModal}>
+          <Ionicons name="filter" size={hp(2.7)} color={Colors.white} />
+        </TouchableOpacity>
       </View>
 
       <ScrollView
@@ -102,6 +116,7 @@ const styles = StyleSheet.create({
     gap: hp(1),
   },
   inputGradientContainer: {
+    flex: 1,
     gap: wp(2),
     width: "100%",
     display: "flex",
@@ -124,6 +139,14 @@ const styles = StyleSheet.create({
     color: Colors.white,
   },
   clearInputValueButton: {
+    height: hp(ComponentParams.button.height.medium),
+    width: hp(ComponentParams.button.height.medium),
+    borderRadius: hp(ComponentParams.button.height.medium / 2),
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.2)",
+  },
+  filterButton: {
     height: hp(ComponentParams.button.height.medium),
     width: hp(ComponentParams.button.height.medium),
     borderRadius: hp(ComponentParams.button.height.medium / 2),

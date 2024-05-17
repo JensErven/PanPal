@@ -32,6 +32,7 @@ const RecipeContent = ({ content }: { content: recipeExampleJsonType }) => {
       mealType: recipe.mealType.toLowerCase().trim(),
       uuid: user.userId,
       isGenerated: true,
+      createdAt: new Date().toISOString(),
     };
   };
 

@@ -64,6 +64,7 @@ const AddCustomRecipeScreen = () => {
     uuid: user.userId,
     mealType: "",
     cuisineType: "",
+    createdAt: new Date().toISOString(),
   });
 
   // useStates and useMemos

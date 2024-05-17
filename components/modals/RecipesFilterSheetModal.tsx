@@ -1,5 +1,13 @@
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
-import React from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Switch,
+  Animated,
+  Easing,
+} from "react-native";
+import React, { useRef } from "react";
 import { BottomSheetModal, BottomSheetView } from "@gorhom/bottom-sheet";
 import {
   widthPercentageToDP as wp,
@@ -13,6 +21,7 @@ import { cuisineTypes } from "@/constants/tastePreferences/CuisineTypes";
 import { mealTypes } from "@/constants/tastePreferences/MealTypes";
 import FilterOptionsSelectCard from "../cards/FilterOptionsSelectCard";
 import { ScrollView } from "react-native-gesture-handler";
+import { Ionicons } from "@expo/vector-icons";
 
 const RecipesFilterSheetModal = ({
   children,
@@ -23,6 +32,8 @@ const RecipesFilterSheetModal = ({
   setSelectedCuisineTypes,
   selectedMealTypes,
   setSelectedMealTypes,
+  setToShowRecipesType,
+  toShowRecipesType,
 }: {
   children?: React.ReactNode;
   snapPoints: number[];
@@ -32,7 +43,32 @@ const RecipesFilterSheetModal = ({
   setSelectedCuisineTypes: React.Dispatch<React.SetStateAction<string[]>>;
   selectedMealTypes: string[];
   setSelectedMealTypes: React.Dispatch<React.SetStateAction<string[]>>;
+  setToShowRecipesType: React.Dispatch<React.SetStateAction<string>>;
+  toShowRecipesType: string;
 }) => {
+  const rotateValue = useRef(new Animated.Value(0)).current;
+
+  const startIconRotateAnimation = () => {
+    rotateValue.setValue(0);
+    Animated.timing(rotateValue, {
+      toValue: 1,
+      duration: 500,
+      easing: Easing.linear,
+      useNativeDriver: true,
+    }).start();
+  };
+
+  const handleResetPress = () => {
+    setSelectedCuisineTypes([]);
+    setSelectedMealTypes([]);
+    setToShowRecipesType("All");
+    startIconRotateAnimation();
+  };
+
+  const rotate = rotateValue.interpolate({
+    inputRange: [0, 1],
+    outputRange: ["0deg", "360deg"],
+  });
   return (
     <BottomSheetModal
       backgroundStyle={styles.modalBackground}
@@ -42,7 +78,7 @@ const RecipesFilterSheetModal = ({
             <StandardButton
               textValue="Apply Filters"
               textColor={Colors.white}
-              height={ComponentParams.button.height.large}
+              height={ComponentParams.button.height.medium}
               colors={[
                 Colors.light.components.button.purple.background[0],
                 Colors.light.components.button.purple.background[1],
@@ -65,16 +101,40 @@ const RecipesFilterSheetModal = ({
         <View style={styles.filterHeaderContainer}>
           <Text style={styles.title}>Filter Options</Text>
           <TouchableOpacity
-            onPress={() => {
-              setSelectedCuisineTypes([]);
-              setSelectedMealTypes([]);
+            style={{
+              flexDirection: "row",
+              gap: wp(1),
+              justifyContent: "center",
+              alignItems: "center",
             }}
+            onPress={handleResetPress}
           >
-            <Text>Clear Filters</Text>
+            <Text style={{ color: Colors.mediumPurple }}>Reset</Text>
+            <Animated.View style={{ transform: [{ rotate }] }}>
+              <Ionicons
+                name="refresh"
+                size={hp(2.7)}
+                color={Colors.mediumPurple}
+              />
+            </Animated.View>
           </TouchableOpacity>
         </View>
 
-        <ScrollView style={styles.content}>
+        <ScrollView contentContainerStyle={styles.content}>
+          <FilterOptionsSelectCard
+            showCount={false}
+            options={["Generated", "Custom"]}
+            title="To Show Recipes"
+            selectedOptions={[toShowRecipesType]}
+            selectOption={(option) => {
+              const updatedToShowRecipesType = option;
+              if (updatedToShowRecipesType === toShowRecipesType) {
+                setToShowRecipesType("All");
+              } else {
+                setToShowRecipesType(updatedToShowRecipesType);
+              }
+            }}
+          />
           <FilterOptionsSelectCard
             options={mealTypes}
             title="Meal Types"
@@ -117,6 +177,13 @@ const styles = StyleSheet.create({
   modalBackground: {
     backgroundColor: Colors.white,
   },
+  inputLabel: {
+    textTransform: "capitalize",
+    fontFamily: Fonts.text_1.fontFamily,
+    fontSize: Fonts.text_1.fontSize,
+    color: Colors.darkBlue,
+    lineHeight: Fonts.text_1.lineHeight,
+  },
   backdrop: {
     position: "absolute",
     top: 0,
@@ -129,7 +196,7 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     flex: 1,
-    gap: hp(1),
+
     width: "100%",
   },
   filterHeaderContainer: {
@@ -138,22 +205,18 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingHorizontal: wp(4),
     paddingVertical: hp(2),
+    borderColor: Colors.secondaryWhite,
+    borderBottomWidth: hp(0.25),
   },
   footerContainer: {
-    paddingHorizontal: wp(4),
-    width: "100%",
-    height: hp(ComponentParams.button.height.large + 4),
-    paddingVertical: hp(2),
+    flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: Colors.white,
-    elevation: 10,
-    shadowColor: Colors.darkBlue,
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
+    width: "100%",
+    paddingHorizontal: wp(4),
+    paddingVertical: hp(1),
+    borderColor: Colors.secondaryWhite,
+    borderTopWidth: hp(0.25),
   },
   footerButton: {
     width: wp(90),
@@ -173,6 +236,7 @@ const styles = StyleSheet.create({
     color: Colors.darkBlue,
   },
   content: {
-    flex: 1,
+    gap: hp(2),
+    paddingVertical: hp(2),
   },
 });

@@ -1,28 +1,59 @@
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import React from "react";
+import { Message } from "@/models/Message";
+import { LinearGradient } from "expo-linear-gradient";
+import Colors from "@/constants/Colors";
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
-import { recipeOptionsExampleJsonType } from "@/models/openai/recipeOptionsExampleJsonType";
-import Fonts from "@/constants/Fonts";
-import Colors from "@/constants/Colors";
-import { LinearGradient } from "expo-linear-gradient";
 import ComponentParams from "@/constants/ComponentParams";
+import Fonts from "@/constants/Fonts";
 import { Ionicons } from "@expo/vector-icons";
+import { Image } from "expo-image";
+import { blurhash } from "@/utils/common";
 
-const RecipeOptionsContent = ({
+const IntroMessageCard = ({
+  image,
+  title,
+  text,
+  options,
+  index,
   selectOption,
-  content,
 }: {
-  selectOption: (option: string) => void;
-  content: recipeOptionsExampleJsonType;
+  image: string;
+  title: string;
+  text: string;
+  options: string[];
+  index: number;
+  selectOption: (message: Message) => void;
 }) => {
+  const handleSelectOption = (option: string) => {
+    const message: Message = {
+      role: "user",
+      content: option,
+    };
+    selectOption(message);
+  };
+
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>{content.intro}</Text>
+    <LinearGradient
+      colors={[...Colors.light.components.button.white.background]}
+      start={[0, 0]}
+      end={[1, 1]}
+      style={styles.container}
+    >
+      <View style={styles.introContainer}>
+        <Image source={image} placeholder={blurhash} style={styles.image} />
+        <View style={{ flex: 1 }}>
+          <Text style={styles.title}>{title}</Text>
+          <Text style={styles.text}>{text}</Text>
+        </View>
+      </View>
+
       <View style={styles.optionListContainer}>
-        {content.options.map((option: any, index: number) => (
+        <Text style={styles.title}>Select an option:</Text>
+        {options.map((option: any, index: number) => (
           <View key={index} style={styles.optionContainer}>
             <LinearGradient
               colors={Colors.light.components.button.purple.background}
@@ -33,7 +64,7 @@ const RecipeOptionsContent = ({
               <TouchableOpacity
                 style={styles.touchable}
                 key={index}
-                onPress={() => selectOption(option)}
+                onPress={() => handleSelectOption(option)}
               >
                 <Ionicons
                   name="checkmark"
@@ -46,19 +77,37 @@ const RecipeOptionsContent = ({
           </View>
         ))}
       </View>
-      <Text style={styles.text}>{content.callToAction}</Text>
-    </View>
+    </LinearGradient>
   );
 };
 
-export default RecipeOptionsContent;
+export default IntroMessageCard;
 
 const styles = StyleSheet.create({
   container: {
-    justifyContent: "center",
+    maxWidth: wp(80),
+    elevation: 3,
+    shadowColor: Colors.darkBlue,
+    backgroundColor: Colors.mediumPurple,
+    paddingHorizontal: wp(4),
+    paddingVertical: hp(2),
     alignItems: "flex-start",
-    gap: hp(2),
+    justifyContent: "flex-start",
+    borderRadius: hp(ComponentParams.button.height.small),
+    alignSelf: "flex-start",
+  },
+  introContainer: {
+    flexDirection: "row",
+    justifyContent: "flex-start",
+    alignItems: "flex-start",
+    gap: wp(2),
     width: "100%",
+    flexWrap: "wrap",
+  },
+  image: {
+    width: hp(ComponentParams.button.height.large),
+    height: hp(ComponentParams.button.height.large),
+    borderRadius: hp(ComponentParams.button.height.large),
   },
   title: {
     fontFamily: Fonts.text_1.fontFamily,
@@ -81,6 +130,7 @@ const styles = StyleSheet.create({
     flexWrap: "wrap",
     alignItems: "flex-start",
     width: "100%",
+    marginTop: hp(2),
   },
   optionContainer: {
     flexDirection: "row",

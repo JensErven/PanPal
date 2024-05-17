@@ -17,10 +17,20 @@ import RecipeContent from "./messageContent/RecipeContent";
 const MessageCard = ({
   message,
   index,
+  selectRecipeOption,
 }: {
   message: Message;
   index: number;
+  selectRecipeOption: (message: Message) => void;
 }) => {
+  const handleSelectRecipeOption = (option: string) => {
+    const message: Message = {
+      role: "user",
+      content: option,
+    };
+    selectRecipeOption(message);
+  };
+
   return (
     <View key={index}>
       {message.role === "system" ? (
@@ -49,7 +59,7 @@ const MessageCard = ({
           style={styles.assistantMessageContainer}
         >
           <View style={styles.messageContent}>
-            {renderContent(message.content)}
+            {renderContent(message.content, handleSelectRecipeOption)}
           </View>
         </LinearGradient>
       )}
@@ -57,10 +67,12 @@ const MessageCard = ({
   );
 };
 
-const renderContent = (content: string) => {
+const renderContent = (
+  content: string,
+  selectRecipeOption: (option: string) => void
+) => {
   if (typeof content === "string") {
     const parsedContent = JSON.parse(content);
-    console.log(parsedContent);
 
     // Check the type of content and render accordingly
     if (parsedContent.responseType === "recipe") {
@@ -68,7 +80,12 @@ const renderContent = (content: string) => {
     } else if (parsedContent.responseType === "tips") {
       return <TipsContent content={parsedContent} />;
     } else if (parsedContent.responseType === "recipeOptions") {
-      return <RecipeOptionsContent content={parsedContent} />;
+      return (
+        <RecipeOptionsContent
+          content={parsedContent}
+          selectOption={selectRecipeOption}
+        />
+      );
     } else if (parsedContent.responseType === "others") {
       return <OthersContent content={parsedContent} />;
     } else {
@@ -118,6 +135,7 @@ const styles = StyleSheet.create({
     width: "100%",
     justifyContent: "center",
     alignItems: "center",
+    flexWrap: "wrap",
   },
   messageText: {
     color: Colors.white,

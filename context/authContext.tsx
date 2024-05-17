@@ -7,17 +7,8 @@ import {
   sendPasswordResetEmail,
   signInWithEmailAndPassword,
   signOut,
-  User,
 } from "firebase/auth";
-import {
-  addDoc,
-  collection,
-  doc,
-  getDoc,
-  onSnapshot,
-  setDoc,
-  updateDoc,
-} from "firebase/firestore";
+import { doc, getDoc, onSnapshot, setDoc } from "firebase/firestore";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { preferenceType } from "@/models/PreferenceType";
 import { Alert, ToastAndroid } from "react-native";
