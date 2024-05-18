@@ -52,7 +52,7 @@ const IntroMessageCard = ({
       </View>
 
       <View style={styles.optionListContainer}>
-        <Text style={styles.title}>Select an option:</Text>
+        <Text style={styles.subTitle}>Select an option:</Text>
         {options.map((option: any, index: number) => (
           <View key={index} style={styles.optionContainer}>
             <LinearGradient
@@ -121,6 +121,12 @@ const styles = StyleSheet.create({
     color: Colors.darkBlue,
     lineHeight: Fonts.text_2.lineHeight,
     flex: 1,
+  },
+  subTitle: {
+    fontFamily: Fonts.QuickSandBold.fontFamily,
+    fontSize: Fonts.QuickSandBold.fontSize,
+    color: Colors.darkBlue,
+    lineHeight: Fonts.QuickSandBold.lineHeight,
   },
 
   optionListContainer: {

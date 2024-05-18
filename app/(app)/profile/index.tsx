@@ -28,7 +28,7 @@ import Fonts from "@/constants/Fonts";
 import StandardButton from "@/components/buttons/StandardButton";
 
 const ProfileScreen = () => {
-  const { user, logout, storeUserTastePreferencesToFirebase } =
+  const { user, logout, storeUserTastePreferencesToFirebase, credits } =
     useContext<any>(AuthContext);
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
   const [isBusinessModelOn, setIsBusinessModelOn] =
@@ -197,7 +197,7 @@ const ProfileScreen = () => {
                     <View className="flex w-full justify-between flex-row">
                       <Text style={styles.title}>Your PanPal Coins</Text>
                       <View className="flex flex-row gap-x-1 justify-center items-center">
-                        <Text style={styles.panpalCreditsText}>15</Text>
+                        <Text style={styles.panpalCreditsText}>{credits}</Text>
                         <LinearGradient
                           style={styles.panpalCreditsButtonContainer}
                           colors={[
@@ -214,7 +214,7 @@ const ProfileScreen = () => {
                     {isBusinessModelOn ? (
                       <>
                         <Text style={styles.subTitle}>
-                          Every day, your PanPal coins are reset to 15, which
+                          Every day, your PanPal coins are reset to 50, which
                           can be used for a variety of features such as
                           generating recipes, enhancing recipes, generating
                           recipe images, and more. In case your coins are fully
@@ -240,7 +240,7 @@ const ProfileScreen = () => {
                       </>
                     ) : (
                       <Text style={styles.subTitle}>
-                        Every day, your PanPal coins are reset to 15, which can
+                        Every day, your PanPal coins are reset to 50, which can
                         be used for a variety of features such as generating
                         recipes, enhancing recipes, generating recipe images,
                         and more. In case your coins are fully used up, you can

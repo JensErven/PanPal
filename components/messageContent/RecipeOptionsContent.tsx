@@ -1,5 +1,5 @@
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
-import React from "react";
+import React, { useEffect } from "react";
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -18,6 +18,10 @@ const RecipeOptionsContent = ({
   selectOption: (option: string) => void;
   content: recipeOptionsExampleJsonType;
 }) => {
+  useEffect(() => {
+    console.log(content);
+  }, [content]);
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>{content.intro}</Text>
@@ -61,10 +65,10 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   title: {
-    fontFamily: Fonts.text_1.fontFamily,
-    fontSize: Fonts.text_1.fontSize,
+    fontFamily: Fonts.QuickSandBold.fontFamily,
+    fontSize: Fonts.QuickSandBold.fontSize,
     color: Colors.darkBlue,
-    lineHeight: Fonts.text_1.lineHeight,
+    lineHeight: Fonts.QuickSandBold.lineHeight,
   },
   text: {
     fontFamily: Fonts.text_2.fontFamily,
@@ -106,9 +110,5 @@ const styles = StyleSheet.create({
     borderRadius: hp(ComponentParams.button.height.small),
     borderColor: Colors.darkBlue,
     borderWidth: 1,
-  },
-  optionText: {
-    color: Colors.white,
-    fontSize: Fonts.text_2.fontSize,
   },
 });

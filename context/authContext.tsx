@@ -8,7 +8,7 @@ import {
   signInWithEmailAndPassword,
   signOut,
 } from "firebase/auth";
-import { doc, getDoc, onSnapshot, setDoc } from "firebase/firestore";
+import { doc, getDoc, onSnapshot, setDoc, updateDoc } from "firebase/firestore";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { preferenceType } from "@/models/PreferenceType";
 import { Alert, ToastAndroid } from "react-native";
@@ -20,6 +20,7 @@ export const AuthContextProvider = ({ children }: { children: any }) => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | undefined>(
     undefined
   );
+  const [credits, setCredits] = useState<number>(0);
 
   useEffect(() => {
     // onAuthStateChanged
@@ -52,10 +53,28 @@ export const AuthContextProvider = ({ children }: { children: any }) => {
           userId: userId,
           bio: data?.bio,
           profileUrl: data?.profileUrl,
+          credits: data?.credits,
         });
+        setCredits(data?.credits || 0);
       }
     });
     return unsubscribe;
+  };
+
+  const subtractCredits = async (amount: number) => {
+    if (credits >= amount) {
+      const newCredits = credits - amount;
+      setCredits(newCredits);
+      if (user?.userId) {
+        const userDocRef = doc(db, "users", user.userId);
+        await updateDoc(userDocRef, { credits: newCredits });
+      }
+    } else {
+      Alert.alert(
+        "Insufficient credits",
+        "You do not have enough credits to perform this action."
+      );
+    }
   };
 
   const updateUserData = async (uid: string) => {
@@ -71,6 +90,7 @@ export const AuthContextProvider = ({ children }: { children: any }) => {
         bio: data?.bio,
         profileUrl: data?.profileUrl,
       });
+      setCredits(data?.credits || 0);
     }
   };
 
@@ -142,6 +162,7 @@ export const AuthContextProvider = ({ children }: { children: any }) => {
       setDoc(doc(db, "users", response?.user?.uid), {
         email,
         username,
+        credits: 50,
       });
       return { success: true, data: response.user };
     } catch (error: any) {
@@ -224,7 +245,9 @@ export const AuthContextProvider = ({ children }: { children: any }) => {
         login,
         logout,
         register,
+        subtractCredits,
         storeUserTastePreferencesToFirebase,
+        credits,
       }}
     >
       {children}

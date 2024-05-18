@@ -20,9 +20,11 @@ import { Message } from "@/models/Message";
 const ChatInputBar = ({
   sendMessage,
   isLoading,
+  isDisabled = false,
 }: {
   sendMessage: (message: Message) => void;
   isLoading?: boolean;
+  isDisabled: boolean;
 }) => {
   const [inputValue, setInputValue] = useState<string>("");
 
@@ -43,7 +45,7 @@ const ChatInputBar = ({
         style={styles.bottomChatbar}
       >
         <TextInput
-          editable={!isLoading}
+          editable={!isLoading && !isDisabled}
           style={styles.textInput}
           placeholder="Type a message..."
           value={inputValue}
@@ -59,6 +61,7 @@ const ChatInputBar = ({
         ]}
       >
         <TouchableOpacity
+          disabled={isLoading || isDisabled}
           onPress={handleSend}
           style={{
             flex: 1,
@@ -86,7 +89,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: wp(4),
     height: hp(8),
     width: wp(100),
-    zIndex: 50,
+    zIndex: 49,
     gap: wp(2),
   },
   bottomChatbar: {

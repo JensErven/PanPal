@@ -1,5 +1,5 @@
 import { View, Text, StyleSheet, ActivityIndicator } from "react-native";
-import React, { useContext } from "react";
+import React, { useContext, useEffect } from "react";
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -35,6 +35,10 @@ const RecipeContent = ({ content }: { content: recipeExampleJsonType }) => {
       createdAt: new Date().toISOString(),
     };
   };
+
+  useEffect(() => {
+    console.log(content);
+  }, [content]);
 
   const handleSaveRecipe = async (recipe: recipeExampleJsonType) => {
     setIsLoading(true);
@@ -197,10 +201,10 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   subTitle: {
-    fontFamily: Fonts.text_1.fontFamily,
-    fontSize: Fonts.text_2.fontSize,
+    fontFamily: Fonts.QuickSandBold.fontFamily,
+    fontSize: Fonts.QuickSandBold.fontSize,
     color: Colors.darkBlue,
-    lineHeight: Fonts.text_2.lineHeight,
+    lineHeight: Fonts.QuickSandBold.lineHeight,
   },
   timesItemsContainer: {
     flexDirection: "row",

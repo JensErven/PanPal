@@ -1,5 +1,5 @@
 import { View, Text, StyleSheet } from "react-native";
-import React from "react";
+import React, { useEffect } from "react";
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -9,6 +9,10 @@ import Fonts from "@/constants/Fonts";
 import Colors from "@/constants/Colors";
 import { tipsExampleJsonType } from "@/models/openai/tipsExampleJsonType";
 const TipsContent = ({ content }: { content: tipsExampleJsonType }) => {
+  useEffect(() => {
+    console.log(content);
+  }, [content]);
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>{content.intro}</Text>
@@ -33,10 +37,10 @@ const styles = StyleSheet.create({
     gap: hp(2),
   },
   title: {
-    fontFamily: Fonts.text_1.fontFamily,
-    fontSize: Fonts.text_1.fontSize,
+    fontFamily: Fonts.QuickSandBold.fontFamily,
+    fontSize: Fonts.QuickSandBold.fontSize,
     color: Colors.darkBlue,
-    lineHeight: Fonts.text_1.lineHeight,
+    lineHeight: Fonts.QuickSandBold.lineHeight,
   },
   text: {
     fontFamily: Fonts.text_2.fontFamily,

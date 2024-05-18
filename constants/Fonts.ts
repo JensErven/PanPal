@@ -46,4 +46,9 @@ export default {
     lineHeight: hp(2.3),
     fontFamily: "QuickSandLight",
   },
+  QuickSandBold: {
+    fontSize: wp(2.3 * 2),
+    lineHeight: hp(3.3),
+    fontFamily: "QuickSandBold",
+  },
 };

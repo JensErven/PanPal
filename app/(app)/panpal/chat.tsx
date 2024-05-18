@@ -4,8 +4,9 @@ import {
   Text,
   ActivityIndicator,
   ScrollView,
+  TouchableOpacity,
 } from "react-native";
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useMemo, useRef } from "react";
 import { LinearGradient } from "expo-linear-gradient";
 import CustomKeyBoardView from "@/components/CustomKeyBoardView";
 import CustomHeader from "@/components/navigation/CustomHeader";
@@ -29,9 +30,17 @@ import panPalIcon from "@/assets/images/panpal-icon-medium.png";
 import IntroMessageCard from "@/components/cards/IntroMessageCard";
 import { cuisineTypes } from "@/constants/tastePreferences/CuisineTypes";
 import { mealTypes } from "@/constants/tastePreferences/MealTypes";
+import PopUp from "@/components/modals/PopUp";
+import { AuthContext, useAuth } from "@/context/authContext";
 
 const PanPalChatScreen = () => {
+  const { credits, subtractCredits } = React.useContext<any>(AuthContext);
+
   const [messages, setMessages] = React.useState<Message[]>([]);
+  const [shouldShowCreditAlert, setShouldShowCreditAlert] =
+    React.useState<boolean>(false);
+  const [shouldShowCreditsInfoPopUp, setShouldShowCreditsInfoPopUp] =
+    React.useState<boolean>(false);
   const [randomIntro, setRandomIntro] = React.useState<{
     greeting: string;
     introText: string;
@@ -42,6 +51,10 @@ const PanPalChatScreen = () => {
   const scrollViewRef = useRef<ScrollView>(null);
 
   const handleSendMessage = (message: Message) => {
+    if (credits === 0) {
+      setShouldShowCreditAlert(true);
+      return;
+    }
     setIsLoading(true);
     setMessages((prevMessages) => [...prevMessages, message]); // Using callback form of setMessages
     openaiServices.createCompletion([...messages, message]).then((response) => {
@@ -49,6 +62,7 @@ const PanPalChatScreen = () => {
         role: response.role,
         content: response.content || "", // Ensure content is always a string
       };
+      subtractCredits(1);
       setMessages((prevMessages) => [...prevMessages, chatCompletionMessage]);
       setIsLoading(false);
     });
@@ -90,76 +104,127 @@ const PanPalChatScreen = () => {
     }
   }, [messages]);
 
+  useEffect(() => {
+    if (credits === 0) {
+      setShouldShowCreditAlert(true);
+    }
+  }, [credits]);
+
+  const handleCreditAlertClose = () => {
+    // Handle closing the credit alert
+    setShouldShowCreditAlert(false);
+  };
+
+  const handleCreditsInfoPopUpClose = () => {
+    // Handle closing the info pop up
+    setShouldShowCreditsInfoPopUp(false);
+  };
+
   return (
-    <LinearGradient
-      style={styles.gradientBackground}
-      colors={[
-        Colors.light.navHeader[0],
-        Colors.light.navHeader[1],
-        Colors.light.navHeader[2],
-      ]}
-      start={[0, 0]}
-      end={[1, 0]}
-    >
-      <StatusBar style="light" />
-      <CustomHeader
-        isTransparent={true}
-        headerTitle={"PanPal Chat"}
-        hasGoBack={true}
-        children={
-          <View style={styles.panpalCreditsContainer}>
-            <View style={styles.helpButton}>
-              <Ionicons name="help" size={hp(2.7)} color={Colors.white} />
-            </View>
-            <Text style={styles.panpalCreditsText}>15</Text>
-            <LinearGradient
-              style={styles.panpalCreditsButtonContainer}
-              colors={[
-                Colors.light.components.button.gold.background[0],
-                Colors.light.components.button.gold.background[1],
-              ]}
-              start={[0.5, 0]}
-              end={[0.5, 1]}
-            >
-              <Text style={styles.panpalCreditsButtonText}>pp</Text>
-            </LinearGradient>
-          </View>
-        }
-      />
+    <>
+      {shouldShowCreditAlert && (
+        <PopUp
+          icon={
+            <Ionicons name="alert" size={hp(2.7)} color={Colors.darkBlue} />
+          }
+          title="Out of PanPal Credits"
+          text="You're out of PanPal credits. Every day, your PanPal credits are reset to 15. You can wait for the next day to receive additional credits."
+          close={handleCreditAlertClose}
+          children={""}
+        />
+      )}
+      {shouldShowCreditsInfoPopUp && (
+        <PopUp
+          icon={<Ionicons name="help" size={hp(2.7)} color={Colors.darkBlue} />}
+          title="PanPal Credits Info"
+          text="PanPal credits are used to interact with PanPal features. Such as getting recipe suggestions, cooking tips, enhancing recipes, generating recipe images,
+          and more. Every day, your PanPal credits are reset to 15. In case your credits are fully used up, you can
+          wait for the next day to receive additional credits."
+          close={handleCreditsInfoPopUpClose}
+          children={""}
+        />
+      )}
+
       <LinearGradient
-        style={styles.container}
-        colors={[Colors.white, "#DDEBF3"]}
-        start={[0.5, 0]}
-        end={[0.5, 1]}
+        style={styles.gradientBackground}
+        colors={[
+          Colors.light.navHeader[0],
+          Colors.light.navHeader[1],
+          Colors.light.navHeader[2],
+        ]}
+        start={[0, 0]}
+        end={[1, 0]}
       >
-        <ScrollView contentContainerStyle={styles.content} ref={scrollViewRef}>
-          <IntroMessageCard
-            image={panPalIcon}
-            title={randomIntro.greeting}
-            text={randomIntro.introText}
-            options={[
-              "Get some suggestions",
-              "Get a random cooking tip",
-              `Try a "${randomIntro.cuisineType}" recipe`,
-              `Give me a "${randomIntro.mealType}" suggestion`,
-            ]}
-            index={0}
-            selectOption={handleSendMessage}
-          />
-          {messages.map((message, index) => (
-            <MessageCard
-              message={message}
-              index={index}
-              selectRecipeOption={handleSendMessage}
+        <StatusBar style="light" />
+        <CustomHeader
+          isTransparent={true}
+          headerTitle={"PanPal Chat"}
+          hasGoBack={true}
+          children={
+            <View style={styles.panpalCreditsContainer}>
+              <TouchableOpacity
+                style={styles.helpButton}
+                onPress={() => setShouldShowCreditsInfoPopUp(true)}
+              >
+                <Ionicons name="help" size={hp(2.7)} color={Colors.white} />
+              </TouchableOpacity>
+              <Text style={styles.panpalCreditsText}>{credits}</Text>
+              <LinearGradient
+                style={styles.panpalCreditsButtonContainer}
+                colors={[
+                  Colors.light.components.button.gold.background[0],
+                  Colors.light.components.button.gold.background[1],
+                ]}
+                start={[0.5, 0]}
+                end={[0.5, 1]}
+              >
+                <Text style={styles.panpalCreditsButtonText}>pp</Text>
+              </LinearGradient>
+            </View>
+          }
+        />
+        <LinearGradient
+          style={styles.container}
+          colors={[Colors.white, "#DDEBF3"]}
+          start={[0.5, 0]}
+          end={[0.5, 1]}
+        >
+          <ScrollView
+            contentContainerStyle={styles.content}
+            ref={scrollViewRef}
+          >
+            <IntroMessageCard
+              image={panPalIcon}
+              title={randomIntro.greeting}
+              text={randomIntro.introText}
+              options={[
+                "Get some suggestions",
+                "Get a random cooking tip",
+                `Try a "${randomIntro.cuisineType}" recipe`,
+                `Give me a "${randomIntro.mealType}" suggestion`,
+              ]}
+              index={0}
+              selectOption={handleSendMessage}
             />
-          ))}
-          {isLoading && (
-            <ActivityIndicator size="large" color={Colors.darkBlue} />
-          )}
-        </ScrollView>
+            {messages.map((message, index) => (
+              <MessageCard
+                message={message}
+                index={index}
+                selectRecipeOption={handleSendMessage}
+              />
+            ))}
+            {isLoading && (
+              <ActivityIndicator size="large" color={Colors.darkBlue} />
+            )}
+          </ScrollView>
+        </LinearGradient>
+        <ChatInputBar
+          sendMessage={handleSendMessage}
+          isLoading={isLoading}
+          isDisabled={credits === 0}
+        />
       </LinearGradient>
-      <ChatInputBar sendMessage={handleSendMessage} isLoading={isLoading} />
-    </LinearGradient>
+    </>
   );
 };
 
@@ -180,6 +245,7 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: hp(ComponentParams.button.height.medium),
     padding: wp(4),
     gap: hp(4),
+    paddingBottom: hp(10),
   },
   messageText: {
     fontSize: Fonts.text_2.fontSize,
