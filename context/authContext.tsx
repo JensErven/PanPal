@@ -7,17 +7,8 @@ import {
   sendPasswordResetEmail,
   signInWithEmailAndPassword,
   signOut,
-  User,
 } from "firebase/auth";
-import {
-  addDoc,
-  collection,
-  doc,
-  getDoc,
-  onSnapshot,
-  setDoc,
-  updateDoc,
-} from "firebase/firestore";
+import { doc, getDoc, onSnapshot, setDoc, updateDoc } from "firebase/firestore";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { preferenceType } from "@/models/PreferenceType";
 import { Alert, ToastAndroid } from "react-native";
@@ -29,20 +20,18 @@ export const AuthContextProvider = ({ children }: { children: any }) => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | undefined>(
     undefined
   );
+  const [credits, setCredits] = useState<number>(0);
 
   useEffect(() => {
-    // onAuthStateChanged
     const unsub = onAuthStateChanged(auth, (user) => {
       if (user && user.emailVerified) {
         setIsAuthenticated(true);
-        setUser(user);
         updateUserData(user.uid);
         retrieveAndStoreUserTastePreferences(user.uid);
         subscribeToUserDocChanges(user.uid);
       } else {
         setIsAuthenticated(false);
         setUser(null);
-        // clear async storage of the taste preferences
       }
     });
     return unsub;
@@ -51,20 +40,37 @@ export const AuthContextProvider = ({ children }: { children: any }) => {
   const subscribeToUserDocChanges = (userId: string) => {
     const userDocRef = doc(db, "users", userId);
     const unsubscribe = onSnapshot(userDocRef, (doc) => {
-      console.log("Data Changed");
       if (doc.exists()) {
         let data = doc.data();
-        setUser({
-          ...user,
+        setUser((prevUser: any) => ({
+          ...prevUser,
           username: data.username,
           email: data.email,
           userId: userId,
           bio: data?.bio,
           profileUrl: data?.profileUrl,
-        });
+          credits: data?.credits,
+        }));
+        setCredits(data?.credits || 0);
       }
     });
     return unsubscribe;
+  };
+
+  const subtractCredits = async (amount: number) => {
+    if (credits >= amount) {
+      const newCredits = credits - amount;
+      setCredits(newCredits);
+      if (user?.userId) {
+        const userDocRef = doc(db, "users", user.userId);
+        await updateDoc(userDocRef, { credits: newCredits });
+      }
+    } else {
+      Alert.alert(
+        "Insufficient credits",
+        "You do not have enough credits to perform this action."
+      );
+    }
   };
 
   const updateUserData = async (uid: string) => {
@@ -80,6 +86,7 @@ export const AuthContextProvider = ({ children }: { children: any }) => {
         bio: data?.bio,
         profileUrl: data?.profileUrl,
       });
+      setCredits(data?.credits || 0);
     }
   };
 
@@ -151,6 +158,7 @@ export const AuthContextProvider = ({ children }: { children: any }) => {
       setDoc(doc(db, "users", response?.user?.uid), {
         email,
         username,
+        credits: 50,
       });
       return { success: true, data: response.user };
     } catch (error: any) {
@@ -233,7 +241,9 @@ export const AuthContextProvider = ({ children }: { children: any }) => {
         login,
         logout,
         register,
+        subtractCredits,
         storeUserTastePreferencesToFirebase,
+        credits,
       }}
     >
       {children}

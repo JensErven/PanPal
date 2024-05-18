@@ -48,6 +48,17 @@ const RecipeCard = ({ recipe }: { recipe: SavedRecipeType }) => {
       key={recipe.id}
       style={styles.recipeContainer}
     >
+      {recipe.data.isGenerated && (
+        <View style={[{}, styles.isGeneratedIconContainer]}>
+          {recipe.data.isGenerated && (
+            <Ionicons
+              name="sparkles"
+              size={hp(2)}
+              color={Colors.mediumPurple}
+            />
+          )}
+        </View>
+      )}
       <TouchableOpacity
         activeOpacity={0.8}
         style={styles.recipeInnerContainer}
@@ -55,13 +66,19 @@ const RecipeCard = ({ recipe }: { recipe: SavedRecipeType }) => {
         onPress={() => handleNavigateToRecipe(recipe.id)}
         onLongPress={handleLongPress}
       >
-        <Image
-          style={styles.recipeImage}
-          source={recipe.data.image ? recipe.data.image : blurhash}
-          placeholder={blurhash}
-          contentFit="cover"
-          transition={1000}
-        />
+        {recipe.data.image ? (
+          <Image
+            style={styles.recipeImage}
+            source={recipe.data.image ? recipe.data.image : blurhash}
+            placeholder={blurhash}
+            contentFit="cover"
+            transition={1000}
+          />
+        ) : (
+          <View style={styles.recipeImage}>
+            <Ionicons name="image" size={hp(5)} color={Colors.white} />
+          </View>
+        )}
         <View style={styles.recipeTextContainer}>
           <Text style={styles.recipeTitle}>{recipe.data.title}</Text>
 
@@ -153,6 +170,22 @@ const styles = StyleSheet.create({
     alignItems: "center",
     padding: wp(2),
   },
+  isGeneratedIconContainer: {
+    position: "absolute",
+    width: hp(ComponentParams.button.height.medium),
+    height: hp(ComponentParams.button.height.small),
+    backgroundColor: Colors.white,
+    shadowColor: Colors.darkBlue,
+    shadowOffset: { width: 0, height: 3 },
+    elevation: 2,
+    justifyContent: "center",
+    alignItems: "center",
+    borderBottomRightRadius: hp(ComponentParams.button.height.small),
+    borderTopLeftRadius: hp(ComponentParams.button.height.small),
+    top: wp(0),
+    left: wp(0),
+    zIndex: 1,
+  },
   overlayRight: {
     display: "flex",
     flexDirection: "row",
@@ -167,6 +200,9 @@ const styles = StyleSheet.create({
     aspectRatio: 1,
     height: "100%",
     borderRadius: hp(3),
+    backgroundColor: Colors.secondaryWhite,
+    justifyContent: "center",
+    alignItems: "center",
   },
   recipeTextContainer: {
     alignItems: "stretch",
@@ -181,12 +217,14 @@ const styles = StyleSheet.create({
     fontSize: Fonts.text_2.fontSize,
     lineHeight: Fonts.text_2.lineHeight,
     color: Colors.darkBlue,
+    textTransform: "capitalize",
   },
   recipeInfoText: {
     fontFamily: Fonts.text_2.fontFamily,
     fontSize: Fonts.text_2.fontSize,
     lineHeight: Fonts.text_2.lineHeight,
     color: Colors.darkBlue,
+    textTransform: "capitalize",
   },
 
   // overlay
@@ -196,6 +234,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
+    zIndex: 2,
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",

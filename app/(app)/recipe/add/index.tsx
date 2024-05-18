@@ -40,7 +40,7 @@ import StandardButton from "@/components/buttons/StandardButton";
 import { Picker } from "@react-native-picker/picker";
 import { recipeService } from "@/services/db/recipe.services";
 import { router } from "expo-router";
-import CustomBottomSheetModal from "@/components/CustomBottomSheetModal";
+import CustomBottomSheetModal from "@/components/modals/CustomBottomSheetModal";
 import { SheetModalContentType } from "@/models/SheetModalContentType";
 import RecipeSelectOptions from "@/constants/RecipeSelectOptions";
 import * as ImagePicker from "expo-image-picker";
@@ -60,11 +60,11 @@ const AddCustomRecipeScreen = () => {
     cookTime: 0,
     servings: 1,
     difficulty: 0,
-    isCustom: true,
     isGenerated: false,
     uuid: user.userId,
     mealType: "",
     cuisineType: "",
+    createdAt: new Date().toISOString(),
   });
 
   // useStates and useMemos

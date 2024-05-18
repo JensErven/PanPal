@@ -53,7 +53,7 @@ const styles = StyleSheet.create({
     height: hp(ComponentParams.button.height.small),
     borderRadius: hp(ComponentParams.button.height.medium / 2),
     backgroundColor: "rgba(0, 0, 0, 0.2)",
-    gap: wp(1),
+    gap: wp(2),
   },
   optionText: {
     fontFamily: Fonts.text_3.fontFamily,
@@ -64,7 +64,7 @@ const styles = StyleSheet.create({
   counterContainer: {
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: Colors.darkBlue,
+    backgroundColor: Colors.mediumBlue,
     width: hp(ComponentParams.button.height.small),
     height: "100%",
     borderRadius: wp(4),

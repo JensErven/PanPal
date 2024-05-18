@@ -1,5 +1,5 @@
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo } from "react";
 import Fonts from "@/constants/Fonts";
 import Colors from "@/constants/Colors";
 import { Ionicons } from "@expo/vector-icons";
@@ -8,6 +8,7 @@ import {
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
 import ComponentParams from "@/constants/ComponentParams";
+import { TextInput } from "react-native-gesture-handler";
 
 const FilterOptionsSelectCard = ({
   onlySingleSelect,
@@ -15,12 +16,14 @@ const FilterOptionsSelectCard = ({
   title,
   selectedOptions,
   selectOption,
+  showCount = true,
 }: {
   onlySingleSelect?: boolean;
   options: string[];
   title: string;
   selectedOptions: string[];
   selectOption: (option: string) => void;
+  showCount?: boolean;
 }) => {
   const filterOptions = useMemo(() => {
     if (onlySingleSelect) {
@@ -41,7 +44,7 @@ const FilterOptionsSelectCard = ({
       <View style={styles.containerHeader}>
         <View style={styles.containerHeaderLeft}>
           <Text style={styles.inputLabel}>{title}</Text>
-          {selectedOptions.length > 0 && (
+          {showCount && selectedOptions.length > 0 && (
             <Text style={styles.optionsSelectedCount}>
               ({selectedOptions.length})
             </Text>
