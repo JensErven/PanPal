@@ -128,7 +128,7 @@ const PanPalChatScreen = () => {
             <Ionicons name="alert" size={hp(2.7)} color={Colors.darkBlue} />
           }
           title="Out of PanPal Credits"
-          text="You're out of PanPal credits. Every day, your PanPal credits are reset to 15. You can wait for the next day to receive additional credits."
+          text="You're out of PanPal credits. Every day, your PanPal credits are reset to 50. You can wait for the next day to receive additional credits."
           close={handleCreditAlertClose}
           children={""}
         />
@@ -138,7 +138,7 @@ const PanPalChatScreen = () => {
           icon={<Ionicons name="help" size={hp(2.7)} color={Colors.darkBlue} />}
           title="PanPal Credits Info"
           text="PanPal credits are used to interact with PanPal features. Such as getting recipe suggestions, cooking tips, enhancing recipes, generating recipe images,
-          and more. Every day, your PanPal credits are reset to 15. In case your credits are fully used up, you can
+          and more. Every day, your PanPal credits are reset to 50. In case your credits are fully used up, you can
           wait for the next day to receive additional credits."
           close={handleCreditsInfoPopUpClose}
           children={""}
@@ -203,11 +203,13 @@ const PanPalChatScreen = () => {
                 `Try a "${randomIntro.cuisineType}" recipe`,
                 `Give me a "${randomIntro.mealType}" suggestion`,
               ]}
-              index={0}
+              key={1000}
+              index={1000}
               selectOption={handleSendMessage}
             />
             {messages.map((message, index) => (
               <MessageCard
+                key={index}
                 message={message}
                 index={index}
                 selectRecipeOption={handleSendMessage}

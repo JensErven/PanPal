@@ -133,28 +133,29 @@ const Saved = () => {
   }, []);
 
   useEffect(() => {
-    const recipesRef = collection(db, "recipes");
-    setIsLoading(true);
-    const subscriber = onSnapshot(recipesRef, {
-      next: (querySnapshot) => {
-        const recipes: SavedRecipeType[] = [];
-        querySnapshot.forEach((doc) => {
-          const data = doc.data() as RecipeType;
-          // Filter recipes where uuid is equal to user.userId
-          if (data.uuid === user.userId) {
-            recipes.push({ id: doc.id, data });
-          }
-        });
-        setInitialRecipes(recipes);
-        setIsLoading(false);
-      },
-      error: (error) => {
-        console.error("Error fetching recipes:", error);
-        setIsLoading(false);
-      },
-    });
-    return () => subscriber();
-  }, [user.userId]);
+    if (user && user.userId) {
+      const recipesRef = collection(db, "recipes");
+      setIsLoading(true);
+      const subscriber = onSnapshot(recipesRef, {
+        next: (querySnapshot) => {
+          const recipes: SavedRecipeType[] = [];
+          querySnapshot.forEach((doc) => {
+            const data = doc.data() as RecipeType;
+            if (data.uuid === user.userId) {
+              recipes.push({ id: doc.id, data });
+            }
+          });
+          setInitialRecipes(recipes);
+          setIsLoading(false);
+        },
+        error: (error) => {
+          console.error("Error fetching recipes:", error);
+          setIsLoading(false);
+        },
+      });
+      return () => subscriber();
+    }
+  }, [user]);
 
   const returnSelectedOptions = (option: string) => {
     if (option === "Cuisines") {

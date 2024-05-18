@@ -34,10 +34,6 @@ const ChatInputBar = ({
     setInputValue("");
   };
 
-  const handleAddImagePress = () => {
-    console.log("Add image pressed");
-  };
-
   return (
     <View style={styles.bottomChatbarContainer}>
       <LinearGradient

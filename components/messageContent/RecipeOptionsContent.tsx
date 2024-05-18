@@ -18,10 +18,6 @@ const RecipeOptionsContent = ({
   selectOption: (option: string) => void;
   content: recipeOptionsExampleJsonType;
 }) => {
-  useEffect(() => {
-    console.log(content);
-  }, [content]);
-
   return (
     <View style={styles.container}>
       <Text style={styles.title}>{content.intro}</Text>

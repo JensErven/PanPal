@@ -195,7 +195,7 @@ const ProfileScreen = () => {
                 <View style={styles.tastePreferenceNoteContent}>
                   <View style={styles.titleContainer}>
                     <View className="flex w-full justify-between flex-row">
-                      <Text style={styles.title}>Your PanPal Coins</Text>
+                      <Text style={styles.title}>Your PanPal Credits</Text>
                       <View className="flex flex-row gap-x-1 justify-center items-center">
                         <Text style={styles.panpalCreditsText}>{credits}</Text>
                         <LinearGradient
@@ -214,12 +214,12 @@ const ProfileScreen = () => {
                     {isBusinessModelOn ? (
                       <>
                         <Text style={styles.subTitle}>
-                          Every day, your PanPal coins are reset to 50, which
+                          Every day, your PanPal credits are reset to 50, which
                           can be used for a variety of features such as
                           generating recipes, enhancing recipes, generating
-                          recipe images, and more. In case your coins are fully
-                          used up, you can either purchase more coins or wait
-                          for the next day to receive additional coins.
+                          recipe images, and more. In case your credits are
+                          fully used up, you can either purchase more credits or
+                          wait for the next day to receive additional credits.
                         </Text>
                         <View style={{ width: "100%" }}>
                           <StandardButton
@@ -240,11 +240,11 @@ const ProfileScreen = () => {
                       </>
                     ) : (
                       <Text style={styles.subTitle}>
-                        Every day, your PanPal coins are reset to 50, which can
-                        be used for a variety of features such as generating
+                        Every day, your PanPal credits are reset to 50, which
+                        can be used for a variety of features such as generating
                         recipes, enhancing recipes, generating recipe images,
-                        and more. In case your coins are fully used up, you can
-                        wait for the next day to receive additional coins.
+                        and more. In case your credits are fully used up, you
+                        can wait for the next day to receive additional credits.
                       </Text>
                     )}
                   </View>

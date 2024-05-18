@@ -10,10 +10,6 @@ import Colors from "@/constants/Colors";
 import { tipsExampleJsonType } from "@/models/openai/tipsExampleJsonType";
 import { othersExampleJsonType } from "@/models/openai/othersExampleJsonType.ts";
 const OthersContent = ({ content }: { content: othersExampleJsonType }) => {
-  useEffect(() => {
-    console.log(content);
-  }, [content]);
-
   return (
     <View style={styles.container}>
       {content.intro && <Text style={styles.title}>{content.intro}</Text>}

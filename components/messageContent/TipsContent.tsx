@@ -9,10 +9,6 @@ import Fonts from "@/constants/Fonts";
 import Colors from "@/constants/Colors";
 import { tipsExampleJsonType } from "@/models/openai/tipsExampleJsonType";
 const TipsContent = ({ content }: { content: tipsExampleJsonType }) => {
-  useEffect(() => {
-    console.log(content);
-  }, [content]);
-
   return (
     <View style={styles.container}>
       <Text style={styles.title}>{content.intro}</Text>

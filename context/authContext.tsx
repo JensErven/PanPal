@@ -23,18 +23,15 @@ export const AuthContextProvider = ({ children }: { children: any }) => {
   const [credits, setCredits] = useState<number>(0);
 
   useEffect(() => {
-    // onAuthStateChanged
     const unsub = onAuthStateChanged(auth, (user) => {
       if (user && user.emailVerified) {
         setIsAuthenticated(true);
-        setUser(user);
         updateUserData(user.uid);
         retrieveAndStoreUserTastePreferences(user.uid);
         subscribeToUserDocChanges(user.uid);
       } else {
         setIsAuthenticated(false);
         setUser(null);
-        // clear async storage of the taste preferences
       }
     });
     return unsub;
@@ -43,18 +40,17 @@ export const AuthContextProvider = ({ children }: { children: any }) => {
   const subscribeToUserDocChanges = (userId: string) => {
     const userDocRef = doc(db, "users", userId);
     const unsubscribe = onSnapshot(userDocRef, (doc) => {
-      console.log("Data Changed");
       if (doc.exists()) {
         let data = doc.data();
-        setUser({
-          ...user,
+        setUser((prevUser: any) => ({
+          ...prevUser,
           username: data.username,
           email: data.email,
           userId: userId,
           bio: data?.bio,
           profileUrl: data?.profileUrl,
           credits: data?.credits,
-        });
+        }));
         setCredits(data?.credits || 0);
       }
     });

@@ -36,10 +36,6 @@ const RecipeContent = ({ content }: { content: recipeExampleJsonType }) => {
     };
   };
 
-  useEffect(() => {
-    console.log(content);
-  }, [content]);
-
   const handleSaveRecipe = async (recipe: recipeExampleJsonType) => {
     setIsLoading(true);
 
@@ -95,6 +91,7 @@ const RecipeContent = ({ content }: { content: recipeExampleJsonType }) => {
         <View style={styles.stepsList}>
           {content.steps.map((step: any, index: number) => (
             <View
+              key={index}
               style={{ flexDirection: "row", flexWrap: "wrap", gap: wp(1) }}
             >
               <Text style={styles.text} key={index}>
