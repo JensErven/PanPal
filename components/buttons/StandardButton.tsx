@@ -51,6 +51,7 @@ const StandardButton = ({
       <LinearGradient
         colors={colors.length >= 2 ? [...colors] : [colors[0], colors[0]]}
         style={{
+          paddingHorizontal: wp(4),
           alignItems: "center",
           justifyContent: "center",
           height: hp(height),

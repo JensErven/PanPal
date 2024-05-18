@@ -43,6 +43,21 @@ const createRecipe = async (recipeData: RecipeType) => {
   }
 };
 
+const updateRecipe = async (recipeId: string, recipeData: RecipeType) => {
+  try {
+    const docRef = doc(db, "recipes", recipeId);
+    if (recipeData.image) {
+      const downloadURL = await uploadImageToFirebase(recipeData.image);
+      recipeData.image = downloadURL;
+    }
+    await updateDoc(docRef, recipeData);
+    return { success: true, message: "Recipe updated successfully" };
+  } catch (error) {
+    console.error("Error updating recipe:", error);
+    return { success: false, message: "Failed to update recipe" };
+  }
+};
+
 const uploadImageToFirebase = async (image: string) => {
   try {
     const fetchResponse = await fetch(image);
@@ -156,7 +171,7 @@ const getRecipe = async (recipeId: string) => {
 
 export const recipeService = {
   getRecipe,
-  // updateRecipe,
+  updateRecipe,
   deleteImageFromFirebase,
   deleteRecipe,
   uploadImageToFirebase,

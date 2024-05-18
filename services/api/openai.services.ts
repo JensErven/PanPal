@@ -1,4 +1,5 @@
 import { Message } from "@/models/Message";
+import { RecipeType } from "@/models/RecipeType";
 import { othersExampleJsonType } from "@/models/openai/othersExampleJsonType.ts";
 import { recipeExampleJsonType } from "@/models/openai/recipeExampleJsonType";
 import { recipeOptionsExampleJsonType } from "@/models/openai/recipeOptionsExampleJsonType";
@@ -93,5 +94,48 @@ export const openaiServices = {
       messages: [roleSystemPrompt, ...prompt],
     });
     return response.choices[0].message;
+  },
+
+  async generateRecipeImage(recipeData: RecipeType) {
+    const {
+      title,
+      description,
+      ingredients,
+      steps,
+      difficulty,
+      servings,
+      cuisineType,
+      mealType,
+    } = recipeData;
+
+    // Constructing a detailed prompt
+    let prompt = `Generate an appetizing, hyper realistic and high-quality image for a recipe called "${title}". `;
+    if (cuisineType) {
+      prompt += `This is a ${cuisineType} dish. `;
+    }
+    if (mealType) {
+      prompt += `It is typically served as a ${mealType}. `;
+    }
+    prompt += `Description: ${description}. `;
+    if (ingredients.length > 0) {
+      prompt += `Key ingredients include: ${ingredients
+        .slice(0, 5)
+        .join(", ")}. `;
+    }
+
+    if (steps.length > 0) {
+      prompt += `The cooking steps involve: ${steps.slice(0, 3).join(", ")}. `;
+    }
+    prompt += `The dish is suitable for ${servings} servings and has a difficulty rating of ${difficulty}/5. `;
+    prompt += `The image should be visually appealing, showcasing the dish in a way that highlights its texture and color.`;
+
+    const response = await openai.images.generate({
+      model: "dall-e-2",
+      prompt: prompt,
+      size: "512x512",
+      n: 1,
+    });
+    const image_url = response.data[0].url;
+    return image_url;
   },
 };
