@@ -19,6 +19,8 @@ const StandardButton = ({
   isDisabled,
   clickHandler,
   loading,
+  iconRight,
+  iconLeft,
 }: {
   textValue: string;
   height: number;
@@ -30,6 +32,8 @@ const StandardButton = ({
   isDisabled?: boolean;
   loading?: boolean;
   clickHandler: () => void;
+  iconRight?: React.ReactNode;
+  iconLeft?: React.ReactNode;
 }) => {
   return (
     <TouchableOpacity
@@ -51,7 +55,7 @@ const StandardButton = ({
       <LinearGradient
         colors={colors.length >= 2 ? [...colors] : [colors[0], colors[0]]}
         style={{
-          paddingHorizontal: wp(4),
+          paddingHorizontal: wp(0),
           alignItems: "center",
           justifyContent: "center",
           height: hp(height),
@@ -59,9 +63,9 @@ const StandardButton = ({
         }}
       >
         {loading ? (
-          <ActivityIndicator size={hp(2.5)} color={textColor} />
+          <ActivityIndicator size={hp(2.7)} color={textColor} />
         ) : (
-          <View className="flex flex-row items-center justify-center gap-x-2">
+          <View className="flex flex-row items-center justify-center gap-x-2 w-full">
             <Text
               style={{
                 textAlign: "center",
@@ -74,6 +78,28 @@ const StandardButton = ({
               {textValue}
             </Text>
             {icon && icon}
+            {iconRight && (
+              <View
+                style={{
+                  position: "absolute",
+
+                  right: wp(0),
+                }}
+              >
+                {iconRight}
+              </View>
+            )}
+            {iconLeft && (
+              <View
+                style={{
+                  position: "absolute",
+
+                  left: wp(0),
+                }}
+              >
+                {iconLeft}
+              </View>
+            )}
           </View>
         )}
       </LinearGradient>

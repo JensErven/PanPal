@@ -71,6 +71,11 @@ const RecipesFilterSheetModal = ({
   });
   return (
     <BottomSheetModal
+      handleComponent={() => (
+        <View style={styles.handleContainer}>
+          <View style={styles.handle}></View>
+        </View>
+      )}
       backgroundStyle={styles.modalBackground}
       footerComponent={(footerProps) => (
         <View style={styles.footerContainer}>
@@ -175,6 +180,10 @@ export default RecipesFilterSheetModal;
 
 const styles = StyleSheet.create({
   modalBackground: {
+    borderTopLeftRadius: hp(ComponentParams.button.height.medium / 2),
+    borderTopRightRadius: hp(ComponentParams.button.height.medium / 2),
+    borderColor: Colors.secondaryWhite,
+    borderWidth: 2,
     backgroundColor: Colors.white,
   },
   inputLabel: {
@@ -196,7 +205,6 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     flex: 1,
-
     width: "100%",
   },
   filterHeaderContainer: {
@@ -238,5 +246,16 @@ const styles = StyleSheet.create({
   content: {
     gap: hp(2),
     paddingVertical: hp(2),
+  },
+  handleContainer: {
+    alignItems: "center",
+    height: hp(ComponentParams.button.height.small),
+    justifyContent: "center",
+  },
+  handle: {
+    width: wp(10),
+    height: hp(1),
+    borderRadius: hp(0.5),
+    backgroundColor: Colors.primarySkyBlue,
   },
 });

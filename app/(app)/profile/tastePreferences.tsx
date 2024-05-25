@@ -22,6 +22,7 @@ import TastePreferencesCard from "@/components/TastePreferencesCard";
 import CustomHeader from "@/components/navigation/CustomHeader";
 import { Ionicons } from "@expo/vector-icons";
 import ComponentParams from "@/constants/ComponentParams";
+import RoundButton from "@/components/buttons/RoundButton";
 
 const tastePreferencesScreen = () => {
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
@@ -51,16 +52,13 @@ const tastePreferencesScreen = () => {
 
   const tastPreferencesChildren = () => {
     return (
-      <>
-        <TouchableOpacity
-          style={styles.headerRightButton}
-          onPress={() => {
-            console.log("edit taste preferences");
-          }}
-        >
-          <Ionicons name="pencil" size={hp(2.7)} color={Colors.white} />
-        </TouchableOpacity>
-      </>
+      <RoundButton
+        handlePress={() => {
+          console.log("edit taste preferences");
+        }}
+      >
+        <Ionicons name="pencil" size={hp(2.7)} color={Colors.white} />
+      </RoundButton>
     );
   };
   useEffect(() => {
@@ -153,13 +151,5 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: wp(4),
     gap: hp(4),
-  },
-  headerRightButton: {
-    backgroundColor: Colors.darkBlue,
-    borderRadius: hp(ComponentParams.button.height.medium / 2),
-    width: hp(ComponentParams.button.height.medium),
-    height: hp(ComponentParams.button.height.medium),
-    justifyContent: "center",
-    alignItems: "center",
   },
 });

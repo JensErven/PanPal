@@ -23,8 +23,9 @@ import { router } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { AuthContext } from "@/context/authContext";
 import { Image } from "expo-image";
-import { blurhash } from "@/utils/common";
+import { blurhash } from "@/utils/general.utils";
 import { userService } from "@/services/db/user.services";
+import RoundButton from "@/components/buttons/RoundButton";
 
 export type UserData = {
   email: string;
@@ -82,16 +83,12 @@ const editProfileScreen = () => {
 
   const tastPreferencesChildren = () => {
     return (
-      <>
-        <TouchableOpacity
-          style={styles.headerRightButton}
-          onPress={handleSubmitEditProfile}
-        >
-          <Ionicons name="checkmark" size={hp(2.7)} color={Colors.white} />
-        </TouchableOpacity>
-      </>
+      <RoundButton handlePress={handleSubmitEditProfile}>
+        <Ionicons name="checkmark" size={hp(2.7)} color={Colors.white} />
+      </RoundButton>
     );
   };
+
   return (
     <LinearGradient
       style={styles.gradientBackground}
@@ -349,14 +346,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: wp(4),
     paddingVertical: hp(4),
     gap: hp(4),
-  },
-  headerRightButton: {
-    backgroundColor: Colors.darkBlue,
-    borderRadius: hp(ComponentParams.button.height.medium / 2),
-    width: hp(ComponentParams.button.height.medium),
-    height: hp(ComponentParams.button.height.medium),
-    justifyContent: "center",
-    alignItems: "center",
   },
   profileTopContainer: {
     marginTop: hp(1),

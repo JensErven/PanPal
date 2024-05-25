@@ -23,9 +23,10 @@ import { router } from "expo-router";
 import ComponentParams from "@/constants/ComponentParams";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Image } from "expo-image";
-import { blurhash } from "@/utils/common";
+import { blurhash } from "@/utils/general.utils";
 import Fonts from "@/constants/Fonts";
 import StandardButton from "@/components/buttons/StandardButton";
+import RoundButton from "@/components/buttons/RoundButton";
 
 const ProfileScreen = () => {
   const { user, logout, storeUserTastePreferencesToFirebase, credits } =
@@ -42,18 +43,12 @@ const ProfileScreen = () => {
   const tastPreferencesChildren = () => {
     return (
       <>
-        <TouchableOpacity
-          style={styles.headerRightButton}
-          onPress={() => router.push("/profile/edit")}
-        >
+        <RoundButton handlePress={() => router.push("/profile/edit")}>
           <Ionicons name="pencil" size={hp(2.7)} color={Colors.white} />
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.headerRightButton}
-          onPress={handleLogout}
-        >
+        </RoundButton>
+        <RoundButton handlePress={handleLogout}>
           <Ionicons name="log-out" size={hp(2.7)} color={Colors.white} />
-        </TouchableOpacity>
+        </RoundButton>
       </>
     );
   };
@@ -314,14 +309,6 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: wp(4),
     gap: hp(4),
-  },
-  headerRightButton: {
-    backgroundColor: Colors.darkBlue,
-    borderRadius: hp(ComponentParams.button.height.medium / 2),
-    width: hp(ComponentParams.button.height.medium),
-    height: hp(ComponentParams.button.height.medium),
-    justifyContent: "center",
-    alignItems: "center",
   },
   profileTopContainer: {
     width: "100%",

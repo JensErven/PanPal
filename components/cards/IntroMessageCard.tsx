@@ -11,7 +11,7 @@ import ComponentParams from "@/constants/ComponentParams";
 import Fonts from "@/constants/Fonts";
 import { Ionicons } from "@expo/vector-icons";
 import { Image } from "expo-image";
-import { blurhash } from "@/utils/common";
+import { blurhash } from "@/utils/general.utils";
 
 const IntroMessageCard = ({
   image,

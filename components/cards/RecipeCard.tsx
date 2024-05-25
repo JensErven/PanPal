@@ -1,9 +1,9 @@
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { LinearGradient } from "expo-linear-gradient";
-import { SavedRecipeType } from "@/app/(app)/(tabs)/saved";
+
 import Colors from "@/constants/Colors";
-import { blurhash } from "@/utils/common";
+import { blurhash } from "@/utils/general.utils";
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -14,8 +14,19 @@ import { router } from "expo-router";
 import { Image } from "expo-image";
 import { Ionicons } from "@expo/vector-icons";
 import { recipeService } from "@/services/db/recipe.services";
+import RoundButton from "../buttons/RoundButton";
+import * as Haptics from "expo-haptics";
+import { SavedRecipeType } from "@/models/SavedRecipeType";
 
-const RecipeCard = ({ recipe }: { recipe: SavedRecipeType }) => {
+const RecipeCard = ({
+  recipe,
+  allowedToEdit = false,
+  allowedToDelete = false,
+}: {
+  recipe: SavedRecipeType;
+  allowedToEdit: boolean;
+  allowedToDelete: boolean;
+}) => {
   const [showOverlay, setShowOverlay] = useState(false);
 
   const handleNavigateToRecipe = async (recipeId: string) => {
@@ -24,6 +35,7 @@ const RecipeCard = ({ recipe }: { recipe: SavedRecipeType }) => {
 
   const handleLongPress = () => {
     setShowOverlay(!showOverlay);
+    Haptics.selectionAsync();
   };
 
   const handleDelete = async () => {
@@ -41,6 +53,10 @@ const RecipeCard = ({ recipe }: { recipe: SavedRecipeType }) => {
     router.push({ pathname: `/recipe/edit/`, params: { recipeId } });
     setShowOverlay(false);
   };
+
+  useEffect(() => {
+    console.log(recipe.data.image);
+  }, [recipe.data.image]);
 
   return (
     <LinearGradient
@@ -80,67 +96,50 @@ const RecipeCard = ({ recipe }: { recipe: SavedRecipeType }) => {
           </View>
         )}
         <View style={styles.recipeTextContainer}>
-          <Text style={styles.recipeTitle}>{recipe.data.title}</Text>
+          <Text
+            style={styles.recipeTitle}
+            numberOfLines={2}
+            ellipsizeMode="tail"
+          >
+            {recipe.data.title}
+          </Text>
 
-          <Text style={styles.recipeInfoText}>
+          <Text
+            style={styles.recipeInfoText}
+            numberOfLines={2}
+            ellipsizeMode="tail"
+          >
             {recipe.data.cuisineType ? recipe.data.cuisineType + " | " : ""}
-            {recipe.data.mealType ? recipe.data.mealType + " | " : ""}
-            {recipe.data.prepTime && recipe.data.cookTime
-              ? recipe.data.prepTime + recipe.data.cookTime + "min"
-              : ""}
+            {recipe.data.mealType ? recipe.data.mealType : ""}
           </Text>
         </View>
       </TouchableOpacity>
       {showOverlay && (
         <TouchableOpacity style={styles.overlay} activeOpacity={1}>
           <View style={styles.overlayLeft}>
-            <LinearGradient
-              style={styles.addButton}
-              colors={[Colors.darkBlue, Colors.darkBlue]}
-            >
-              <TouchableOpacity
-                onPress={handleLongPress}
-                style={{
-                  flex: 1,
-                  justifyContent: "center",
-                  alignItems: "center",
-                }}
-              >
-                <Ionicons name="close" size={hp(2.7)} color={Colors.white} />
-              </TouchableOpacity>
-            </LinearGradient>
+            <RoundButton handlePress={handleLongPress}>
+              <Ionicons name="close" size={hp(2.7)} color={Colors.white} />
+            </RoundButton>
           </View>
           <View style={styles.overlayRight}>
-            <LinearGradient
-              style={styles.addButton}
-              colors={[Colors.darkBlue, Colors.darkBlue]}
-            >
-              <TouchableOpacity
-                onPress={() => handleEdit(recipe.id)}
-                style={{
-                  flex: 1,
-                  justifyContent: "center",
-                  alignItems: "center",
-                }}
+            {!recipe.data.isGenerated && allowedToEdit && (
+              <RoundButton
+                transparent={false}
+                handlePress={() => handleEdit(recipe.id)}
+                backgroundColor={Colors.mediumBlue}
               >
                 <Ionicons name="pencil" size={hp(2.7)} color={Colors.white} />
-              </TouchableOpacity>
-            </LinearGradient>
-            <LinearGradient
-              style={styles.addButton}
-              colors={[Colors.darkBlue, Colors.darkBlue]}
-            >
-              <TouchableOpacity
-                onPress={handleDelete}
-                style={{
-                  flex: 1,
-                  justifyContent: "center",
-                  alignItems: "center",
-                }}
+              </RoundButton>
+            )}
+            {allowedToDelete && (
+              <RoundButton
+                handlePress={handleDelete}
+                transparent={false}
+                backgroundColor="#C70000"
               >
-                <Ionicons name="trash" size={hp(2.7)} color={"#FF6666"} />
-              </TouchableOpacity>
-            </LinearGradient>
+                <Ionicons name="trash" size={hp(2.7)} color={Colors.white} />
+              </RoundButton>
+            )}
           </View>
         </TouchableOpacity>
       )}
@@ -152,15 +151,19 @@ export default RecipeCard;
 
 const styles = StyleSheet.create({
   recipeContainer: {
-    flex: 1,
     display: "flex",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     borderRadius: hp(ComponentParams.button.height.small),
-    elevation: 4,
-    height: hp(15),
+    overflow: "hidden",
     shadowColor: Colors.darkBlue,
     shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.3,
-    shadowRadius: 5,
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 2,
+    height: hp(15),
+    width: "100%",
   },
   recipeInnerContainer: {
     flex: 1,
@@ -195,6 +198,7 @@ const styles = StyleSheet.create({
     display: "flex",
     flexDirection: "row",
     gap: wp(2),
+    marginLeft: wp(4.8),
   },
   recipeImage: {
     aspectRatio: 1,
@@ -223,7 +227,7 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.text_2.fontFamily,
     fontSize: Fonts.text_2.fontSize,
     lineHeight: Fonts.text_2.lineHeight,
-    color: Colors.darkBlue,
+    color: Colors.darkGrey,
     textTransform: "capitalize",
   },
 
@@ -239,7 +243,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     paddingHorizontal: wp(4),
-    backgroundColor: "rgba(0, 0, 0, 0.25)",
+    backgroundColor: "rgba(0, 0, 0, 0.50)",
     borderRadius: hp(ComponentParams.button.height.small),
   },
   overlayButton: {

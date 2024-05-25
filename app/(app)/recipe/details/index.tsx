@@ -5,9 +5,10 @@ import {
   ActivityIndicator,
   TouchableOpacity,
   ToastAndroid,
+  Alert,
 } from "react-native";
-import React, { useEffect, useState } from "react";
-import { router, useLocalSearchParams } from "expo-router";
+import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
+import { router, useLocalSearchParams, useFocusEffect } from "expo-router";
 import { recipeService } from "@/services/db/recipe.services";
 import { RecipeType } from "@/models/RecipeType";
 import { LinearGradient } from "expo-linear-gradient";
@@ -21,43 +22,66 @@ import {
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
 import { Ionicons } from "@expo/vector-icons";
-import { Image } from "expo-image";
-import { blurhash } from "@/utils/common";
 import Fonts from "@/constants/Fonts";
-import StandardButton from "@/components/buttons/StandardButton";
 import { openaiServices } from "@/services/api/openai.services";
+import RecipeDetailsTabBar from "@/components/navigation/RecipeDetailsTabBar";
+import RecipeTipsCard from "@/components/cards/RecipeTipsCard";
+import RecipeIngredientsDetails from "@/components/RecipeIngredientsDetails";
+import RecipeStepsDetails from "@/components/RecipeStepsDetails";
+import { AuthContext } from "@/context/authContext";
+import RecipeImageContainer from "@/components/RecipeImageContainer";
+import RecipeHeaderContainer from "@/components/RecipeHeaderContainer";
+import RecipeRatingDetailsCard from "@/components/recipe-details/RecipeRatingDetailsCard";
+import RecipeReviewsListCard from "@/components/recipe-details/RecipeReviewsListCard";
+import { BottomSheetModal, BottomSheetView } from "@gorhom/bottom-sheet";
+import RecipeDetailsTabBarSheetModal from "@/components/modals/RecipeDetailsTabBarSheetModal";
+import CustomizeRecipeOptionsCard from "@/components/recipe-details/CustomizeRecipeOptionsCard";
+import RoundButton from "@/components/buttons/RoundButton";
+import FullScreenLoading from "@/components/FullScreenLoading";
+import { Line } from "react-native-svg";
+import StandardButton from "@/components/buttons/StandardButton";
 
 const DetailsRecipe = () => {
+  const { user } = useContext<any>(AuthContext);
   const { recipeId } = useLocalSearchParams();
-  const { deleteRecipe, updateRecipe, deleteImageFromFirebase } = recipeService;
+  const { deleteRecipe, updateRecipe, deleteImageFromFirebase, getRecipe } =
+    recipeService;
   const { generateRecipeImage } = openaiServices;
   const [recipe, setRecipe] = useState<RecipeType | undefined>(undefined);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isGeneratingImage, setIsGeneratingImage] = useState<boolean>(false);
   const [generatedImage, setGeneratedImage] = useState<string | undefined>("");
+  const [selectedTab, setSelectedTab] = useState<number>(0);
+  const recipesDetailsTabBarSheetModal = useRef<BottomSheetModal>(null);
 
-  useEffect(() => {
-    // Fetch recipe details when currentRecipeId changes
-    const fetchRecipe = async () => {
+  useFocusEffect(
+    React.useCallback(() => {
+      if (!recipeId) return;
       setIsLoading(true);
-
-      const recipeData = await recipeService.getRecipe(recipeId as string);
-      if (!recipeData) {
-        console.log("No recipe found");
-        return;
-      }
-      setRecipe(recipeData);
-      console.log("Recipe found:", recipeData);
-      setIsLoading(false);
-    };
-    fetchRecipe();
-  }, []);
+      getRecipe(recipeId as string)
+        .then((res) => {
+          setRecipe(res);
+          console.log(res);
+          setTimeout(() => {
+            setIsLoading(false);
+          }, 200);
+        })
+        .catch((err) => {
+          if (err.code === "not-found") router.back();
+        });
+    }, [recipeId])
+  );
 
   const handleEditRecipe = () => {
-    console.log("Edit recipe");
+    if (!recipe) return;
+    if (recipe.isGenerated) return;
+    if (recipe.uuid !== user.userId) return;
+    router.push({ pathname: `/recipe/edit/`, params: { recipeId } });
   };
 
   const handleDeleteRecipe = () => {
+    if (!recipeId) return;
+    if (recipe?.uuid !== user.userId) return;
     deleteImageFromFirebase(recipe?.image as string).then((res) => {
       console.log(res);
       deleteRecipe(recipeId as string).then((res) => {
@@ -99,7 +123,7 @@ const DetailsRecipe = () => {
         (res) => {
           console.log(res);
           if (res.success) {
-            setRecipe(updatedRecipe);
+            setRecipe(res.recipeData);
             ToastAndroid.show("One PanPal Credit used", ToastAndroid.SHORT);
             console.log("Recipe updated successfully");
           } else {
@@ -116,23 +140,134 @@ const DetailsRecipe = () => {
   const headerChildren = () => {
     return (
       <>
-        <TouchableOpacity
-          style={styles.headerRightButton}
-          onPress={handleDeleteRecipe}
-        >
+        <RoundButton handlePress={handleDeleteRecipe}>
           <Ionicons name="trash" size={hp(2.7)} color={Colors.white} />
-        </TouchableOpacity>
-        {!recipe?.isGenerated && (
-          <TouchableOpacity
-            style={styles.headerRightButton}
-            onPress={handleEditRecipe}
-          >
+        </RoundButton>
+        {!recipe?.isGenerated && user?.userId === recipe?.uuid && (
+          <RoundButton handlePress={handleEditRecipe}>
             <Ionicons name="pencil" size={hp(2.7)} color={Colors.white} />
-          </TouchableOpacity>
+          </RoundButton>
         )}
       </>
     );
   };
+
+  const handleSelectTabBarItem = (index: number) => {
+    setSelectedTab(index);
+    recipesDetailsTabBarSheetModal.current?.expand();
+  };
+
+  useEffect(() => {
+    recipesDetailsTabBarSheetModal.current?.present();
+  }, [recipe]);
+
+  const checkAuthorization = async () => {
+    if (!recipe) return false;
+    if (recipe.uuid !== user.userId) return false;
+    return true;
+  };
+
+  const handleUpdateImage = async (image: string) => {
+    if (!recipe) return;
+    const updatedRecipe = { ...recipe, image };
+    checkAuthorization().then(async (res) => {
+      if (!res) {
+        Alert.alert(
+          "Unauthorized",
+          "You are not authorized to edit this recipe"
+        );
+        return;
+      }
+
+      await updateRecipe(recipeId as string, updatedRecipe).then(
+        (res) => {
+          console.log(res);
+          if (res.success) {
+            setRecipe(res.recipeData);
+          } else {
+            console.log("Failed to update recipe");
+          }
+        },
+        (err) => {
+          console.error(err);
+        }
+      );
+    });
+  };
+
+  const detailsTabBarChildren = useMemo(() => {
+    if (!recipe) return;
+    switch (selectedTab) {
+      case 0:
+        return (
+          <>
+            {recipe.servings && recipe.ingredients && (
+              <RecipeIngredientsDetails
+                ingredients={recipe.ingredients}
+                servings={recipe.servings}
+              />
+            )}
+          </>
+        );
+      case 1:
+        return (
+          <RecipeStepsDetails
+            steps={recipe.steps}
+            times={[recipe.cookTime ?? 0, recipe.prepTime ?? 0]}
+          />
+        );
+      default:
+        return null;
+    }
+  }, [selectedTab, recipe]);
+
+  const detailsTabBarFooterChildren = useMemo(() => {
+    if (!recipe) return;
+    switch (selectedTab) {
+      case 0:
+        return (
+          <View style={styles.footerContainer}>
+            <LinearGradient
+              colors={["transparent", Colors.white]}
+              style={styles.footerGradient}
+            />
+            {/* <StandardButton
+              textValue="Add to Shopping List"
+              clickHandler={() => console.log("Add to Shopping List")}
+              colors={Colors.light.components.button.purple.background}
+              textColor={Colors.white}
+              height={ComponentParams.button.height.medium}
+            /> */}
+          </View>
+        );
+      case 1:
+        return (
+          <View style={styles.footerContainer}>
+            <LinearGradient
+              colors={["transparent", Colors.white]}
+              style={styles.footerGradient}
+            />
+            {/* <StandardButton
+            iconRight={
+              <Ionicons
+                name="play"
+                size={hp(2.7)}
+                color={Colors.white}
+                style={{ marginRight: wp(4) }}
+              />
+            }
+            textValue="Start Cooking Assistance"
+            clickHandler={() => console.log("Start Cooking")}
+            colors={Colors.light.components.button.purple.background}
+            textColor={Colors.white}
+            height={ComponentParams.button.height.medium}
+          /> */}
+          </View>
+        );
+      default:
+        return null;
+    }
+  }, [selectedTab, recipe]);
 
   return (
     <LinearGradient
@@ -148,89 +283,90 @@ const DetailsRecipe = () => {
       <StatusBar style="light" />
       <CustomHeader
         isTransparent={true}
-        headerTitle={"Recipe Details"}
         hasGoBack={true}
+        headerTitle={"Recipe Details"}
         children={headerChildren()}
       />
-      <CustomKeyBoardView>
+      <RecipeDetailsTabBarSheetModal
+        snapPoints={[hp(12), hp(100)]}
+        bottomSheetModalRef={recipesDetailsTabBarSheetModal}
+        children={
+          <>
+            <RecipeDetailsTabBar
+              displayContent={true}
+              selectedTab={selectedTab}
+              children={detailsTabBarChildren}
+              tabBarTitles={[
+                `Ingredients (${recipe?.ingredients.length})`,
+                `Steps (${recipe?.steps.length})`,
+              ]}
+              onPress={(index: number) => {
+                handleSelectTabBarItem(index);
+              }}
+            />
+          </>
+        }
+        footerChildren={detailsTabBarFooterChildren}
+      />
+      <LinearGradient
+        style={styles.container}
+        colors={[Colors.white, "#DDEBF3"]}
+        start={[0.5, 0]}
+        end={[0.5, 1]}
+      >
         <LinearGradient
-          style={styles.container}
-          colors={[Colors.white, Colors.white]}
+          style={styles.bottomGradient}
+          colors={["transparent", Colors.secondaryWhite, Colors.primarySkyBlue]}
           start={[0.5, 0]}
           end={[0.5, 1]}
-        >
-          {isLoading ? (
-            <ActivityIndicator
-              size={wp(15)}
-              style={{ padding: wp(5) }}
-              color={Colors.mediumBlue}
-            />
-          ) : (
-            <View style={styles.content}>
-              <View style={styles.recipeHeaderContainer}>
-                {recipe?.image ? (
-                  <Image
-                    style={styles.recipeImage}
-                    source={recipe.image ? recipe.image : blurhash}
-                    placeholder={blurhash}
-                    contentFit="cover"
-                    transition={500}
+        />
+        {isLoading ? (
+          <FullScreenLoading />
+        ) : (
+          recipe && (
+            <CustomKeyBoardView>
+              <View style={styles.content}>
+                <View>
+                  <RecipeImageContainer
+                    allowedToEdit={recipe?.uuid === user.userId}
+                    img={recipe?.image as string}
+                    handleNewImage={(image) => {
+                      handleUpdateImage(image);
+                    }}
                   />
-                ) : (
-                  <View style={[styles.recipeImage, { gap: hp(2) }]}>
-                    <Ionicons name="image" size={hp(5)} color={Colors.white} />
-                    <View style={{ width: "auto" }}>
-                      <StandardButton
-                        isDisabled={isGeneratingImage}
-                        colors={Colors.light.components.button.white.background}
-                        icon={
-                          <Ionicons
-                            name="sparkles"
-                            size={hp(2)}
-                            color={Colors.mediumPurple}
-                          />
-                        }
-                        textColor={Colors.darkGrey}
-                        borderColor={Colors.secondaryWhite}
-                        textValue={
-                          isGeneratingImage ? "Generating..." : "Generate Image"
-                        }
-                        clickHandler={handleGenerateImage}
-                        height={ComponentParams.button.height.medium}
-                      />
-                    </View>
-                  </View>
-                )}
-
-                <View style={styles.headerTextContentContainer}>
-                  <View style={styles.headerTextContentFirst}>
-                    <View
-                      style={{
-                        flexDirection: "row",
-                        flexWrap: "wrap",
-                        alignItems: "flex-start",
-                        gap: wp(2),
-                      }}
-                    >
-                      {recipe?.isGenerated && (
-                        <Ionicons
-                          style={{ paddingTop: hp(1) }}
-                          name="sparkles"
-                          size={hp(2)}
-                          color={Colors.mediumPurple}
-                        />
-                      )}
-                      <Text style={styles.headerTitle}>{recipe?.title}</Text>
-                    </View>
-
-                    <Text style={styles.text}>{recipe?.description}</Text>
-                  </View>
+                  <RecipeHeaderContainer
+                    headerData={{
+                      title: recipe?.title,
+                      description: recipe?.description,
+                      prepTime: recipe?.prepTime,
+                      cookTime: recipe?.cookTime,
+                      mealType: recipe?.mealType,
+                      cuisineType: recipe?.cuisineType,
+                      isGenerated: recipe?.isGenerated,
+                    }}
+                  />
                 </View>
+
+                {/* <CustomizeRecipeOptionsCard /> */}
+
+                {/* <RecipeRatingDetailsCard
+              data={{
+                thumbsUp: 25,
+                thumbsDown: 5,
+                fastReviewTags: [
+                  { tag: "Easy", count: 5 },
+                  { tag: "Tasty", count: 3 },
+                  { tag: "Healthy", count: 2 },
+                ],
+              }}
+            />
+            <RecipeReviewsListCard /> */}
+                <RecipeTipsCard recipe={recipe} setRecipe={setRecipe} />
               </View>
-            </View>
-          )}
-        </LinearGradient>
-      </CustomKeyBoardView>
+            </CustomKeyBoardView>
+          )
+        )}
+      </LinearGradient>
     </LinearGradient>
   );
 };
@@ -241,33 +377,59 @@ const styles = StyleSheet.create({
   gradientBackground: {
     flex: 1,
   },
+  footerContainer: {
+    padding: wp(4),
+    width: "100%",
+    backgroundColor: Colors.white,
+  },
+  footerGradient: {
+    width: "120%",
+    height: hp(2),
+    position: "absolute",
+    top: 0,
+    left: 0,
+    transform: [{ translateY: -hp(2) }],
+  },
+  headerSecondContent: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  timesValues: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    width: "100%",
+  },
+  headerThirdContent: {
+    flexDirection: "row",
+    justifyContent: "flex-start",
+    alignItems: "center",
+    gap: wp(2),
+  },
+  itemTag: {
+    padding: hp(1),
+    borderRadius: hp(1),
+    backgroundColor: Colors.white,
+    elevation: 1,
+    shadowColor: Colors.darkBlue,
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+  },
   container: {
     overflow: "hidden",
     borderTopLeftRadius: hp(ComponentParams.button.height.medium),
     flex: 1,
     borderTopColor: Colors.darkBlue,
     borderTopWidth: wp(1),
-    minHeight: hp(100),
   },
   content: {
     borderTopLeftRadius: hp(ComponentParams.button.height.medium),
     flex: 1,
+    paddingBottom: hp(20),
     gap: hp(4),
-  },
-  headerRightButton: {
-    backgroundColor: "rgba(0, 0, 0, 0.2)",
-    borderRadius: hp(ComponentParams.button.height.medium / 2),
-    width: hp(ComponentParams.button.height.medium),
-    height: hp(ComponentParams.button.height.medium),
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  recipeImage: {
-    width: "100%",
-    aspectRatio: 3 / 2,
-    backgroundColor: Colors.secondaryWhite,
-    justifyContent: "center",
-    alignItems: "center",
   },
   recipeHeaderContainer: {
     width: "100%",
@@ -285,14 +447,23 @@ const styles = StyleSheet.create({
     paddingTop: hp(2),
     paddingBottom: hp(6),
     gap: hp(2),
+    justifyContent: "center",
   },
   headerTitle: {
+    textAlign: "center",
     textTransform: "capitalize",
     fontFamily: Fonts.heading_3.fontFamily,
     fontSize: Fonts.heading_3.fontSize,
     color: Colors.darkBlue,
     lineHeight: Fonts.heading_3.lineHeight,
     flex: 1,
+  },
+  headerText: {
+    fontFamily: Fonts.text_2.fontFamily,
+    fontSize: Fonts.text_2.fontSize,
+    color: Colors.darkBlue,
+    lineHeight: Fonts.text_2.lineHeight,
+    textAlign: "center",
   },
   text: {
     fontFamily: Fonts.text_2.fontFamily,
@@ -304,5 +475,14 @@ const styles = StyleSheet.create({
     gap: hp(1),
     width: "100%",
     justifyContent: "center",
+  },
+  bottomGradient: {
+    zIndex: 50,
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+    width: "100%",
+    height: hp(17),
   },
 });

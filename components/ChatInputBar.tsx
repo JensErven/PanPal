@@ -54,6 +54,7 @@ const ChatInputBar = ({
         colors={[
           Colors.light.components.button.purple.background[0],
           Colors.light.components.button.purple.background[1],
+          Colors.light.components.button.purple.background[2],
         ]}
       >
         <TouchableOpacity
@@ -87,6 +88,9 @@ const styles = StyleSheet.create({
     width: wp(100),
     zIndex: 49,
     gap: wp(2),
+    elevation: 5,
+    shadowColor: Colors.darkBlue,
+    shadowOffset: { width: 0, height: 2 },
   },
   bottomChatbar: {
     flexDirection: "row",

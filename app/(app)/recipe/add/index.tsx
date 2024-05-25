@@ -27,15 +27,11 @@ import { LinearGradient } from "expo-linear-gradient";
 import CustomKeyBoardView from "@/components/CustomKeyBoardView";
 import { AuthContext } from "@/context/authContext";
 import { Image } from "expo-image";
-import { blurhash } from "@/utils/common";
+import { blurhash } from "@/utils/general.utils";
 import CustomHeader from "@/components/navigation/CustomHeader";
 import { StatusBar } from "expo-status-bar";
 import { RecipeType } from "@/models/RecipeType";
-import BottomSheet, {
-  BottomSheetModal,
-  BottomSheetModalProvider,
-  BottomSheetView,
-} from "@gorhom/bottom-sheet";
+import { BottomSheetModal } from "@gorhom/bottom-sheet";
 import StandardButton from "@/components/buttons/StandardButton";
 import { Picker } from "@react-native-picker/picker";
 import { recipeService } from "@/services/db/recipe.services";
@@ -45,6 +41,7 @@ import { SheetModalContentType } from "@/models/SheetModalContentType";
 import RecipeSelectOptions from "@/constants/RecipeSelectOptions";
 import * as ImagePicker from "expo-image-picker";
 import { useActiveTab } from "@/context/activeTabContext";
+import RoundButton from "@/components/buttons/RoundButton";
 
 const AddCustomRecipeScreen = () => {
   const { user } = useContext<any>(AuthContext);
@@ -122,6 +119,11 @@ const AddCustomRecipeScreen = () => {
       return;
     }
     try {
+      // everything to lowercase
+      recipe.title = recipe.title.toLowerCase();
+      recipe.description = recipe.description.toLowerCase();
+      recipe.ingredients = recipe.ingredients.map((item) => item.toLowerCase());
+      recipe.steps = recipe.steps.map((item) => item.toLowerCase());
       await recipeService.createRecipe(recipe);
     } catch (error) {
       console.log(error);
@@ -138,14 +140,9 @@ const AddCustomRecipeScreen = () => {
 
   const headerChildren = () => {
     return (
-      <>
-        <TouchableOpacity
-          style={styles.headerRightButton}
-          onPress={handleRecipeCreate}
-        >
-          <Ionicons name="checkmark" size={hp(2.7)} color={Colors.white} />
-        </TouchableOpacity>
-      </>
+      <RoundButton handlePress={handleRecipeCreate}>
+        <Ionicons name="checkmark" size={hp(2.7)} color={Colors.white} />
+      </RoundButton>
     );
   };
 
@@ -861,14 +858,6 @@ const styles = StyleSheet.create({
     aspectRatio: 3 / 2,
     height: "100%",
     borderRadius: hp(ComponentParams.button.height.small),
-  },
-  headerRightButton: {
-    backgroundColor: Colors.darkBlue,
-    borderRadius: hp(ComponentParams.button.height.medium / 2),
-    width: hp(ComponentParams.button.height.medium),
-    height: hp(ComponentParams.button.height.medium),
-    justifyContent: "center",
-    alignItems: "center",
   },
   gradientBackground: {
     flex: 1,

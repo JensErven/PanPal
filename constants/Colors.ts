@@ -23,6 +23,7 @@ export default {
   mediumPurple: mediumPurple,
   gold: gold,
   darkGold: darkGold,
+  primarySkyBlue: primarySkyBlue,
 
   light: {
     text: darkBlue,

@@ -85,6 +85,7 @@ const roleSystemPrompt: Message = {
     "    - Always check the user's taste profile before providing any responses.\n\n" +
     "These guidelines ensure PanPal's interactions with users are consistent, engaging, and helpful, maintaining a delightful culinary experience for all queries.",
 };
+
 export const openaiServices = {
   async createCompletion(prompt: Message[]) {
     const response = await openai.chat.completions.create({
@@ -137,5 +138,21 @@ export const openaiServices = {
     });
     const image_url = response.data[0].url;
     return image_url;
+  },
+
+  async createRecipeTip(recipeData: RecipeType) {
+    const prompt: Message = {
+      role: "user",
+      content: `Can you provide me with only ONE cooking tip for this recipe with following details? Look at the alreacy existing tips and make sure that you DO NOT provide the same tip to the user Provide me with a joyful answer using emoji's. recipe schema: ${JSON.stringify(
+        recipeData
+      )}"`,
+    };
+    const response = await openai.chat.completions.create({
+      model: "gpt-3.5-turbo",
+      max_tokens: 250,
+      response_format: { type: "json_object" },
+      messages: [roleSystemPrompt, prompt],
+    });
+    return response.choices[0].message;
   },
 };

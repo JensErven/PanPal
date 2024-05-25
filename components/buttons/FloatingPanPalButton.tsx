@@ -5,7 +5,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { Image } from "expo-image";
 import Colors from "@/constants/Colors";
 import ComponentParams from "@/constants/ComponentParams";
-import { blurhash } from "@/utils/common";
+import { blurhash } from "@/utils/general.utils";
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,

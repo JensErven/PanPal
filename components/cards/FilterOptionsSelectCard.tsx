@@ -119,7 +119,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: wp(4),
     height: hp(ComponentParams.button.height.small),
     borderRadius: hp(ComponentParams.button.height.small),
-
     backgroundColor: Colors.white,
     elevation: 2,
   },

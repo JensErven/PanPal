@@ -18,6 +18,8 @@ import { Ionicons } from "@expo/vector-icons";
 import ComponentParams from "@/constants/ComponentParams";
 import Fonts from "@/constants/Fonts";
 import { ScrollView } from "react-native-gesture-handler";
+import TransparentButton from "../buttons/RoundButton";
+import RoundButton from "../buttons/RoundButton";
 
 const ios = Platform.OS === "ios";
 const SearchBarHeader = ({
@@ -37,7 +39,6 @@ const SearchBarHeader = ({
     <View
       style={[
         {
-          paddingTop: ios ? top : top + 10,
           backgroundColor: "transparent",
         },
         styles.container,
@@ -86,9 +87,9 @@ const SearchBarHeader = ({
             </TouchableOpacity>
           )}
         </LinearGradient>
-        <TouchableOpacity style={styles.filterButton} onPress={showFilterModal}>
+        <RoundButton handlePress={showFilterModal}>
           <Ionicons name="filter" size={hp(2.7)} color={Colors.white} />
-        </TouchableOpacity>
+        </RoundButton>
       </View>
 
       <ScrollView
@@ -139,14 +140,6 @@ const styles = StyleSheet.create({
     color: Colors.white,
   },
   clearInputValueButton: {
-    height: hp(ComponentParams.button.height.medium),
-    width: hp(ComponentParams.button.height.medium),
-    borderRadius: hp(ComponentParams.button.height.medium / 2),
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "rgba(0, 0, 0, 0.2)",
-  },
-  filterButton: {
     height: hp(ComponentParams.button.height.medium),
     width: hp(ComponentParams.button.height.medium),
     borderRadius: hp(ComponentParams.button.height.medium / 2),

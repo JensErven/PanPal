@@ -6,9 +6,8 @@ import {
   ScrollView,
   TouchableOpacity,
 } from "react-native";
-import React, { useEffect, useMemo, useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import { LinearGradient } from "expo-linear-gradient";
-import CustomKeyBoardView from "@/components/CustomKeyBoardView";
 import CustomHeader from "@/components/navigation/CustomHeader";
 import Colors from "@/constants/Colors";
 import {
@@ -17,25 +16,22 @@ import {
 } from "react-native-responsive-screen";
 import { StatusBar } from "expo-status-bar";
 import ComponentParams from "@/constants/ComponentParams";
-import { TextInput } from "react-native-gesture-handler";
 import { Ionicons } from "@expo/vector-icons";
 import Fonts from "@/constants/Fonts";
 import { Message } from "@/models/Message";
 import ChatInputBar from "@/components/ChatInputBar";
 import { openaiServices } from "@/services/api/openai.services";
 import MessageCard from "@/components/MessageCard";
-import { blurhash } from "@/utils/common";
-import { Image } from "expo-image";
+import * as Haptics from "expo-haptics";
 import panPalIcon from "@/assets/images/panpal-icon-medium.png";
 import IntroMessageCard from "@/components/cards/IntroMessageCard";
 import { cuisineTypes } from "@/constants/tastePreferences/CuisineTypes";
 import { mealTypes } from "@/constants/tastePreferences/MealTypes";
 import PopUp from "@/components/modals/PopUp";
-import { AuthContext, useAuth } from "@/context/authContext";
+import { AuthContext } from "@/context/authContext";
 
 const PanPalChatScreen = () => {
   const { credits, subtractCredits } = React.useContext<any>(AuthContext);
-
   const [messages, setMessages] = React.useState<Message[]>([]);
   const [shouldShowCreditAlert, setShouldShowCreditAlert] =
     React.useState<boolean>(false);
@@ -99,6 +95,9 @@ const PanPalChatScreen = () => {
   }, []);
 
   useEffect(() => {
+    // notify user that a new message has been received
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    // scroll to the end of the chat
     if (scrollViewRef.current) {
       scrollViewRef.current.scrollToEnd({ animated: true });
     }
@@ -130,7 +129,6 @@ const PanPalChatScreen = () => {
           title="Out of PanPal Credits"
           text="You're out of PanPal credits. Every day, your PanPal credits are reset to 50. You can wait for the next day to receive additional credits."
           close={handleCreditAlertClose}
-          children={""}
         />
       )}
       {shouldShowCreditsInfoPopUp && (
@@ -138,10 +136,8 @@ const PanPalChatScreen = () => {
           icon={<Ionicons name="help" size={hp(2.7)} color={Colors.darkBlue} />}
           title="PanPal Credits Info"
           text="PanPal credits are used to interact with PanPal features. Such as getting recipe suggestions, cooking tips, enhancing recipes, generating recipe images,
-          and more. Every day, your PanPal credits are reset to 50. In case your credits are fully used up, you can
-          wait for the next day to receive additional credits."
+          and more. Every day, your PanPal credits are reset to 50. In case your credits are fully used up, you can wait for the next day to receive additional credits."
           close={handleCreditsInfoPopUpClose}
-          children={""}
         />
       )}
 
@@ -216,7 +212,7 @@ const PanPalChatScreen = () => {
               />
             ))}
             {isLoading && (
-              <ActivityIndicator size="large" color={Colors.darkBlue} />
+              <ActivityIndicator size={hp(5.4)} color={Colors.primarySkyBlue} />
             )}
           </ScrollView>
         </LinearGradient>

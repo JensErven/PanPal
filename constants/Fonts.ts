@@ -38,7 +38,7 @@ export default {
   text_3: {
     fontSize: wp(1.9 * 2),
     lineHeight: hp(2.7),
-    fontFamily: "QuickSandRegular",
+    fontFamily: "QuickSandMedium",
   },
   /* text_4: tabbar/others*/
   text_4: {

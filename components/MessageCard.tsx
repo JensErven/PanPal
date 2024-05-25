@@ -108,7 +108,7 @@ const styles = StyleSheet.create({
   userMessageContainer: {
     maxWidth: wp(80),
     elevation: 3,
-    shadowColor: Colors.darkBlue,
+    shadowColor: Colors.darkGrey,
     backgroundColor: Colors.mediumPurple,
     paddingHorizontal: wp(4),
     paddingVertical: hp(2),
@@ -121,7 +121,7 @@ const styles = StyleSheet.create({
     maxWidth: wp(80),
     width: wp(80),
     elevation: 3,
-    shadowColor: Colors.darkBlue,
+    shadowColor: Colors.darkGrey,
     backgroundColor: Colors.mediumPurple,
     paddingHorizontal: wp(4),
     paddingVertical: hp(2),
