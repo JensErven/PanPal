@@ -1,4 +1,11 @@
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Alert,
+  ToastAndroid,
+} from "react-native";
 import React, { useRef } from "react";
 import { Image } from "expo-image";
 import { blurhash } from "@/utils/general.utils";
@@ -15,17 +22,25 @@ import { BottomSheetModal, BottomSheetView } from "@gorhom/bottom-sheet";
 import StandardButton from "./buttons/StandardButton";
 import * as ImagePicker from "expo-image-picker";
 import RoundButton from "./buttons/RoundButton";
+import { openaiServices } from "@/services/api/openai.services";
+import { RecipeType } from "@/models/RecipeType";
+import { AuthContext } from "@/context/authContext";
 
 const RecipeImageContainer = ({
   allowedToEdit = false,
   img,
+  recipe,
   handleNewImage,
+  setRecipe,
 }: {
   allowedToEdit: boolean;
+  recipe?: RecipeType;
   img: string;
   handleNewImage: (image: string) => void;
+  setRecipe?: (recipe: RecipeType) => void;
 }) => {
   // image string
+  const generateImageCreditCost = 10;
   const [image, setImage] = React.useState<string>("");
   // modal
   const modalRef = useRef<BottomSheetModal>(null);
@@ -33,6 +48,11 @@ const RecipeImageContainer = ({
     if (!allowedToEdit) return;
     modalRef.current?.present();
   };
+  const [isGeneratingImage, setIsGeneratingImage] =
+    React.useState<boolean>(false);
+  const { credits, subtractCredits } = React.useContext<any>(AuthContext);
+
+  const { generateRecipeImage } = openaiServices;
 
   const handleCloseModal = () => {
     modalRef.current?.dismiss();
@@ -45,13 +65,42 @@ const RecipeImageContainer = ({
     });
 
     if (!result.canceled) {
-      console.log(result);
       setImage(result.assets[0].uri);
       handleNewImage(result.assets[0].uri);
       handleCloseModal();
     } else {
       handleCloseModal();
     }
+  };
+
+  const handleGenerateImage = () => {
+    if (!recipe) {
+      console.error("Recipe not found");
+      return;
+    }
+    if (credits < generateImageCreditCost) {
+      ToastAndroid.show("Insufficient Panpal Credits", ToastAndroid.SHORT);
+      return;
+    }
+    setIsGeneratingImage(true);
+    generateRecipeImage(recipe as RecipeType).then(
+      (res) => {
+        if (res) {
+          handleNewImage(res);
+          subtractCredits(generateImageCreditCost);
+          ToastAndroid.show(
+            `${generateImageCreditCost} PanPal Credits deducted`,
+            ToastAndroid.SHORT
+          );
+        }
+        handleCloseModal();
+        setIsGeneratingImage(false);
+      },
+      (err) => {
+        Alert.alert("Failed to generate image", err.message);
+        setIsGeneratingImage(false);
+      }
+    );
   };
 
   return (
@@ -64,7 +113,7 @@ const RecipeImageContainer = ({
           </View>
         )}
         ref={modalRef}
-        snapPoints={[hp(22)]}
+        snapPoints={[hp(28)]}
         index={0}
         backdropComponent={(backdropProps) => (
           <TouchableOpacity
@@ -79,6 +128,7 @@ const RecipeImageContainer = ({
           <Text style={styles.modalTitle}>Image</Text>
           <View style={styles.modalContent}>
             <StandardButton
+              isDisabled={isGeneratingImage}
               textValue="Choose from gallery"
               colors={[Colors.primarySkyBlue, Colors.primarySkyBlue]}
               height={ComponentParams.button.height.medium}
@@ -103,6 +153,43 @@ const RecipeImageContainer = ({
               }
               textColor={Colors.darkGrey}
               clickHandler={() => pickImageAsync()}
+            />
+            <StandardButton
+              isDisabled={isGeneratingImage}
+              loading={isGeneratingImage}
+              textValue="Generate image"
+              colors={[Colors.primarySkyBlue, Colors.primarySkyBlue]}
+              height={ComponentParams.button.height.medium}
+              borderColor="transparent"
+              iconRight={
+                <View style={styles.panpalCreditsContainer}>
+                  <Text style={styles.panpalCreditsText}>
+                    {generateImageCreditCost}
+                  </Text>
+                  <LinearGradient
+                    style={styles.panpalCreditsButtonContainer}
+                    colors={[
+                      Colors.light.components.button.gold.background[0],
+                      Colors.light.components.button.gold.background[1],
+                    ]}
+                    start={[0.5, 0]}
+                    end={[0.5, 1]}
+                  >
+                    <Text style={styles.panpalCreditsButtonText}>pp</Text>
+                  </LinearGradient>
+                </View>
+              }
+              iconLeft={
+                <View style={styles.generateButtonIconLeft}>
+                  <Ionicons
+                    name="sparkles"
+                    size={hp(2.7)}
+                    color={Colors.mediumPurple}
+                  />
+                </View>
+              }
+              textColor={Colors.darkGrey}
+              clickHandler={() => handleGenerateImage()}
             />
           </View>
         </BottomSheetView>
@@ -182,8 +269,7 @@ const styles = StyleSheet.create({
   // modal
   handleContainer: {
     alignItems: "center",
-    height: hp(ComponentParams.button.height.medium),
-
+    height: hp(ComponentParams.button.height.small),
     justifyContent: "center",
   },
   handle: {
@@ -195,13 +281,15 @@ const styles = StyleSheet.create({
 
   modalViewContainer: {
     flex: 1,
-    backgroundColor: Colors.secondaryWhite,
+
     paddingHorizontal: wp(4),
   },
   modalBackground: {
     borderTopLeftRadius: hp(ComponentParams.button.height.medium / 2),
     borderTopRightRadius: hp(ComponentParams.button.height.medium / 2),
-    backgroundColor: Colors.secondaryWhite,
+    borderColor: Colors.secondaryWhite,
+    borderWidth: 2,
+    backgroundColor: Colors.white,
   },
   modalTitle: {
     fontSize: Fonts.heading_3.fontSize,
@@ -212,7 +300,7 @@ const styles = StyleSheet.create({
   },
   modalContent: {
     paddingVertical: hp(2),
-    gap: hp(2),
+    gap: hp(1),
   },
   modalButton: {
     paddingHorizontal: wp(4),
@@ -228,5 +316,48 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.text_1.fontFamily,
     color: Colors.darkGrey,
     textTransform: "capitalize",
+  },
+  panpalCreditsContainer: {
+    display: "flex",
+    flexDirection: "row",
+    marginRight: wp(1),
+    gap: wp(1),
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  panpalCreditsText: {
+    fontFamily: Fonts.text_1.fontFamily,
+    fontSize: Fonts.text_1.fontSize,
+    color: Colors.darkGrey,
+    lineHeight: Fonts.text_1.lineHeight,
+  },
+  panpalCreditsButtonText: {
+    textTransform: "uppercase",
+    fontFamily: Fonts.text_1.fontFamily,
+    fontSize: Fonts.text_2.fontSize,
+    color: Colors.darkGold,
+    textAlign: "center",
+    position: "absolute",
+    textAlignVertical: "center",
+  },
+  panpalCreditsButtonContainer: {
+    borderBottomColor: Colors.darkGold,
+    borderBottomWidth: 1,
+    borderRightColor: Colors.darkGold,
+    borderRightWidth: 1,
+    borderRadius: hp(ComponentParams.button.height.small),
+    width: hp(ComponentParams.button.height.small),
+    height: hp(ComponentParams.button.height.small),
+    justifyContent: "center",
+    alignItems: "center",
+    aspectRatio: 1,
+  },
+  generateButtonIconLeft: {
+    justifyContent: "center",
+    alignItems: "center",
+    width: hp(ComponentParams.button.height.small),
+    aspectRatio: 1,
+    borderRadius: hp(ComponentParams.button.height.small),
+    marginLeft: wp(1),
   },
 });

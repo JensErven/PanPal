@@ -109,7 +109,7 @@ export const openaiServices = {
       mealType,
     } = recipeData;
 
-    // Constructing a detailed prompt
+    // Constructing a detailed prompt within the character limit
     let prompt = `Generate an appetizing, hyper realistic and high-quality image for a recipe called "${title}". `;
     if (cuisineType) {
       prompt += `This is a ${cuisineType} dish. `;
@@ -117,18 +117,24 @@ export const openaiServices = {
     if (mealType) {
       prompt += `It is typically served as a ${mealType}. `;
     }
-    prompt += `Description: ${description}. `;
+    if (description.length > 0) {
+      prompt += `Description: ${description.slice(0, 100)}. `; // Truncate description if too long
+    }
     if (ingredients.length > 0) {
       prompt += `Key ingredients include: ${ingredients
         .slice(0, 5)
         .join(", ")}. `;
     }
-
     if (steps.length > 0) {
       prompt += `The cooking steps involve: ${steps.slice(0, 3).join(", ")}. `;
     }
-    prompt += `The dish is suitable for ${servings} servings and has a difficulty rating of ${difficulty}/5. `;
-    prompt += `The image should be visually appealing, showcasing the dish in a way that highlights its texture and color.`;
+    prompt += `The dish is for ${servings} servings and has a difficulty rating of ${difficulty}/5. `;
+    prompt += `The image should highlight the dish's texture and color.`;
+
+    // Ensure the prompt does not exceed 1000 characters
+    if (prompt.length > 1000) {
+      prompt = prompt.slice(0, 997) + "...";
+    }
 
     const response = await openai.images.generate({
       model: "dall-e-2",
@@ -156,3 +162,7 @@ export const openaiServices = {
     return response.choices[0].message;
   },
 };
+
+("https://firebasestorage.googleapis.com/v0/b/panpal-20566.appspot.com/o/recipeImages%2F446a497e-837c-4d44-9c36-b3ac491adc69?alt=media&token=9c8de9a0-563e-4d12-99d3-fa80d9715726");
+
+("https://firebasestorage.googleapis.com/v0/b/panpal-20566.appspot.com/o/recipeImages%2F99bff098-e4df-47d3-8cdc-5bd848361ca3?alt=media&token=cab87538-2aba-470f-a1a6-35c850bcc137");

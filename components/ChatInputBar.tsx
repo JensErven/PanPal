@@ -46,7 +46,8 @@ const ChatInputBar = ({
           placeholder="Type a message..."
           value={inputValue}
           onChangeText={(text) => setInputValue(text)}
-          placeholderTextColor="#A0B7D6"
+          placeholderTextColor={"#A0B7D6"}
+          onSubmitEditing={handleSend}
         />
       </LinearGradient>
       <LinearGradient
@@ -102,13 +103,16 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   textInput: {
-    height: "100%",
-    width: "100%",
     flex: 1,
-    fontSize: Fonts.text_2.fontSize,
+    minHeight: hp(ComponentParams.button.height.medium),
+    borderRadius: hp(ComponentParams.button.height.medium / 2),
+    backgroundColor: Colors.secondaryWhite,
+    paddingHorizontal: wp(1),
+    paddingVertical: hp(1),
     fontFamily: Fonts.text_2.fontFamily,
+    fontSize: Fonts.text_2.fontSize,
+    color: Colors.darkGrey,
     lineHeight: Fonts.text_2.lineHeight,
-    color: Colors.darkBlue,
   },
   sendButton: {
     display: "flex",

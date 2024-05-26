@@ -5,6 +5,7 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   ToastAndroid,
+  Alert,
 } from "react-native";
 import React, { useContext, useEffect } from "react";
 import Fonts from "@/constants/Fonts";
@@ -23,6 +24,7 @@ import { tipsExampleJsonType } from "@/models/openai/tipsExampleJsonType";
 import FullScreenLoading from "../FullScreenLoading";
 import { recipeService } from "@/services/db/recipe.services";
 import { AuthContext } from "@/context/authContext";
+import PagerView from "react-native-pager-view";
 
 const RecipeTipsCard = ({
   recipe,
@@ -54,71 +56,68 @@ const RecipeTipsCard = ({
           const parsedContent = JSON.parse(response.content);
           if (parsedContent.responseType === "tips") {
             subtractCredits(1);
-            ToastAndroid.show("1 Panpal Credit deducted", ToastAndroid.SHORT);
+            ToastAndroid.show("1 PanPal Credits deducted", ToastAndroid.SHORT);
             setTips([...tips, ...parsedContent.tips]);
             saveTipsToRecipe([...tips, ...parsedContent.tips]);
           }
         }
       })
       .catch((error) => {
-        console.log(error);
+        Alert.alert("Error", "Failed to generate tips. Please try again.");
       })
       .finally(() => {
-        setIsLoading(false); // Move setIsLoading(false) inside finally block
+        setIsLoading(false);
       });
   };
 
   const saveTipsToRecipe = (tips: string[]) => {
     const updatedRecipe = { ...recipe, tips };
-    // Save the updated recipe to the database
     if (!recipe.id) return;
     recipeService.saveTipsToRecipe(recipe.id, tips).then(
       (response) => {
         if (response) setRecipe(updatedRecipe);
-        console.log("Recipe updated with tips", response);
       },
       (error) => {
-        console.log("Error updating recipe", error);
+        Alert.alert("Error", "Failed to save tips to recipe");
       }
     );
   };
 
   return (
-    <LinearGradient
-      style={styles.container}
-      colors={[Colors.white, Colors.white]}
-      start={[0.5, 0]}
-      end={[0.5, 1]}
-    >
-      <View style={styles.content}>
-        <View style={styles.contentTitleContainer}>
-          <View style={styles.contentTitleLeft}>
-            <Ionicons
-              name="sparkles"
-              size={hp(2)}
-              color={Colors.mediumPurple}
-            />
-            <Text style={styles.cardTitle}>Tips & Tricks</Text>
-          </View>
-          <View style={styles.contentTitleRight}>
-            <Text style={styles.contentTitleRightText}>{tips.length}/10</Text>
-          </View>
+    <View style={styles.content}>
+      <View style={styles.contentTitleContainer}>
+        <View style={styles.contentTitleLeft}>
+          <Ionicons name="sparkles" size={hp(2)} color={Colors.mediumPurple} />
+          <Text style={styles.cardTitle}>Tips & Tricks</Text>
         </View>
-        <View style={styles.itemList}>
-          {tips.map((tip, index) => (
-            <View key={index} style={styles.tipItem}>
-              <View style={styles.bulletPoint}>
-                <Ionicons
-                  name="ellipse"
-                  size={wp(2)}
-                  color={Colors.mediumPurple}
-                />
-              </View>
-              <Text style={styles.cardText}>{tip}</Text>
-            </View>
-          ))}
+        <View style={styles.contentTitleRight}>
+          <Text style={styles.contentTitleRightText}>{tips.length}/10</Text>
         </View>
-        {tips.length < 10 && (
+      </View>
+      <View style={styles.itemListContainer}>
+        {tips.length === 0 ? (
+          <Text style={styles.cardText}>No tips available</Text>
+        ) : (
+          <>
+            {tips.map((tip, index) => (
+              <LinearGradient
+                style={styles.tipItem}
+                key={index}
+                colors={[Colors.white, "#DDEBF3"]}
+                start={[0.5, 0]}
+                end={[0.5, 1]}
+              >
+                <View style={styles.tipItemInner}>
+                  <Text style={styles.cardText}>{tip}</Text>
+                </View>
+              </LinearGradient>
+            ))}
+          </>
+        )}
+      </View>
+
+      {tips.length < 10 && (
+        <View style={{ flex: 1, width: "100%", paddingHorizontal: wp(4) }}>
           <StandardButton
             loading={isLoading}
             isDisabled={tips.length >= 10 || isLoading}
@@ -147,122 +146,125 @@ const RecipeTipsCard = ({
             }
             clickHandler={handleGenerateMoreTips}
           />
-        )}
-      </View>
-    </LinearGradient>
+        </View>
+      )}
+    </View>
   );
 };
 
 export default RecipeTipsCard;
 
 const styles = StyleSheet.create({
-  container: {
-    paddingVertical: hp(2),
-    paddingHorizontal: wp(4),
-    display: "flex",
-    flexDirection: "column",
-    justifyContent: "space-between",
-    alignItems: "flex-start",
-    borderRadius: hp(ComponentParams.button.height.medium),
-    elevation: 2,
-    shadowColor: Colors.darkBlue,
-  },
-  contentTitleContainer: {
-    justifyContent: "space-between",
-    flexDirection: "row",
-    alignItems: "center",
-  },
   content: {
-    width: "100%",
-    gap: hp(2),
-  },
-  cardTitle: {
-    fontFamily: Fonts.heading_3.fontFamily,
-    fontSize: Fonts.heading_3.fontSize,
-    color: Colors.darkBlue,
-    lineHeight: Fonts.heading_3.lineHeight,
-  },
-  cardText: {
-    lineHeight: Fonts.text_2.lineHeight,
-    fontFamily: Fonts.text_2.fontFamily,
-    fontSize: Fonts.text_2.fontSize,
-    color: Colors.darkGrey,
-    marginBottom: hp(1),
-    flexWrap: "wrap",
-    marginRight: wp(2),
-  },
-  bulletPoint: {
-    width: wp(2),
-    height: wp(2),
-    borderRadius: hp(1),
-    marginTop: hp(1),
-  },
-  tipItem: {
     display: "flex",
-    flexDirection: "row",
-    gap: wp(2),
-    alignItems: "flex-start",
-  },
-  itemList: {
-    width: "100%",
     flexDirection: "column",
     justifyContent: "flex-start",
     alignItems: "flex-start",
-    gap: hp(1),
+    width: "100%",
   },
-  panpalCreditsButtonContainer: {
-    backgroundColor: Colors.light.components.button.gold.background[0], // Set the background color to represent a coin
-    borderRadius: hp(ComponentParams.button.height.small / 2), // Rounded border
-    width: hp(ComponentParams.button.height.small),
-    height: hp(ComponentParams.button.height.small),
-    justifyContent: "center",
-    alignItems: "center",
-    borderWidth: 2, // Border width
-    borderColor: Colors.light.components.button.gold.border, // Border color
-  },
-  panpalCreditsText: {
-    textAlignVertical: "center",
-    fontFamily: Fonts.text_2.fontFamily,
-    fontSize: Fonts.text_2.fontSize,
-    lineHeight: Fonts.text_2.lineHeight,
-    color: Colors.white,
-  },
-  panpalCreditsButtonText: {
-    textAlign: "center",
-    textTransform: "uppercase",
-    fontFamily: Fonts.text_1.fontFamily,
-    fontSize: Fonts.text_3.fontSize,
-    lineHeight: Fonts.text_3.lineHeight,
-    color: Colors.darkGold,
-  },
-  panpalCreditsContainer: {
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
-    gap: wp(1),
-    backgroundColor: "transparent",
-    height: hp(ComponentParams.button.height.medium),
-    paddingHorizontal: wp(2),
-    borderRadius: hp(ComponentParams.button.height.medium / 2),
-  },
-  contentTitleLeft: {
-    marginLeft: wp(1),
+  contentTitleContainer: {
     display: "flex",
     flexDirection: "row",
+    justifyContent: "space-between",
     alignItems: "center",
-    gap: wp(1),
+    width: "100%",
+    paddingHorizontal: wp(4),
+  },
+  contentTitleLeft: {
+    display: "flex",
+    flexDirection: "row",
     justifyContent: "center",
+    alignItems: "center",
+  },
+  itemListContainer: {
+    width: "100%",
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "flex-start",
+    alignItems: "center",
+    gap: hp(2),
+    paddingVertical: hp(2),
+    overflow: "hidden",
+    paddingHorizontal: wp(4),
   },
   contentTitleRight: {
     display: "flex",
-    justifyContent: "center",
     flexDirection: "row",
+    justifyContent: "center",
     alignItems: "center",
   },
   contentTitleRightText: {
     fontFamily: Fonts.text_2.fontFamily,
     fontSize: Fonts.text_2.fontSize,
+    lineHeight: Fonts.text_2.lineHeight,
+    color: Colors.darkGrey,
+  },
+  cardTitle: {
+    lineHeight: Fonts.text_1.lineHeight,
+    fontFamily: Fonts.text_1.fontFamily,
+    fontSize: Fonts.text_1.fontSize,
+    color: Colors.darkBlue,
+    marginLeft: wp(2),
+  },
+  tipItem: {
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "flex-start",
+    width: "100%",
+    elevation: 2,
+    shadowColor: Colors.cardDropShadow,
+    padding: wp(2),
+    borderRadius: hp(ComponentParams.button.height.small),
+  },
+  tipItemInner: {
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "flex-start",
+    width: "100%",
+    padding: wp(2),
+    shadowColor: Colors.cardDropShadow,
+  },
+  cardText: {
+    fontFamily: Fonts.text_2.fontFamily,
+    fontSize: Fonts.text_2.fontSize,
     color: Colors.darkGrey,
     lineHeight: Fonts.text_2.lineHeight,
+  },
+  panpalCreditsContainer: {
+    display: "flex",
+    flexDirection: "row",
+    marginRight: wp(1),
+    gap: wp(1),
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  panpalCreditsText: {
+    fontFamily: Fonts.text_2.fontFamily,
+    fontSize: Fonts.text_2.fontSize,
+    color: Colors.white,
+    lineHeight: Fonts.text_2.lineHeight,
+  },
+  panpalCreditsButtonText: {
+    textTransform: "uppercase",
+    fontFamily: Fonts.text_1.fontFamily,
+    fontSize: Fonts.text_2.fontSize,
+    color: Colors.darkGold,
+    textAlign: "center",
+    position: "absolute",
+    textAlignVertical: "center",
+  },
+  panpalCreditsButtonContainer: {
+    borderBottomColor: Colors.darkGold,
+    borderBottomWidth: 1,
+    borderRightColor: Colors.darkGold,
+    borderRightWidth: 1,
+    borderRadius: hp(ComponentParams.button.height.small),
+    width: hp(ComponentParams.button.height.small),
+    height: hp(ComponentParams.button.height.small),
+    justifyContent: "center",
+    alignItems: "center",
+    aspectRatio: 1,
   },
 });

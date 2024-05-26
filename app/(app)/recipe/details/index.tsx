@@ -1,12 +1,4 @@
-import {
-  View,
-  Text,
-  StyleSheet,
-  ActivityIndicator,
-  TouchableOpacity,
-  ToastAndroid,
-  Alert,
-} from "react-native";
+import { View, StyleSheet, ToastAndroid, Alert } from "react-native";
 import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
 import { router, useLocalSearchParams, useFocusEffect } from "expo-router";
 import { recipeService } from "@/services/db/recipe.services";
@@ -40,6 +32,7 @@ import RoundButton from "@/components/buttons/RoundButton";
 import FullScreenLoading from "@/components/FullScreenLoading";
 import { Line } from "react-native-svg";
 import StandardButton from "@/components/buttons/StandardButton";
+import { RecipesContext } from "@/context/recipesContext";
 
 const DetailsRecipe = () => {
   const { user } = useContext<any>(AuthContext);
@@ -53,24 +46,43 @@ const DetailsRecipe = () => {
   const [generatedImage, setGeneratedImage] = useState<string | undefined>("");
   const [selectedTab, setSelectedTab] = useState<number>(0);
   const recipesDetailsTabBarSheetModal = useRef<BottomSheetModal>(null);
+  const { recipes } = useContext<any>(RecipesContext);
 
   useFocusEffect(
     React.useCallback(() => {
       if (!recipeId) return;
       setIsLoading(true);
-      getRecipe(recipeId as string)
+      findRecipeInContext(recipeId as string)
         .then((res) => {
-          setRecipe(res);
-          console.log(res);
-          setTimeout(() => {
+          if (res) {
+            console.log("Found recipe in context");
+            setRecipe(res);
             setIsLoading(false);
-          }, 200);
+          }
         })
         .catch((err) => {
-          if (err.code === "not-found") router.back();
+          getRecipe(recipeId as string)
+            .then((res) => {
+              if (res) {
+                console.log("Fetched recipe from db");
+                setRecipe(res);
+                setIsLoading(false);
+              }
+            })
+            .catch((err) => {
+              setIsLoading(false);
+              Alert.alert("Failed to fetch recipe", err.message);
+            });
         });
     }, [recipeId])
   );
+
+  const findRecipeInContext = async (recipeId: string) => {
+    const recipe = recipes.find((recipe: RecipeType) => recipe.id === recipeId);
+    if (recipe) {
+      return recipe.data;
+    }
+  };
 
   const handleEditRecipe = () => {
     if (!recipe) return;
@@ -82,15 +94,14 @@ const DetailsRecipe = () => {
   const handleDeleteRecipe = () => {
     if (!recipeId) return;
     if (recipe?.uuid !== user.userId) return;
+
     deleteImageFromFirebase(recipe?.image as string).then((res) => {
-      console.log(res);
       deleteRecipe(recipeId as string).then((res) => {
-        console.log(res);
         if (res.success) {
           router.back();
           ToastAndroid.show("Recipe deleted successfully", ToastAndroid.SHORT);
         } else {
-          console.log("Failed to delete recipe");
+          Alert.alert("Failed to delete recipe", res.message);
         }
       });
     });
@@ -105,12 +116,11 @@ const DetailsRecipe = () => {
     }
     generateRecipeImage(recipe as RecipeType).then(
       (res) => {
-        console.log(res);
         setIsGeneratingImage(false);
         setGeneratedImage(res);
       },
       (err) => {
-        console.error(err);
+        Alert.alert("Failed to generate image", err.message);
         setIsGeneratingImage(false);
       }
     );
@@ -121,17 +131,15 @@ const DetailsRecipe = () => {
       const updatedRecipe = { ...recipe, image: generatedImage };
       updateRecipe(recipeId as string, updatedRecipe).then(
         (res) => {
-          console.log(res);
           if (res.success) {
             setRecipe(res.recipeData);
             ToastAndroid.show("One PanPal Credit used", ToastAndroid.SHORT);
-            console.log("Recipe updated successfully");
           } else {
-            console.log("Failed to update recipe");
+            Alert.alert("Failed to update recipe", res.message);
           }
         },
         (err) => {
-          console.error(err);
+          Alert.alert("Failed to update recipe", err.message);
         }
       );
     }
@@ -181,15 +189,14 @@ const DetailsRecipe = () => {
 
       await updateRecipe(recipeId as string, updatedRecipe).then(
         (res) => {
-          console.log(res);
           if (res.success) {
             setRecipe(res.recipeData);
           } else {
-            console.log("Failed to update recipe");
+            Alert.alert("Failed to update recipe", res.message);
           }
         },
         (err) => {
-          console.error(err);
+          Alert.alert("Failed to update recipe", err.message);
         }
       );
     });
@@ -333,6 +340,8 @@ const DetailsRecipe = () => {
                     handleNewImage={(image) => {
                       handleUpdateImage(image);
                     }}
+                    setRecipe={setRecipe}
+                    recipe={recipe}
                   />
                   <RecipeHeaderContainer
                     headerData={{

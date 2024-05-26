@@ -1,4 +1,10 @@
-import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  ToastAndroid,
+} from "react-native";
 import React, { useEffect, useState } from "react";
 import { LinearGradient } from "expo-linear-gradient";
 
@@ -28,7 +34,7 @@ const RecipeCard = ({
   allowedToDelete: boolean;
 }) => {
   const [showOverlay, setShowOverlay] = useState(false);
-
+  const { deleteRecipe, deleteImageFromFirebase } = recipeService;
   const handleNavigateToRecipe = async (recipeId: string) => {
     router.push({ pathname: `/recipe/details/`, params: { recipeId } });
   };
@@ -39,24 +45,19 @@ const RecipeCard = ({
   };
 
   const handleDelete = async () => {
-    if (
-      recipe.data?.image &&
-      recipe.data.image.startsWith("https://firebasestorage.googleapis.com")
-    ) {
-      await recipeService.deleteImageFromFirebase(recipe.data.image);
-    }
-    recipeService.deleteRecipe(recipe.id);
+    if (!allowedToDelete) return;
+    if (!recipe) return;
+    deleteImageFromFirebase(recipe.data.image as string);
+    deleteRecipe(recipe.id);
+
     setShowOverlay(false);
   };
 
   const handleEdit = async (recipeId: string) => {
+    if (!allowedToEdit) return;
     router.push({ pathname: `/recipe/edit/`, params: { recipeId } });
     setShowOverlay(false);
   };
-
-  useEffect(() => {
-    console.log(recipe.data.image);
-  }, [recipe.data.image]);
 
   return (
     <LinearGradient
@@ -157,10 +158,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     borderRadius: hp(ComponentParams.button.height.small),
     overflow: "hidden",
-    shadowColor: Colors.darkBlue,
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
+    shadowColor: Colors.cardDropShadow,
     elevation: 2,
     height: hp(15),
     width: "100%",

@@ -38,8 +38,12 @@ const createRecipe = async (recipeData: RecipeType) => {
       const downloadURL = await uploadImageToFirebase(recipeData.image);
       recipeData.image = downloadURL;
     }
-    await setDoc(docRef, recipeData);
-    return { success: true, message: "Recipe created successfully" };
+    await setDoc(docRef, recipeData).then();
+    return {
+      success: true,
+      message: "Recipe created successfully",
+      id: docRef.id,
+    };
   } catch (error) {
     console.error("Error creating recipe:", error);
     return { success: false, message: "Failed to create recipe" };
@@ -160,8 +164,9 @@ const deleteRecipe = async (recipeId: string) => {
 
 const deleteImageFromFirebase = async (imageUrl: string) => {
   // If the imageUrl contains "firebase", it's a Firebase Storage URL
-  if (!imageUrl.includes("firebase")) {
-    return { success: false, message: "Invalid image URL" };
+  if (!imageUrl) return;
+  if (!imageUrl.includes("firebasestorage")) {
+    return { success: true, message: "Invalid image URL" };
   }
 
   // Get a reference to the storage

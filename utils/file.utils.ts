@@ -11,7 +11,7 @@ import ingredients from "../constants/ingredients.json";
 export const compressImage = async (image: string) => {
   try {
     const manipResult = await ImageManipulator.manipulateAsync(image, [], {
-      compress: 0.25,
+      compress: 0.5,
     });
     return manipResult.uri;
   } catch (error) {

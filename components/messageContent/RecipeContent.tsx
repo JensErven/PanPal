@@ -1,4 +1,11 @@
-import { View, Text, StyleSheet, ActivityIndicator } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  ActivityIndicator,
+  TouchableOpacity,
+  Alert,
+} from "react-native";
 import React, { useContext, useEffect } from "react";
 import {
   widthPercentageToDP as wp,
@@ -13,10 +20,11 @@ import { Ionicons } from "@expo/vector-icons";
 import { recipeService } from "@/services/db/recipe.services";
 import { RecipeType } from "@/models/RecipeType";
 import { AuthContext } from "@/context/authContext";
+import { router } from "expo-router";
 
 const RecipeContent = ({ content }: { content: recipeExampleJsonType }) => {
   const { user } = useContext<any>(AuthContext);
-
+  const [savedRecipeId, setSavedRecipeId] = React.useState<string>("");
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
   const [isSaved, setIsSaved] = React.useState<boolean>(false);
   const formatRecipe = (recipe: recipeExampleJsonType): RecipeType => {
@@ -41,14 +49,24 @@ const RecipeContent = ({ content }: { content: recipeExampleJsonType }) => {
 
     try {
       const formattedRecipe = formatRecipe(recipe);
-      await recipeService.createRecipe(formattedRecipe);
-      setIsSaved(true); // Update saved status
+      await recipeService.createRecipe(formattedRecipe).then((response) => {
+        if (!response.id) return;
+        setIsSaved(true);
+        setSavedRecipeId(response.id);
+      });
     } catch (e) {
-      console.log(e);
+      Alert.alert("Error", "An error occurred while saving the recipe");
     } finally {
-      console.log("Recipe saved");
       setIsLoading(false);
     }
+  };
+
+  const handleGoToRecipe = () => {
+    if (!savedRecipeId && !isSaved) return;
+    router.push({
+      pathname: `/recipe/details/`,
+      params: { recipeId: savedRecipeId },
+    });
   };
 
   return (
@@ -116,36 +134,86 @@ const RecipeContent = ({ content }: { content: recipeExampleJsonType }) => {
           </View>
         )}
       </View>
-      <View style={{ width: "100%", marginTop: hp(2) }}>
-        <StandardButton
-          isDisabled={isLoading || isSaved}
-          icon={
-            isLoading ? (
-              <ActivityIndicator size="large" color={Colors.white} />
-            ) : (
-              <Ionicons
-                name={isSaved ? "bookmark" : "bookmark-outline"}
-                size={hp(2.7)}
-                color={Colors.white}
+      <View
+        style={{
+          width: "100%",
+          marginTop: hp(2),
+          flexDirection: "row",
+          gap: wp(2),
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
+      >
+        {isSaved && savedRecipeId ? (
+          <>
+            <Ionicons
+              name="bookmark"
+              size={hp(3.2)}
+              color={Colors.mediumPurple}
+            />
+            <View style={{ flex: 1 }}>
+              <StandardButton
+                textValue="Go to Recipe"
+                height={ComponentParams.button.height.medium}
+                colors={[
+                  Colors.light.components.button.purple.background[0],
+                  Colors.light.components.button.purple.background[1],
+                  Colors.light.components.button.purple.background[2],
+                ]}
+                borderColor={
+                  Colors.light.components.button.purple.background[0]
+                }
+                textColor={Colors.white}
+                shadowColor={Colors.light.components.button.white.dropShadow}
+                clickHandler={handleGoToRecipe}
+                iconRight={
+                  <Ionicons
+                    name="arrow-forward"
+                    size={hp(3.2)}
+                    style={{ marginRight: wp(2) }}
+                    color={Colors.white}
+                  />
+                }
               />
-            )
-          }
-          textValue={
-            isSaved ? "Saved" : isLoading ? "Saving..." : "Save Recipe"
-          }
-          height={ComponentParams.button.height.medium}
-          colors={[
-            Colors.light.components.button.purple.background[0],
-            Colors.light.components.button.purple.background[1],
-            Colors.light.components.button.purple.background[2],
-          ]}
-          borderColor={Colors.light.components.button.purple.background[0]}
-          textColor={Colors.white}
-          shadowColor={Colors.light.components.button.white.dropShadow}
-          clickHandler={() => {
-            handleSaveRecipe(content);
-          }}
-        />
+            </View>
+          </>
+        ) : (
+          <>
+            <TouchableOpacity
+              onPress={() => {
+                handleSaveRecipe(content);
+              }}
+            >
+              <Ionicons
+                name="bookmark"
+                size={hp(3.2)}
+                color={Colors.primarySkyBlue}
+              />
+            </TouchableOpacity>
+            <View style={{ flex: 1 }}>
+              <StandardButton
+                isDisabled={isLoading || isSaved}
+                textValue={
+                  isSaved ? "Saved" : isLoading ? "Saving..." : "Save Recipe"
+                }
+                height={ComponentParams.button.height.medium}
+                colors={[
+                  Colors.light.components.button.purple.background[0],
+                  Colors.light.components.button.purple.background[1],
+                  Colors.light.components.button.purple.background[2],
+                ]}
+                borderColor={
+                  Colors.light.components.button.purple.background[0]
+                }
+                textColor={Colors.white}
+                shadowColor={Colors.light.components.button.white.dropShadow}
+                clickHandler={() => {
+                  handleSaveRecipe(content);
+                }}
+              />
+            </View>
+          </>
+        )}
       </View>
     </View>
   );

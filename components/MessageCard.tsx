@@ -53,7 +53,7 @@ const MessageCard = ({
         </LinearGradient>
       ) : (
         <LinearGradient
-          colors={[...Colors.light.components.button.white.background]}
+          colors={[Colors.white, Colors.secondaryWhite]}
           start={[0, 0]}
           end={[1, 1]}
           style={styles.assistantMessageContainer}

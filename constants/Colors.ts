@@ -24,6 +24,7 @@ export default {
   gold: gold,
   darkGold: darkGold,
   primarySkyBlue: primarySkyBlue,
+  cardDropShadow: cardDropShadow,
 
   light: {
     text: darkBlue,

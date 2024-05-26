@@ -27,9 +27,7 @@ const RecipeIngredientsDetails = ({
 }) => {
   const [changingServings, setChangingServings] = React.useState(servings);
 
-  const handleOpenConvertUnitsModal = () => {
-    console.log("Open Convert Units Modal");
-  };
+  const handleOpenConvertUnitsModal = () => {};
 
   const changedIngredients = useMemo(() => {
     return updateIngredientQuantities(ingredients, servings, changingServings);

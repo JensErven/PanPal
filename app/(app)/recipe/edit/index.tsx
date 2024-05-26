@@ -14,7 +14,7 @@ import CustomHeader from "@/components/navigation/CustomHeader";
 import { StatusBar } from "expo-status-bar";
 import { RecipeType } from "@/models/RecipeType";
 import { Ionicons } from "@expo/vector-icons";
-import { router, useLocalSearchParams } from "expo-router";
+import { router, useFocusEffect, useLocalSearchParams } from "expo-router";
 import { AuthContext } from "@/context/authContext";
 import { recipeService } from "@/services/db/recipe.services";
 import { TextInput } from "react-native-gesture-handler";
@@ -31,6 +31,7 @@ import EditRecipeMealType from "@/components/edits/EditRecipeMealType";
 import RecipeImageContainer from "@/components/RecipeImageContainer";
 import FullScreenLoading from "@/components/FullScreenLoading";
 import EditRecipeServings from "@/components/edits/EditRecipeServings";
+import { RecipesContext } from "@/context/recipesContext";
 
 const EditCustomRecipeScreen = () => {
   const { user } = useContext<any>(AuthContext);
@@ -39,21 +40,43 @@ const EditCustomRecipeScreen = () => {
   const [recipe, setRecipe] = useState<RecipeType | undefined>(undefined);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [maxCharAmount, setMaxCharAmount] = useState<number>(250);
+  const { recipes } = useContext<any>(RecipesContext);
 
-  useEffect(() => {
-    if (!recipeId) return;
+  useFocusEffect(
+    React.useCallback(() => {
+      if (!recipeId) return;
+      setIsLoading(true);
+      findRecipeInContext(recipeId as string)
+        .then((res) => {
+          if (res) {
+            console.log("Found recipe in context");
+            setRecipe(res);
+            setIsLoading(false);
+          }
+        })
+        .catch((err) => {
+          getRecipe(recipeId as string)
+            .then((res) => {
+              if (res) {
+                console.log("Fetched recipe from db");
+                setRecipe(res);
+                setIsLoading(false);
+              }
+            })
+            .catch((err) => {
+              setIsLoading(false);
+              Alert.alert("Failed to fetch recipe", err.message);
+            });
+        });
+    }, [recipeId])
+  );
 
-    setIsLoading(true);
-    getRecipe(recipeId as string)
-      .then((res) => {
-        setRecipe(res);
-        if (res.uuid !== user.userId) router.back();
-        setIsLoading(false);
-      })
-      .catch((err) => {
-        if (err.code === "not-found") router.back();
-      });
-  }, [recipeId]);
+  const findRecipeInContext = async (recipeId: string) => {
+    const recipe = recipes.find((recipe: RecipeType) => recipe.id === recipeId);
+    if (recipe) {
+      return recipe.data;
+    }
+  };
 
   const handleConfirmEditRecipe = () => {
     if (!recipe) return;
@@ -99,24 +122,19 @@ const EditCustomRecipeScreen = () => {
         );
         return;
       }
-      await deleteImageFromFirebase(recipe.image as string)
-        .then((res) => {
-          console.log(res);
-        })
-        .catch((err) => {
-          console.error(err);
-        });
+      await deleteImageFromFirebase(recipe.image as string).catch((err) => {
+        Alert.alert("Failed to delete image", err.message);
+      });
       await updateRecipe(recipeId as string, updatedRecipe).then(
         (res) => {
-          console.log(res);
           if (res.success) {
             setRecipe(res.recipeData);
           } else {
-            console.log("Failed to update recipe");
+            Alert.alert("Failed to update recipe", res.message);
           }
         },
         (err) => {
-          console.error(err);
+          Alert.alert("Failed to update recipe", err.message);
         }
       );
     });
@@ -125,11 +143,7 @@ const EditCustomRecipeScreen = () => {
   return (
     <LinearGradient
       style={styles.gradientBackground}
-      colors={[
-        Colors.light.navHeader[0],
-        Colors.light.navHeader[1],
-        Colors.light.navHeader[2],
-      ]}
+      colors={Colors.light.navHeader}
       start={[0, 0]}
       end={[1, 0]}
     >
@@ -157,6 +171,8 @@ const EditCustomRecipeScreen = () => {
                 handleNewImage={(image) => {
                   handleUpdateImage(image);
                 }}
+                setRecipe={setRecipe}
+                recipe={recipe}
               />
               <View style={styles.content}>
                 <View style={styles.contentItem}>

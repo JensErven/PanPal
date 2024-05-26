@@ -196,10 +196,6 @@ const Saved = () => {
     );
   };
 
-  const handleSheetChanges = useCallback((index: number) => {
-    console.log("handleSheetChanges", index);
-  }, []);
-
   return (
     <LinearGradient
       style={styles.gradientBackground}
@@ -226,7 +222,6 @@ const Saved = () => {
       <RecipesFilterSheetModal
         snapPoints={[hp(100)]}
         bottomSheetModalRef={recipesFilterSheetModal}
-        handleSheetChanges={handleSheetChanges}
         selectedCuisineTypes={selectedCuisineTypes}
         setSelectedCuisineTypes={setSelectedCuisineTypes}
         selectedMealTypes={selectedMealTypes}

@@ -71,11 +71,7 @@ const CustomTabBar = ({ tabs }: { tabs: TabBarItem[] }) => {
             setIsPlusButtonPressed(false);
             router.push("/recipe/add");
           }}
-          colors={[
-            Colors.light.components.button.purple.background[0],
-            Colors.light.components.button.purple.background[1],
-            Colors.light.components.button.purple.background[2],
-          ]}
+          colors={Colors.light.components.button.purple.background}
           textColor={Colors.white}
           height={ComponentParams.button.height.medium}
           borderColor={Colors.light.components.button.purple.border}
@@ -98,11 +94,7 @@ const CustomTabBar = ({ tabs }: { tabs: TabBarItem[] }) => {
       />
       <View style={[styles.container]}>
         <LinearGradient
-          colors={[
-            Colors.light.components.button.purple.background[0],
-            Colors.light.components.button.purple.background[1],
-            Colors.light.components.button.purple.background[2],
-          ]}
+          colors={Colors.light.components.button.purple.background}
           start={[0, 0]}
           end={[0.5, 1]}
           style={styles.plusButtonGradientcontainer}
@@ -143,11 +135,7 @@ const CustomTabBar = ({ tabs }: { tabs: TabBarItem[] }) => {
               key={tab.index}
               colors={
                 activeTab === tab.index
-                  ? [
-                      Colors.light.components.button.purple.background[0],
-                      Colors.light.components.button.purple.background[1],
-                      Colors.light.components.button.purple.background[2],
-                    ]
+                  ? Colors.light.components.button.purple.background
                   : [Colors.white, Colors.white]
               }
             >

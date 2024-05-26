@@ -4,7 +4,7 @@ import {
   ActivityIndicator,
   TouchableOpacity,
 } from "react-native";
-import React, { useEffect } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { preferenceType } from "@/models/PreferenceType";
 import { allergyTypes } from "@/constants/tastePreferences/AllergyTypes";
@@ -23,76 +23,60 @@ import CustomHeader from "@/components/navigation/CustomHeader";
 import { Ionicons } from "@expo/vector-icons";
 import ComponentParams from "@/constants/ComponentParams";
 import RoundButton from "@/components/buttons/RoundButton";
+import { AuthContext } from "@/context/authContext";
+
+export type TastePreferenceType = {
+  cuisineTypes: string[];
+  allergyTypes: string[];
+};
 
 const tastePreferencesScreen = () => {
-  const [isLoading, setIsLoading] = React.useState<boolean>(false);
-  const [contentSteps, setContentSteps] = React.useState<preferenceType[]>([
+  const { tastePreferences } = useContext<any>(AuthContext);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const contentSteps: preferenceType[] = [
     {
-      title: "Your Allergies",
-      searchInputPlaceholder: "search allergies...",
-      addInputPlaceholder: "add other allergies...",
-      options: allergyTypes,
-      selectedOptions: [],
+      title: "Cuisine Types",
+      selectedOptions: cuisineTypes.map((type) => type.name),
+      searchInputPlaceholder: "Search cuisine types",
+      addInputPlaceholder: "Add a cuisine type",
+      options: cuisineTypes.map((type) => type.name),
     },
     {
-      title: "Preferred Cuisines",
-      searchInputPlaceholder: "search cuisines...",
-      addInputPlaceholder: "add other cuisines...",
-      options: cuisineTypes,
-      selectedOptions: [],
+      title: "Allergy Types",
+      selectedOptions: tastePreferences?.allergyTypes || [],
+      searchInputPlaceholder: "Search allergy types",
+      addInputPlaceholder: "Add an allergy type",
+      options: allergyTypes.map((type) => type.name),
     },
     {
       title: "Disliked Ingredients",
-      searchInputPlaceholder: "search ingredients...",
-      addInputPlaceholder: "add other ingredients...",
-      options: dislikedIngredientTypes,
-      selectedOptions: [],
+      selectedOptions: tastePreferences?.dislikedIngredientTypes || [],
+      searchInputPlaceholder: "Search disliked ingredients",
+      addInputPlaceholder: "Add a disliked ingredient",
+      options: dislikedIngredientTypes.map((type) => type.name),
     },
-  ]);
+  ];
 
-  const tastPreferencesChildren = () => {
-    return (
-      <RoundButton
-        handlePress={() => {
-          console.log("edit taste preferences");
-        }}
-      >
-        <Ionicons name="pencil" size={hp(2.7)} color={Colors.white} />
-      </RoundButton>
-    );
-  };
+  const tastPreferencesChildren = () => (
+    <RoundButton
+      handlePress={() => {
+        console.log("edit taste preferences");
+      }}
+    >
+      <Ionicons name="pencil" size={hp(2.7)} color={Colors.white} />
+    </RoundButton>
+  );
+
   useEffect(() => {
-    console.log("tastePreferencesScreen");
-    // get the preferences from the user in async storage and store the selectedOptions to the corresponding contentSteps
-    const getPreferences = async () => {
-      setIsLoading(true);
-      const preferences = await AsyncStorage.getItem("userTastePreferences");
-      console.log("Preferences found:", preferences);
-      // if (preferences) {
-      //   console.log("Preferences found:", preferences);
-      //   const parsedPreferences = JSON.parse(preferences);
-      //   setContentSteps((prev) =>
-      //     prev.map((step) => {
-      //       const selectedOptions = parsedPreferences.find(
-      //         (preference: preferenceType) => preference.title === step.title
-      //       )?.selectedOptions;
-      //       return { ...step, selectedOptions };
-      //     })
-      //   );
-      // }
-      setIsLoading(false);
-    };
-    getPreferences();
-  }, []);
+    console.log("Taste Preferences Screen Mounted");
+    console.log(tastePreferences);
+  }, [tastePreferences]);
 
   return (
     <LinearGradient
       style={styles.gradientBackground}
-      colors={[
-        Colors.light.navHeader[0],
-        Colors.light.navHeader[1],
-        Colors.light.navHeader[2],
-      ]}
+      colors={Colors.light.navHeader}
       start={[0, 0]}
       end={[1, 0]}
     >
@@ -122,7 +106,7 @@ const tastePreferencesScreen = () => {
                 <TastePreferencesCard
                   key={index}
                   title={step.title}
-                  selectedOptions={step.selectedOptions || []} // Ensure selectedOptions is always defined
+                  selectedOptions={step.selectedOptions}
                 />
               ))}
             </View>
@@ -150,6 +134,6 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: hp(ComponentParams.button.height.medium),
     flex: 1,
     padding: wp(4),
-    gap: hp(4),
+    gap: hp(2),
   },
 });

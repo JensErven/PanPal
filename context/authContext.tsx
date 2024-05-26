@@ -15,19 +15,27 @@ import { Alert, ToastAndroid } from "react-native";
 
 export const AuthContext = createContext(null);
 
+export type TastePreferenceType = {
+  cuisineTypes: string[];
+  allergyTypes: string[];
+};
+
 export const AuthContextProvider = ({ children }: { children: any }) => {
   const [user, setUser] = useState<any>(null);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | undefined>(
     undefined
   );
   const [credits, setCredits] = useState<number>(0);
+  const [tastePreferences, setTastePreferences] = useState<TastePreferenceType>(
+    { cuisineTypes: [], allergyTypes: [] }
+  );
 
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, (user) => {
       if (user && user.emailVerified) {
         setIsAuthenticated(true);
         updateUserData(user.uid);
-        retrieveAndStoreUserTastePreferences(user.uid);
+        subscribeToUserTastePreferencesDocChanges(user.uid);
         subscribeToUserDocChanges(user.uid);
       } else {
         setIsAuthenticated(false);
@@ -52,6 +60,20 @@ export const AuthContextProvider = ({ children }: { children: any }) => {
           credits: data?.credits,
         }));
         setCredits(data?.credits || 0);
+      }
+    });
+    return unsubscribe;
+  };
+
+  const subscribeToUserTastePreferencesDocChanges = (userId: string) => {
+    const userDocRef = doc(db, "tastePreferences", userId);
+    const unsubscribe = onSnapshot(userDocRef, (doc) => {
+      if (doc.exists()) {
+        const data = doc.data() as TastePreferenceType;
+        setTastePreferences({
+          cuisineTypes: data.cuisineTypes || [],
+          allergyTypes: data.allergyTypes || [],
+        });
       }
     });
     return unsubscribe;
@@ -174,39 +196,11 @@ export const AuthContextProvider = ({ children }: { children: any }) => {
     }
   };
 
-  const retrieveAndStoreUserTastePreferences = async (userId: string) => {
-    try {
-      // Retrieve user taste preferences from Firestore
-      const docRef = doc(db, "userTastePreferences", userId);
-      const docSnap = await getDoc(docRef);
-
-      if (docSnap.exists()) {
-        const preferences = docSnap.data();
-
-        // Store preferences in AsyncStorage
-        await AsyncStorage.setItem(
-          `userTastePreferences`,
-          JSON.stringify(preferences)
-        );
-
-        console.log(
-          "User taste preferences retrieved from Firebase and stored in AsyncStorage."
-        );
-      } else {
-        console.log("User taste preferences not found in Firestore.");
-      }
-    } catch (error) {
-      console.error(
-        "Error retrieving and storing user taste preferences:",
-        error
-      );
-    }
-  };
   const storeUserTastePreferencesToFirebase = async (userId: string) => {
     console.log("Storing user taste preferences in Firebase.");
     try {
       // get the preferences from async storage
-      const preferences = await AsyncStorage.getItem("userTastePreferences");
+      const preferences = await AsyncStorage.getItem("tastePreferences");
       console.log("preferences", preferences);
       if (!preferences) {
         console.log("No preferences found in AsyncStorage.");
@@ -215,7 +209,7 @@ export const AuthContextProvider = ({ children }: { children: any }) => {
       const parsedPreferences = JSON.parse(preferences);
       // Update or create preferences documents in Firestore
       parsedPreferences.forEach(async (preference: preferenceType) => {
-        const docRef = doc(db, "userTastePreferences", userId);
+        const docRef = doc(db, "tastePreferences", userId);
         const newDoc = {
           selectedOptions: preference.selectedOptions,
           title: preference.title,
@@ -244,6 +238,7 @@ export const AuthContextProvider = ({ children }: { children: any }) => {
         subtractCredits,
         storeUserTastePreferencesToFirebase,
         credits,
+        tastePreferences,
       }}
     >
       {children}

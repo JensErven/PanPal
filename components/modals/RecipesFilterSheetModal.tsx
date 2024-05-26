@@ -38,7 +38,7 @@ const RecipesFilterSheetModal = ({
   children?: React.ReactNode;
   snapPoints: number[];
   bottomSheetModalRef: React.RefObject<BottomSheetModal>;
-  handleSheetChanges: (index: number) => void;
+  handleSheetChanges?: (index: number) => void;
   selectedCuisineTypes: string[];
   setSelectedCuisineTypes: React.Dispatch<React.SetStateAction<string[]>>;
   selectedMealTypes: string[];

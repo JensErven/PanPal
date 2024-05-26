@@ -40,7 +40,7 @@ const ProfileScreen = () => {
     await logout();
   };
 
-  const tastPreferencesChildren = () => {
+  const headerChildren = () => {
     return (
       <>
         <RoundButton handlePress={() => router.push("/profile/edit")}>
@@ -55,11 +55,7 @@ const ProfileScreen = () => {
   return (
     <LinearGradient
       style={styles.gradientBackground}
-      colors={[
-        Colors.light.navHeader[0],
-        Colors.light.navHeader[1],
-        Colors.light.navHeader[2],
-      ]}
+      colors={Colors.light.navHeader}
       start={[0, 0]}
       end={[1, 0]}
     >
@@ -67,7 +63,7 @@ const ProfileScreen = () => {
         isTransparent={true}
         headerTitle={"Your Profile"}
         hasGoBack={true}
-        children={tastPreferencesChildren()}
+        children={headerChildren()}
       />
       <LinearGradient
         style={styles.container}
@@ -125,7 +121,7 @@ const ProfileScreen = () => {
                 </Text>
               </View>
 
-              <LinearGradient
+              {/* <LinearGradient
                 style={styles.tastePreferenceNoteContainer}
                 colors={[Colors.white, Colors.white, Colors.secondaryWhite]}
                 start={[0.5, 0]}
@@ -162,11 +158,7 @@ const ProfileScreen = () => {
                     <StandardButton
                       textValue="View Taste Profile"
                       height={ComponentParams.button.height.medium}
-                      colors={[
-                        Colors.light.components.button.purple.background[0],
-                        Colors.light.components.button.purple.background[1],
-                        Colors.light.components.button.purple.background[2],
-                      ]}
+                      colors={Colors.light.components.button.purple.background}
                       borderColor={
                         Colors.light.components.button.purple.background[0]
                       }
@@ -180,7 +172,7 @@ const ProfileScreen = () => {
                     />
                   </View>
                 </View>
-              </LinearGradient>
+              </LinearGradient> */}
               <LinearGradient
                 style={styles.tastePreferenceNoteContainer}
                 colors={[Colors.white, Colors.white, Colors.secondaryWhite]}
@@ -195,10 +187,9 @@ const ProfileScreen = () => {
                         <Text style={styles.panpalCreditsText}>{credits}</Text>
                         <LinearGradient
                           style={styles.panpalCreditsButtonContainer}
-                          colors={[
-                            Colors.light.components.button.gold.background[0],
-                            Colors.light.components.button.gold.background[1],
-                          ]}
+                          colors={
+                            Colors.light.components.button.gold.background
+                          }
                           start={[0.5, 0]}
                           end={[0.5, 1]}
                         >
@@ -220,10 +211,9 @@ const ProfileScreen = () => {
                           <StandardButton
                             textValue="Get PanPal Coins"
                             height={ComponentParams.button.height.medium}
-                            colors={[
-                              Colors.light.components.button.gold.background[0],
-                              Colors.light.components.button.gold.background[1],
-                            ]}
+                            colors={
+                              Colors.light.components.button.gold.background
+                            }
                             borderColor={Colors.darkGold}
                             textColor={Colors.light.text}
                             shadowColor={
@@ -262,12 +252,9 @@ const ProfileScreen = () => {
                     <StandardButton
                       textValue="Logout"
                       height={ComponentParams.button.height.medium}
-                      colors={[
-                        Colors.light.components.button.white.background[1],
-                        Colors.light.components.button.white.background[0],
-                      ]}
+                      colors={Colors.light.components.button.white.background}
                       borderColor={Colors.light.components.button.white.border}
-                      textColor={Colors.light.components.button.white.text}
+                      textColor={Colors.darkGrey}
                       shadowColor={
                         Colors.light.components.button.white.dropShadow
                       }
@@ -275,7 +262,7 @@ const ProfileScreen = () => {
                         <Ionicons
                           name="log-out"
                           size={hp(2.7)}
-                          color={Colors.light.components.button.white.text}
+                          color={Colors.darkGrey}
                         />
                       }
                       clickHandler={handleLogout}
@@ -334,7 +321,7 @@ const styles = StyleSheet.create({
   },
   userName: {
     flexWrap: "wrap",
-    color: Colors.light.text,
+    color: Colors.darkBlue,
     fontSize: Fonts.heading_3.fontSize,
     fontFamily: Fonts.heading_3.fontFamily,
     lineHeight: Fonts.heading_3.lineHeight,
@@ -345,7 +332,7 @@ const styles = StyleSheet.create({
     fontSize: Fonts.text_2.fontSize,
     fontFamily: Fonts.text_2.fontFamily,
     lineHeight: Fonts.text_2.lineHeight,
-    color: Colors.light.text,
+    color: Colors.darkGrey,
   },
   userBioText: {
     flexWrap: "wrap",
@@ -363,7 +350,7 @@ const styles = StyleSheet.create({
     alignItems: "flex-start",
     borderRadius: hp(ComponentParams.button.height.small),
     elevation: 3,
-    shadowColor: Colors.darkBlue,
+    shadowColor: Colors.cardDropShadow,
   },
   tastePreferenceNoteContent: {
     width: "100%",
@@ -372,14 +359,14 @@ const styles = StyleSheet.create({
   title: {
     fontFamily: Fonts.text_1.fontFamily,
     fontSize: Fonts.text_1.fontSize,
-    color: Colors.light.text,
+    color: Colors.darkBlue,
     lineHeight: Fonts.text_1.lineHeight,
   },
   subTitle: {
     lineHeight: Fonts.text_2.lineHeight,
     fontFamily: Fonts.text_2.fontFamily,
     fontSize: Fonts.text_2.fontSize,
-    color: Colors.darkBlue,
+    color: Colors.darkGrey,
     marginBottom: hp(1),
   },
   titleContainer: {
