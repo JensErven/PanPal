@@ -109,9 +109,7 @@ const extractCoreIngredient = (ingredient: string) => {
  */
 export const getIngredientImage = (ingredient: string) => {
   if (!ingredient.trim()) {
-    return {
-      uri: null,
-    };
+    return "";
   }
 
   const coreIngredient = extractCoreIngredient(ingredient);
@@ -131,13 +129,9 @@ export const getIngredientImage = (ingredient: string) => {
   }
 
   if (!foundIngredient) {
-    return {
-      uri: "https://www.themealdb.com/images/ingredients/notfound.png", // Use a not-found image URI
-    };
+    return "";
   }
 
   const baseUrl = "https://www.themealdb.com/images/ingredients/";
-  return {
-    uri: `${baseUrl}${foundIngredient.strIngredient}.png`,
-  };
+  return `${baseUrl}${foundIngredient.strIngredient}.png`;
 };

@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useRef, useState } from "react";
 import { auth, db } from "../firebaseConfig";
 import {
   createUserWithEmailAndPassword,
@@ -8,10 +8,17 @@ import {
   signInWithEmailAndPassword,
   signOut,
 } from "firebase/auth";
-import { doc, getDoc, onSnapshot, setDoc, updateDoc } from "firebase/firestore";
+import {
+  Timestamp,
+  doc,
+  getDoc,
+  onSnapshot,
+  setDoc,
+  updateDoc,
+} from "firebase/firestore";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { preferenceType } from "@/models/PreferenceType";
-import { Alert, ToastAndroid } from "react-native";
+import { Alert } from "react-native";
 
 export const AuthContext = createContext(null);
 
@@ -20,36 +27,160 @@ export type TastePreferenceType = {
   allergyTypes: string[];
 };
 
+export type UserCreditsType = {
+  credits: number;
+  lastResetDay: Timestamp;
+};
+
 export const AuthContextProvider = ({ children }: { children: any }) => {
   const [user, setUser] = useState<any>(null);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | undefined>(
     undefined
   );
-  const [credits, setCredits] = useState<number>(0);
+  const [credits, setCredits] = useState<UserCreditsType>(
+    {} as UserCreditsType
+  );
   const [tastePreferences, setTastePreferences] = useState<TastePreferenceType>(
     { cuisineTypes: [], allergyTypes: [] }
   );
+  const unsubscribeFunctions = useRef<(() => void)[]>([]); // Use useRef instead of useState
 
   useEffect(() => {
-    const unsub = onAuthStateChanged(auth, (user) => {
-      if (user && user.emailVerified) {
+    const unsubscribeAll = () => {
+      unsubscribeFunctions.current.forEach((unsubscribe) => unsubscribe());
+      unsubscribeFunctions.current.length = 0; // Clear the array
+    };
+
+    const handleAuthStateChanged = (user: any) => {
+      if (user && user.uid && user.emailVerified) {
         setIsAuthenticated(true);
         updateUserData(user.uid);
         subscribeToUserTastePreferencesDocChanges(user.uid);
-        subscribeToUserDocChanges(user.uid);
+        const unsubscribeCredits = subscribeToCreditsDocChanges(user.uid);
+        const unsubscribeUser = subscribeToUserDocChanges(user.uid);
+        unsubscribeFunctions.current.push(unsubscribeCredits, unsubscribeUser);
       } else {
         setIsAuthenticated(false);
         setUser(null);
+        setCredits({} as UserCreditsType);
+      }
+    };
+
+    const unsubscribeAuthStateChanged = onAuthStateChanged(
+      auth,
+      handleAuthStateChanged
+    );
+
+    return () => {
+      unsubscribeAll(); // Unsubscribe from all listeners
+      unsubscribeAuthStateChanged(); // Unsubscribe from onAuthStateChanged
+    };
+  }, []);
+
+  /**
+   * Subscribes to changes in the credits document for a specific user.
+   * If the document exists, it checks if the last reset day is different from today.
+   * If it is different, it resets the credits to 50 and updates the document.
+   * If it is the same, it sets the credits and last reset day from the document.
+   * If the document does not exist, it creates a new document with initial credits of 50 and the current date as the last reset day.
+   * @param userId The ID of the user.
+   * @returns A function to unsubscribe from the snapshot listener.
+   */
+  const subscribeToCreditsDocChanges = (userId: string) => {
+    const creditsDocRef = doc(db, "credits", userId);
+    const unsubscribe = onSnapshot(creditsDocRef, async (doc) => {
+      if (doc.exists()) {
+        console.log("Credits doc exists");
+        let data = doc.data();
+        const today = new Date();
+        const todayMidnight = new Date(
+          today.getFullYear(),
+          today.getMonth(),
+          today.getDate(),
+          0,
+          0,
+          0,
+          0
+        );
+        const lastResetDay = data.lastResetDay.toDate();
+        const lastResetDayMidnight = new Date(
+          lastResetDay.getFullYear(),
+          lastResetDay.getMonth(),
+          lastResetDay.getDate(),
+          0,
+          0,
+          0,
+          0
+        );
+        console.log("lastResetDayMidnight", lastResetDayMidnight);
+        console.log("todayMidnight", todayMidnight);
+        if (lastResetDayMidnight.getTime() !== todayMidnight.getTime()) {
+          const newCreditsData = await resetCredits(50, userId);
+          if (newCreditsData) {
+            setCredits(newCreditsData);
+          }
+        } else {
+          setCredits({
+            credits: data.credits,
+            lastResetDay: data.lastResetDay,
+          });
+        }
+      } else {
+        console.log("Credits doc does not exist");
+        setCredits({ credits: 50, lastResetDay: Timestamp.now() });
+        await setDoc(creditsDocRef, {
+          credits: 50,
+          lastResetDay: Timestamp.now(),
+        });
       }
     });
-    return unsub;
-  }, []);
+    return unsubscribe;
+  };
+
+  useEffect(() => {
+    console.log("User", user);
+    console.log("Credits", credits);
+    console.log("TastePreferences", tastePreferences);
+  }, [user, credits, tastePreferences]);
+
+  const resetCredits = async (amount: number, userId: string) => {
+    const newCredits = amount;
+    const newLastResetDay = Timestamp.now();
+
+    if (userId) {
+      console.log("Resetting credits to 50");
+      const creditsDocRef = doc(db, "credits", userId);
+      await updateDoc(creditsDocRef, {
+        credits: newCredits,
+        lastResetDay: newLastResetDay,
+      });
+
+      // Return the updated credits data
+      return { credits: newCredits, lastResetDay: newLastResetDay };
+    }
+  };
+
+  const substractCredits = async (amount: number) => {
+    if (credits.credits >= amount) {
+      const newCredits = credits.credits - amount;
+      setCredits((prevCredits) => ({ ...prevCredits, credits: newCredits }));
+      if (user?.userId) {
+        const creditsDocRef = doc(db, "credits", user.userId);
+        await updateDoc(creditsDocRef, { credits: newCredits });
+      }
+    } else {
+      Alert.alert(
+        "Insufficient credits",
+        "You do not have enough credits to perform this action."
+      );
+    }
+  };
 
   const subscribeToUserDocChanges = (userId: string) => {
     const userDocRef = doc(db, "users", userId);
     const unsubscribe = onSnapshot(userDocRef, (doc) => {
       if (doc.exists()) {
-        let data = doc.data();
+        const data = doc.data();
         setUser((prevUser: any) => ({
           ...prevUser,
           username: data.username,
@@ -57,9 +188,7 @@ export const AuthContextProvider = ({ children }: { children: any }) => {
           userId: userId,
           bio: data?.bio,
           profileUrl: data?.profileUrl,
-          credits: data?.credits,
         }));
-        setCredits(data?.credits || 0);
       }
     });
     return unsubscribe;
@@ -79,46 +208,28 @@ export const AuthContextProvider = ({ children }: { children: any }) => {
     return unsubscribe;
   };
 
-  const subtractCredits = async (amount: number) => {
-    if (credits >= amount) {
-      const newCredits = credits - amount;
-      setCredits(newCredits);
-      if (user?.userId) {
-        const userDocRef = doc(db, "users", user.userId);
-        await updateDoc(userDocRef, { credits: newCredits });
-      }
-    } else {
-      Alert.alert(
-        "Insufficient credits",
-        "You do not have enough credits to perform this action."
-      );
-    }
-  };
-
   const updateUserData = async (uid: string) => {
     const docRef = doc(db, "users", uid);
     const docSnap = await getDoc(docRef);
     if (docSnap.exists()) {
       let data = docSnap.data();
-      setUser({
-        ...user,
+      setUser((prevUser: any) => ({
+        ...prevUser,
         username: data.username,
         email: data.email,
         userId: uid,
         bio: data?.bio,
         profileUrl: data?.profileUrl,
-      });
-      setCredits(data?.credits || 0);
+      }));
     }
   };
 
   const handleSendPasswordResetEmail = async (email: string) => {
     try {
-      // Call the sendPasswordResetEmail function provided by Firebase
       await sendPasswordResetEmail(auth, email);
       return {
         success: true,
-        msg: "Email succesfully sent to " + email,
+        msg: "Email successfully sent to " + email,
       };
     } catch (error: any) {
       return { success: false, msg: error.message };
@@ -126,7 +237,6 @@ export const AuthContextProvider = ({ children }: { children: any }) => {
   };
 
   const login = async (email: string, password: string) => {
-    // signInWithEmailAndPassword
     try {
       const response = await signInWithEmailAndPassword(auth, email, password);
       if (!response.user.emailVerified) {
@@ -154,8 +264,12 @@ export const AuthContextProvider = ({ children }: { children: any }) => {
 
   const logout = async () => {
     try {
-      // logout
       await signOut(auth);
+      // Unsubscribe from all Firebase listeners
+      unsubscribeFunctions.current.forEach((unsubscribe) => unsubscribe());
+      // Clear the array of unsubscribe functions
+      unsubscribeFunctions.current.length = 0;
+
       return { success: true };
     } catch (error: any) {
       return { success: false, msg: error.message };
@@ -163,7 +277,6 @@ export const AuthContextProvider = ({ children }: { children: any }) => {
   };
 
   const register = async (email: string, password: string) => {
-    // createUserWithEmailAndPassword
     try {
       const response = await createUserWithEmailAndPassword(
         auth,
@@ -177,11 +290,17 @@ export const AuthContextProvider = ({ children }: { children: any }) => {
       );
       const username = email.split("@")[0].replace(/\./g, " ");
 
-      setDoc(doc(db, "users", response?.user?.uid), {
+      await setDoc(doc(db, "users", response?.user?.uid), {
         email,
         username,
-        credits: 50,
+        bio: "",
+        profileUrl: "",
       });
+      await setDoc(doc(db, "credits", response?.user?.uid), {
+        credits: 50,
+        lastResetDay: Timestamp.now(),
+      });
+
       return { success: true, data: response.user };
     } catch (error: any) {
       let msg = error.message;
@@ -199,7 +318,6 @@ export const AuthContextProvider = ({ children }: { children: any }) => {
   const storeUserTastePreferencesToFirebase = async (userId: string) => {
     console.log("Storing user taste preferences in Firebase.");
     try {
-      // get the preferences from async storage
       const preferences = await AsyncStorage.getItem("tastePreferences");
       console.log("preferences", preferences);
       if (!preferences) {
@@ -207,7 +325,6 @@ export const AuthContextProvider = ({ children }: { children: any }) => {
         return;
       }
       const parsedPreferences = JSON.parse(preferences);
-      // Update or create preferences documents in Firestore
       parsedPreferences.forEach(async (preference: preferenceType) => {
         const docRef = doc(db, "tastePreferences", userId);
         const newDoc = {
@@ -221,9 +338,9 @@ export const AuthContextProvider = ({ children }: { children: any }) => {
       console.log("User taste preferences stored in Firebase");
     } catch (error) {
       console.error("Error storing user taste preferences:", error);
-      // Handle specific types of errors if needed
     }
   };
+
   return (
     <AuthContext.Provider
       value={{
@@ -235,7 +352,7 @@ export const AuthContextProvider = ({ children }: { children: any }) => {
         login,
         logout,
         register,
-        subtractCredits,
+        substractCredits,
         storeUserTastePreferencesToFirebase,
         credits,
         tastePreferences,

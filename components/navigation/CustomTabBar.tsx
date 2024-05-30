@@ -124,7 +124,7 @@ const CustomTabBar = ({ tabs }: { tabs: TabBarItem[] }) => {
                         Colors.light.components.button.purple.background[0],
                     }
                   : {
-                      borderColor: Colors.secondaryWhite,
+                      borderColor: Colors.primarySkyBlue,
                       borderWidth: 2,
                     },
                 index === 1 ? { marginRight: wp(7) } : null,
@@ -136,7 +136,7 @@ const CustomTabBar = ({ tabs }: { tabs: TabBarItem[] }) => {
               colors={
                 activeTab === tab.index
                   ? Colors.light.components.button.purple.background
-                  : [Colors.white, Colors.white]
+                  : [Colors.white, Colors.primarySkyBlue]
               }
             >
               <TouchableOpacity
@@ -193,6 +193,7 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   tabGradientContainer: {
+    backgroundColor: Colors.primarySkyBlue,
     flex: 1,
     borderRadius: hp(4),
     overflow: "hidden",

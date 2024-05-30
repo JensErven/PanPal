@@ -22,6 +22,7 @@ import { blurhash } from "@/utils/general.utils";
 import { getIngredientImage } from "@/utils/file.utils";
 import ingredientPlaceholder from "@/assets/images/ingredient_placeholder.png";
 import { measurements } from "@/constants/Measurements";
+import { LinearGradient } from "expo-linear-gradient";
 
 const EditRecipeIngredientList = ({
   recipe,
@@ -35,6 +36,24 @@ const EditRecipeIngredientList = ({
   );
   const [ingredientTextInput, setIngredientTextInput] =
     React.useState<string>("");
+  const [ingredientImages, setIngredientImages] = React.useState<string[]>([]);
+
+  useEffect(() => {
+    const fetchImages = async () => {
+      const images = await Promise.all(
+        recipe?.ingredients.map(async (ingredient: string) => {
+          try {
+            const imageUrlString = getIngredientImage(ingredient);
+            return imageUrlString;
+          } catch (error) {
+            return "";
+          }
+        })
+      );
+      setIngredientImages(images);
+    };
+    fetchImages();
+  }, [recipe?.ingredients]);
 
   const handleAddIngredient = () => {
     if (recipe) {
@@ -45,11 +64,6 @@ const EditRecipeIngredientList = ({
       ToastAndroid.show("Ingredient added", ToastAndroid.SHORT);
       setIngredientTextInput("");
     }
-  };
-
-  const handleGetImage = (ingredient: string) => {
-    if (ingredient === "") return ingredientPlaceholder;
-    return getIngredientImage(ingredient);
   };
 
   /**
@@ -138,7 +152,7 @@ const EditRecipeIngredientList = ({
       )}
       {recipe?.ingredients && (
         <View style={styles.stepItemList}>
-          {recipe?.ingredients.map((ingredient, index) => (
+          {recipe?.ingredients.map((ingredient: string, index: number) => (
             <View key={index} style={styles.listItem}>
               <View
                 style={{
@@ -148,11 +162,14 @@ const EditRecipeIngredientList = ({
                   justifyContent: "space-between",
                 }}
               >
-                <View style={styles.stepNumber}>
-                  {ingredient !== "" ? (
+                <LinearGradient
+                  style={styles.stepNumber}
+                  colors={[Colors.white, Colors.primarySkyBlue]}
+                >
+                  {ingredientImages[index] ? (
                     <Image
                       style={styles.ingredientImage}
-                      source={handleGetImage(ingredient)}
+                      source={ingredientImages[index]}
                       placeholder={blurhash}
                       contentFit="cover"
                       transition={500}
@@ -161,10 +178,10 @@ const EditRecipeIngredientList = ({
                     <Ionicons
                       name="image"
                       size={hp(2.7)}
-                      color={Colors.darkGrey}
+                      color={Colors.primarySkyBlue}
                     />
                   )}
-                </View>
+                </LinearGradient>
 
                 {editIngredient === index ? (
                   <TextInput
@@ -320,7 +337,7 @@ const styles = StyleSheet.create({
     height: hp(ComponentParams.button.height.medium),
   },
   ingredientImage: {
-    backgroundColor: Colors.secondaryWhite,
+    backgroundColor: "transparent",
     width: hp(ComponentParams.button.height.small),
     height: hp(ComponentParams.button.height.small),
     borderRadius: hp(ComponentParams.button.height.small / 2),

@@ -68,10 +68,10 @@ const tastePreferencesScreen = () => {
     </RoundButton>
   );
 
-  useEffect(() => {
-    console.log("Taste Preferences Screen Mounted");
-    console.log(tastePreferences);
-  }, [tastePreferences]);
+  // useEffect(() => {
+  //   console.log("Taste Preferences Screen Mounted");
+  //   console.log(tastePreferences);
+  // }, [tastePreferences]);
 
   return (
     <LinearGradient

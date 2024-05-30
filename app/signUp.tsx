@@ -206,15 +206,15 @@ const styles = StyleSheet.create({
   inputContainer: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: Colors.light.components.inputField.background,
+    backgroundColor: "rgba(0, 0, 0, 0.2)",
     borderRadius: hp(ComponentParams.button.height.large),
     paddingHorizontal: wp(3),
     height: hp(ComponentParams.button.height.large),
-    borderColor: Colors.light.components.inputField.innerShadow,
+    borderColor: "rgba(0, 0, 0, 0.2)",
     borderWidth: 1,
   },
   input: {
-    color: Colors.light.text,
+    color: Colors.white,
     height: hp(ComponentParams.button.height.large),
     fontFamily: Fonts.text_2.fontFamily,
     flex: 1,

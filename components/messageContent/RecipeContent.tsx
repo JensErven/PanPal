@@ -6,7 +6,7 @@ import {
   TouchableOpacity,
   Alert,
 } from "react-native";
-import React, { useContext, useEffect } from "react";
+import React, { useContext, useEffect, useMemo } from "react";
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -21,12 +21,19 @@ import { recipeService } from "@/services/db/recipe.services";
 import { RecipeType } from "@/models/RecipeType";
 import { AuthContext } from "@/context/authContext";
 import { router } from "expo-router";
+import { RecipesContext } from "@/context/recipesContext";
 
 const RecipeContent = ({ content }: { content: recipeExampleJsonType }) => {
+  const { recipes } = useContext<any>(RecipesContext);
   const { user } = useContext<any>(AuthContext);
   const [savedRecipeId, setSavedRecipeId] = React.useState<string>("");
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
-  const [isSaved, setIsSaved] = React.useState<boolean>(false);
+  const isSaved = useMemo<boolean>(() => {
+    if (!savedRecipeId) return false;
+    if (recipes.find((r: RecipeType) => r.id === savedRecipeId)) return true;
+    return false;
+  }, [savedRecipeId, recipes]);
+
   const formatRecipe = (recipe: recipeExampleJsonType): RecipeType => {
     return {
       title: recipe.title.toLowerCase().trim(),
@@ -51,7 +58,7 @@ const RecipeContent = ({ content }: { content: recipeExampleJsonType }) => {
       const formattedRecipe = formatRecipe(recipe);
       await recipeService.createRecipe(formattedRecipe).then((response) => {
         if (!response.id) return;
-        setIsSaved(true);
+
         setSavedRecipeId(response.id);
       });
     } catch (e) {
@@ -61,11 +68,13 @@ const RecipeContent = ({ content }: { content: recipeExampleJsonType }) => {
     }
   };
 
-  const handleGoToRecipe = () => {
+  const handleGoToRecipe = async () => {
     if (!savedRecipeId && !isSaved) return;
+    // check if the recipe still exists in the context
+    const recipe = recipes.find((r: RecipeType) => r.id === savedRecipeId);
     router.push({
       pathname: `/recipe/details/`,
-      params: { recipeId: savedRecipeId },
+      params: { recipeId: recipe.id },
     });
   };
 
@@ -165,7 +174,7 @@ const RecipeContent = ({ content }: { content: recipeExampleJsonType }) => {
                 }
                 textColor={Colors.white}
                 shadowColor={Colors.light.components.button.white.dropShadow}
-                clickHandler={handleGoToRecipe}
+                clickHandler={() => handleGoToRecipe()}
                 iconRight={
                   <Ionicons
                     name="arrow-forward"

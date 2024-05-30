@@ -15,10 +15,12 @@ import OthersContent from "./messageContent/OthersContent";
 import RecipeContent from "./messageContent/RecipeContent";
 
 const MessageCard = ({
+  disableSelectOption,
   message,
   index,
   selectRecipeOption,
 }: {
+  disableSelectOption: boolean;
   message: Message;
   index: number;
   selectRecipeOption: (message: Message) => void;
@@ -59,7 +61,11 @@ const MessageCard = ({
           style={styles.assistantMessageContainer}
         >
           <View style={styles.messageContent}>
-            {renderContent(message.content, handleSelectRecipeOption)}
+            {renderContent(
+              message.content,
+              handleSelectRecipeOption,
+              disableSelectOption
+            )}
           </View>
         </LinearGradient>
       )}
@@ -69,7 +75,8 @@ const MessageCard = ({
 
 const renderContent = (
   content: string,
-  selectRecipeOption: (option: string) => void
+  selectRecipeOption: (option: string) => void,
+  disableSelectContent: boolean
 ) => {
   if (typeof content === "string") {
     const parsedContent = JSON.parse(content);
@@ -82,6 +89,7 @@ const renderContent = (
     } else if (parsedContent.responseType === "recipeOptions") {
       return (
         <RecipeOptionsContent
+          disableSelectContent={disableSelectContent}
           content={parsedContent}
           selectOption={selectRecipeOption}
         />

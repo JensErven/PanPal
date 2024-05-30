@@ -14,6 +14,7 @@ import { Image } from "expo-image";
 import { blurhash } from "@/utils/general.utils";
 
 const IntroMessageCard = ({
+  disableSelectOption,
   image,
   title,
   text,
@@ -21,6 +22,7 @@ const IntroMessageCard = ({
   index,
   selectOption,
 }: {
+  disableSelectOption: boolean;
   image: string;
   title: string;
   text: string;
@@ -62,6 +64,7 @@ const IntroMessageCard = ({
               style={styles.selectOptionButton}
             >
               <TouchableOpacity
+                disabled={disableSelectOption}
                 style={styles.touchable}
                 key={index}
                 onPress={() => handleSelectOption(option)}

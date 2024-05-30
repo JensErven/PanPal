@@ -1,10 +1,9 @@
 import { StyleSheet, Text, View } from "react-native";
-import React, { useEffect } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
-  BottomSheetFooter,
   BottomSheetModal,
-  BottomSheetScrollView,
   BottomSheetView,
+  BottomSheetScrollView,
 } from "@gorhom/bottom-sheet";
 import ComponentParams from "@/constants/ComponentParams";
 import Colors from "@/constants/Colors";
@@ -12,6 +11,7 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
+import { LinearGradient } from "expo-linear-gradient";
 
 const CustomSheetModal = ({
   modalRef,
@@ -20,16 +20,24 @@ const CustomSheetModal = ({
   footerChildren,
   snapPoints = [hp(100)],
   handleSheetChanges,
+  hasBackdrop = true,
+  enablePanDownToClose = true,
 }: {
   modalRef: React.RefObject<BottomSheetModal>;
   headerChildren: React.ReactNode;
-  scrollViewChildren: React.ReactNode;
+  scrollViewChildren?: React.ReactNode;
   footerChildren?: React.ReactNode;
   snapPoints?: number[];
   handleSheetChanges?: (index: number) => void;
+  hasBackdrop?: boolean;
+  enablePanDownToClose?: boolean;
 }) => {
   return (
     <BottomSheetModal
+      backdropComponent={(backdropProps) =>
+        hasBackdrop && <View style={styles.backdrop} />
+      }
+      enablePanDownToClose={enablePanDownToClose}
       onChange={handleSheetChanges}
       handleComponent={() => (
         <View style={styles.handleContainer}>
@@ -47,6 +55,7 @@ const CustomSheetModal = ({
       <BottomSheetView style={styles.headerContainer}>
         {headerChildren}
       </BottomSheetView>
+
       <BottomSheetScrollView style={styles.scrollViewContainer}>
         {scrollViewChildren}
       </BottomSheetScrollView>
@@ -57,6 +66,15 @@ const CustomSheetModal = ({
 export default CustomSheetModal;
 
 const styles = StyleSheet.create({
+  backdrop: {
+    position: "absolute",
+    top: 0,
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: "black",
+    opacity: 0.6,
+  },
   modalContainer: {
     borderTopLeftRadius: hp(ComponentParams.button.height.medium / 2),
     borderTopRightRadius: hp(ComponentParams.button.height.medium / 2),
@@ -69,12 +87,14 @@ const styles = StyleSheet.create({
     justifyContent: "space-around",
     paddingHorizontal: wp(4),
     borderBottomWidth: 1,
+    paddingBottom: hp(2),
     borderBottomColor: Colors.secondaryWhite,
   },
   scrollViewContainer: {
+    paddingVertical: hp(2),
     paddingHorizontal: wp(4),
     flex: 1,
-    backgroundColor: "transparent", // Change to "white" for a white background
+    backgroundColor: "transparent",
   },
   footerContainer: {
     paddingVertical: hp(1),

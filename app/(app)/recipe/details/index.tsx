@@ -1,4 +1,4 @@
-import { View, StyleSheet, ToastAndroid, Alert } from "react-native";
+import { View, StyleSheet, ToastAndroid, Alert, Text } from "react-native";
 import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
 import { router, useLocalSearchParams, useFocusEffect } from "expo-router";
 import { recipeService } from "@/services/db/recipe.services";
@@ -23,31 +23,30 @@ import RecipeStepsDetails from "@/components/RecipeStepsDetails";
 import { AuthContext } from "@/context/authContext";
 import RecipeImageContainer from "@/components/RecipeImageContainer";
 import RecipeHeaderContainer from "@/components/RecipeHeaderContainer";
-import RecipeRatingDetailsCard from "@/components/recipe-details/RecipeRatingDetailsCard";
-import RecipeReviewsListCard from "@/components/recipe-details/RecipeReviewsListCard";
-import { BottomSheetModal, BottomSheetView } from "@gorhom/bottom-sheet";
-import RecipeDetailsTabBarSheetModal from "@/components/modals/RecipeDetailsTabBarSheetModal";
+import { BottomSheetModal } from "@gorhom/bottom-sheet";
 import CustomizeRecipeOptionsCard from "@/components/recipe-details/CustomizeRecipeOptionsCard";
 import RoundButton from "@/components/buttons/RoundButton";
 import FullScreenLoading from "@/components/FullScreenLoading";
-import { Line } from "react-native-svg";
 import StandardButton from "@/components/buttons/StandardButton";
 import { RecipesContext } from "@/context/recipesContext";
+import CustomSheetModal from "@/components/modals/CustomSheetModal";
+import CircularProgress from "@/components/ProgressBar";
+import SmallInfoTag from "@/components/recipe-details/SmallInfoTag";
 
 const DetailsRecipe = () => {
   const { user } = useContext<any>(AuthContext);
   const { recipeId } = useLocalSearchParams();
   const { deleteRecipe, updateRecipe, deleteImageFromFirebase, getRecipe } =
     recipeService;
-  const { generateRecipeImage } = openaiServices;
   const [recipe, setRecipe] = useState<RecipeType | undefined>(undefined);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [isGeneratingImage, setIsGeneratingImage] = useState<boolean>(false);
   const [generatedImage, setGeneratedImage] = useState<string | undefined>("");
   const [selectedTab, setSelectedTab] = useState<number>(0);
   const recipesDetailsTabBarSheetModal = useRef<BottomSheetModal>(null);
   const { recipes } = useContext<any>(RecipesContext);
-
+  // steps progress
+  const [progress, setProgress] = React.useState<number>(0);
+  const [selectedSteps, setSelectedSteps] = React.useState<number[]>([]);
   useFocusEffect(
     React.useCallback(() => {
       if (!recipeId) return;
@@ -72,6 +71,7 @@ const DetailsRecipe = () => {
             .catch((err) => {
               setIsLoading(false);
               Alert.alert("Failed to fetch recipe", err.message);
+              router.back();
             });
         });
     }, [recipeId])
@@ -80,7 +80,8 @@ const DetailsRecipe = () => {
   const findRecipeInContext = async (recipeId: string) => {
     const recipe = recipes.find((recipe: RecipeType) => recipe.id === recipeId);
     if (recipe) {
-      return recipe.data;
+      const newRecipe = { ...recipe.data, id: recipe.id };
+      return newRecipe;
     }
   };
 
@@ -107,25 +108,6 @@ const DetailsRecipe = () => {
     });
   };
 
-  const handleGenerateImage = () => {
-    setIsGeneratingImage(true);
-    if (!recipe) {
-      console.error("Recipe not found");
-      setIsGeneratingImage(false);
-      return;
-    }
-    generateRecipeImage(recipe as RecipeType).then(
-      (res) => {
-        setIsGeneratingImage(false);
-        setGeneratedImage(res);
-      },
-      (err) => {
-        Alert.alert("Failed to generate image", err.message);
-        setIsGeneratingImage(false);
-      }
-    );
-  };
-
   useEffect(() => {
     if (generatedImage && recipe) {
       const updatedRecipe = { ...recipe, image: generatedImage };
@@ -145,7 +127,7 @@ const DetailsRecipe = () => {
     }
   }, [generatedImage]);
 
-  const headerChildren = () => {
+  const CustomHeaderChildren = () => {
     return (
       <>
         <RoundButton handlePress={handleDeleteRecipe}>
@@ -202,7 +184,7 @@ const DetailsRecipe = () => {
     });
   };
 
-  const detailsTabBarChildren = useMemo(() => {
+  const RecipeDetailsModalContentChildren = useMemo(() => {
     if (!recipe) return;
     switch (selectedTab) {
       case 0:
@@ -219,6 +201,9 @@ const DetailsRecipe = () => {
       case 1:
         return (
           <RecipeStepsDetails
+            setProgress={setProgress}
+            selectedSteps={selectedSteps}
+            setSelectedSteps={setSelectedSteps}
             steps={recipe.steps}
             times={[recipe.cookTime ?? 0, recipe.prepTime ?? 0]}
           />
@@ -226,35 +211,24 @@ const DetailsRecipe = () => {
       default:
         return null;
     }
-  }, [selectedTab, recipe]);
+  }, [selectedTab, recipe, selectedSteps, progress, selectedSteps]);
 
-  const detailsTabBarFooterChildren = useMemo(() => {
+  const RecipeDetailsModalFooterChildren = useMemo(() => {
     if (!recipe) return;
     switch (selectedTab) {
       case 0:
         return (
-          <View style={styles.footerContainer}>
-            <LinearGradient
-              colors={["transparent", Colors.white]}
-              style={styles.footerGradient}
-            />
-            {/* <StandardButton
-              textValue="Add to Shopping List"
-              clickHandler={() => console.log("Add to Shopping List")}
-              colors={Colors.light.components.button.purple.background}
-              textColor={Colors.white}
-              height={ComponentParams.button.height.medium}
-            /> */}
-          </View>
+          <StandardButton
+            textValue="Add to Shopping List"
+            clickHandler={() => console.log("Add to Shopping List")}
+            colors={Colors.light.components.button.purple.background}
+            textColor={Colors.white}
+            height={ComponentParams.button.height.medium}
+          />
         );
       case 1:
         return (
-          <View style={styles.footerContainer}>
-            <LinearGradient
-              colors={["transparent", Colors.white]}
-              style={styles.footerGradient}
-            />
-            {/* <StandardButton
+          <StandardButton
             iconRight={
               <Ionicons
                 name="play"
@@ -268,13 +242,113 @@ const DetailsRecipe = () => {
             colors={Colors.light.components.button.purple.background}
             textColor={Colors.white}
             height={ComponentParams.button.height.medium}
-          /> */}
-          </View>
+          />
         );
       default:
         return null;
     }
   }, [selectedTab, recipe]);
+
+  const RecipeDetailsModalHeaderChildren = useMemo(() => {
+    if (!recipe) return;
+    switch (selectedTab) {
+      case 0:
+        return (
+          <RecipeDetailsTabBar
+            displayContent={true}
+            selectedTab={selectedTab}
+            tabBarTitles={[
+              `Ingredients (${recipe.ingredients.length})`,
+              `Steps (${recipe.steps.length})`,
+            ]}
+            onPress={(index: number) => {
+              handleSelectTabBarItem(index);
+            }}
+          />
+        );
+      case 1:
+        return (
+          <RecipeDetailsTabBar
+            displayContent={true}
+            selectedTab={selectedTab}
+            tabBarTitles={[
+              `Ingredients (${recipe.ingredients.length})`,
+              `Steps (${recipe.steps.length})`,
+            ]}
+            onPress={(index: number) => {
+              handleSelectTabBarItem(index);
+            }}
+            children={
+              <View style={styles.topContent}>
+                <View style={styles.timesContainer}>
+                  <SmallInfoTag
+                    text={`${recipe.cookTime} min`}
+                    icon={
+                      <View
+                        style={{
+                          flexDirection: "row",
+                          gap: wp(1),
+                          justifyContent: "center",
+                          alignItems: "center",
+                        }}
+                      >
+                        <Ionicons
+                          name="timer"
+                          size={hp(2)}
+                          color={Colors.darkGrey}
+                        />
+                        <Text style={{ color: Colors.darkGrey }}>Cook:</Text>
+                      </View>
+                    }
+                  />
+                  <SmallInfoTag
+                    text={`${recipe.prepTime} min`}
+                    icon={
+                      <View
+                        style={{
+                          flexDirection: "row",
+                          gap: wp(1),
+                          justifyContent: "center",
+                          alignItems: "center",
+                        }}
+                      >
+                        <Ionicons
+                          name="timer"
+                          size={hp(2)}
+                          color={Colors.darkGrey}
+                        />
+                        <Text style={{ color: Colors.darkGrey }}>Prep:</Text>
+                      </View>
+                    }
+                  />
+                </View>
+                <View style={styles.progressContainer}>
+                  <Text style={styles.progressTitle}>Progress</Text>
+                  <View
+                    style={{
+                      justifyContent: "center",
+                      position: "relative",
+                      alignItems: "center",
+                    }}
+                  >
+                    <CircularProgress
+                      progress={progress}
+                      size={hp(10)}
+                      strokeWidth={hp(1)}
+                      backgroundColor={Colors.secondaryWhite}
+                      strokeColor={Colors.primarySkyBlue}
+                    />
+                    <Text style={styles.progressText}>
+                      {selectedSteps.length} / {recipe.steps.length}
+                    </Text>
+                  </View>
+                </View>
+              </View>
+            }
+          />
+        );
+    }
+  }, [selectedTab, recipe, progress]);
 
   return (
     <LinearGradient
@@ -292,29 +366,18 @@ const DetailsRecipe = () => {
         isTransparent={true}
         hasGoBack={true}
         headerTitle={"Recipe Details"}
-        children={headerChildren()}
+        children={CustomHeaderChildren()}
       />
-      <RecipeDetailsTabBarSheetModal
+      <CustomSheetModal
+        hasBackdrop={false}
+        enablePanDownToClose={false}
+        headerChildren={RecipeDetailsModalHeaderChildren}
         snapPoints={[hp(12), hp(100)]}
-        bottomSheetModalRef={recipesDetailsTabBarSheetModal}
-        children={
-          <>
-            <RecipeDetailsTabBar
-              displayContent={true}
-              selectedTab={selectedTab}
-              children={detailsTabBarChildren}
-              tabBarTitles={[
-                `Ingredients (${recipe?.ingredients.length})`,
-                `Steps (${recipe?.steps.length})`,
-              ]}
-              onPress={(index: number) => {
-                handleSelectTabBarItem(index);
-              }}
-            />
-          </>
-        }
-        footerChildren={detailsTabBarFooterChildren}
+        modalRef={recipesDetailsTabBarSheetModal}
+        scrollViewChildren={RecipeDetailsModalContentChildren}
+        footerChildren={RecipeDetailsModalFooterChildren}
       />
+
       <LinearGradient
         style={styles.container}
         colors={[Colors.white, "#DDEBF3"]}
@@ -355,21 +418,6 @@ const DetailsRecipe = () => {
                     }}
                   />
                 </View>
-
-                {/* <CustomizeRecipeOptionsCard /> */}
-
-                {/* <RecipeRatingDetailsCard
-              data={{
-                thumbsUp: 25,
-                thumbsDown: 5,
-                fastReviewTags: [
-                  { tag: "Easy", count: 5 },
-                  { tag: "Tasty", count: 3 },
-                  { tag: "Healthy", count: 2 },
-                ],
-              }}
-            />
-            <RecipeReviewsListCard /> */}
                 <RecipeTipsCard recipe={recipe} setRecipe={setRecipe} />
               </View>
             </CustomKeyBoardView>
@@ -385,19 +433,6 @@ export default DetailsRecipe;
 const styles = StyleSheet.create({
   gradientBackground: {
     flex: 1,
-  },
-  footerContainer: {
-    padding: wp(4),
-    width: "100%",
-    backgroundColor: Colors.white,
-  },
-  footerGradient: {
-    width: "120%",
-    height: hp(2),
-    position: "absolute",
-    top: 0,
-    left: 0,
-    transform: [{ translateY: -hp(2) }],
   },
   headerSecondContent: {
     flexDirection: "row",
@@ -492,6 +527,35 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     width: "100%",
-    height: hp(17),
+    height: hp(15),
+  },
+  progressContainer: {
+    gap: wp(2),
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  progressText: {
+    fontSize: Fonts.text_1.fontSize,
+    fontFamily: Fonts.text_1.fontFamily,
+    color: Colors.darkGrey,
+    position: "absolute",
+  },
+  progressTitle: {
+    fontSize: Fonts.text_1.fontSize,
+    fontFamily: Fonts.text_1.fontFamily,
+    color: Colors.darkGrey,
+  },
+  timesContainer: {
+    flexDirection: "column",
+    justifyContent: "center",
+    alignItems: "flex-start",
+    gap: hp(1),
+  },
+
+  topContent: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
   },
 });

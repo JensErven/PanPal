@@ -40,7 +40,7 @@ const EditProfileUsername = ({
         placeholder="username"
         placeholderTextColor={"#A0B7D6"}
         onChangeText={(text: string) => {
-          if (username) setUsername(text);
+          if (username !== undefined) setUsername(text);
         }}
       />
     </View>

@@ -25,14 +25,9 @@ import {
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
 import { StatusBar } from "expo-status-bar";
-import { RecipeType } from "@/models/RecipeType";
-import { collection, onSnapshot } from "firebase/firestore";
-import { db } from "@/firebaseConfig";
 import SearchBarHeader from "@/components/headers/SearchBarHeader";
 import FilterOptionButton from "@/components/buttons/FilterOptionButton";
 import { BottomSheetModal } from "@gorhom/bottom-sheet";
-import RecipesFilterSheetModal from "@/components/modals/RecipesFilterSheetModal";
-import { testRecipes as testRecipesData } from "@/constants/testData/testRecipes";
 import RecipeCard from "@/components/cards/RecipeCard";
 import { Ionicons } from "@expo/vector-icons";
 import CustomHeader from "@/components/navigation/CustomHeader";
@@ -43,6 +38,12 @@ import RoundButton from "@/components/buttons/RoundButton";
 import { useRecipes } from "@/context/recipesContext";
 import FullScreenLoading from "@/components/FullScreenLoading";
 import { SavedRecipeType } from "@/models/SavedRecipeType";
+import CustomSheetModal from "@/components/modals/CustomSheetModal";
+import FilterHeader from "@/components/modals/filter/FilterHeader";
+import FilterFooter from "@/components/modals/filter/FilterFooter";
+import FilterOptionsSelectCard from "@/components/cards/FilterOptionsSelectCard";
+import { cuisineTypes } from "@/constants/tastePreferences/CuisineTypes";
+import { mealTypes } from "@/constants/tastePreferences/MealTypes";
 
 const Saved = () => {
   const { recipes, isLoading } = useRecipes();
@@ -196,6 +197,12 @@ const Saved = () => {
     );
   };
 
+  const handleFilterReset = () => {
+    setSelectedCuisineTypes([]);
+    setSelectedMealTypes([]);
+    setToShowRecipesType("All");
+  };
+
   return (
     <LinearGradient
       style={styles.gradientBackground}
@@ -207,6 +214,7 @@ const Saved = () => {
       start={[0, 0]}
       end={[1, 0]}
     >
+      <StatusBar style="light" />
       <CustomHeader
         isTransparent={true}
         hasGoBack={false}
@@ -219,17 +227,68 @@ const Saved = () => {
         showFilterModal={handleOpenRecipesFilterModal}
         children={searchBarHeaderChildren()}
       />
-      <RecipesFilterSheetModal
+      <CustomSheetModal
+        modalRef={recipesFilterSheetModal}
         snapPoints={[hp(100)]}
-        bottomSheetModalRef={recipesFilterSheetModal}
-        selectedCuisineTypes={selectedCuisineTypes}
-        setSelectedCuisineTypes={setSelectedCuisineTypes}
-        selectedMealTypes={selectedMealTypes}
-        setSelectedMealTypes={setSelectedMealTypes}
-        setToShowRecipesType={setToShowRecipesType}
-        toShowRecipesType={toShowRecipesType}
+        headerChildren={<FilterHeader reset={() => handleFilterReset()} />}
+        footerChildren={
+          <FilterFooter
+            closeModal={() => recipesFilterSheetModal.current?.dismiss()}
+          />
+        }
+        scrollViewChildren={
+          <>
+            <FilterOptionsSelectCard
+              clearAll={() => setToShowRecipesType("All")}
+              showCount={false}
+              options={["Generated", "Custom"]}
+              title="To Show Recipes"
+              selectedOptions={[toShowRecipesType]}
+              selectOption={(option) => {
+                const updatedToShowRecipesType = option;
+                if (updatedToShowRecipesType === toShowRecipesType) {
+                  setToShowRecipesType("All");
+                } else {
+                  setToShowRecipesType(updatedToShowRecipesType);
+                }
+              }}
+            />
+            <FilterOptionsSelectCard
+              clearAll={() => setSelectedMealTypes([])}
+              options={mealTypes}
+              title="Meal Types"
+              selectedOptions={selectedMealTypes}
+              selectOption={(option) => {
+                const updatedSelectedMealTypes = [...selectedMealTypes];
+                if (updatedSelectedMealTypes.includes(option)) {
+                  const index = updatedSelectedMealTypes.indexOf(option);
+                  updatedSelectedMealTypes.splice(index, 1);
+                } else {
+                  updatedSelectedMealTypes.push(option);
+                }
+                setSelectedMealTypes(updatedSelectedMealTypes);
+              }}
+            />
+            <FilterOptionsSelectCard
+              clearAll={() => setSelectedCuisineTypes([])}
+              searchEnabled={true}
+              options={cuisineTypes.map((cuisine) => cuisine)}
+              title="Cuisine Types"
+              selectedOptions={selectedCuisineTypes}
+              selectOption={(option) => {
+                const updatedSelectedCuisineTypes = [...selectedCuisineTypes];
+                if (updatedSelectedCuisineTypes.includes(option)) {
+                  const index = updatedSelectedCuisineTypes.indexOf(option);
+                  updatedSelectedCuisineTypes.splice(index, 1);
+                } else {
+                  updatedSelectedCuisineTypes.push(option);
+                }
+                setSelectedCuisineTypes(updatedSelectedCuisineTypes);
+              }}
+            />
+          </>
+        }
       />
-      <StatusBar style="light" />
 
       <LinearGradient
         style={styles.container}

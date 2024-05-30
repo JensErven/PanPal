@@ -19,6 +19,7 @@ import { BottomSheetModal } from "@gorhom/bottom-sheet";
 import { mealTypes as meals } from "@/constants/tastePreferences/MealTypes";
 import CustomSheetModal from "../modals/CustomSheetModal";
 import StandardButton from "../buttons/StandardButton";
+import OptionTagButton from "../buttons/OptionTagButton";
 
 const EditRecipeMealType = ({
   recipe = {} as RecipeType,
@@ -81,46 +82,18 @@ const EditRecipeMealType = ({
         scrollViewChildren={
           <View style={styles.scrollContentContainer}>
             {filteredMeals.map((meal: string, index: number) => (
-              <TouchableOpacity
+              <OptionTagButton
                 key={index}
-                onPress={() => {
+                option={meal}
+                selectOption={() => {
                   if (recipe.mealType === meal) {
                     setRecipe({ ...recipe, mealType: "" });
-                    return;
+                  } else {
+                    setRecipe({ ...recipe, mealType: meal });
                   }
-                  setRecipe({ ...recipe, mealType: meal });
                 }}
-                style={[
-                  styles.optionContainer,
-                  {
-                    backgroundColor:
-                      recipe.mealType === meal
-                        ? Colors.mediumPurple
-                        : Colors.white,
-                  },
-                ]}
-              >
-                <Text
-                  style={[
-                    styles.text,
-                    {
-                      color:
-                        recipe.mealType === meal
-                          ? Colors.white
-                          : Colors.darkGrey,
-                    },
-                  ]}
-                >
-                  {meal}
-                </Text>
-                {recipe.mealType === meal && (
-                  <Ionicons
-                    name="checkmark"
-                    size={hp(2.7)}
-                    color={Colors.white}
-                  />
-                )}
-              </TouchableOpacity>
+                selected={recipe.mealType === meal}
+              />
             ))}
           </View>
         }
@@ -177,7 +150,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: wp(4),
     paddingVertical: hp(1),
     gap: wp(2),
-    marginBottom: hp(2),
   },
   text: {
     textTransform: "capitalize",

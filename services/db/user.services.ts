@@ -4,7 +4,7 @@ import { UserData } from "@/app/(app)/profile/edit";
 import { AuthContext, useAuth } from "@/context/authContext"; // Import the useAuth hook to access the setUser function
 import { useContext } from "react";
 
-const updateUser = async (user: any, userData: any, setUser: any) => {
+const updateUser = async (user: any, userData: any) => {
   try {
     const docRef = doc(db, "users", user.userId);
     const docSnap = await getDoc(docRef);

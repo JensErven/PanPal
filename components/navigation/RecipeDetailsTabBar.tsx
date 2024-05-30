@@ -1,4 +1,11 @@
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Animated,
+  Easing,
+} from "react-native";
 import React from "react";
 import Colors from "@/constants/Colors";
 import {
@@ -55,9 +62,11 @@ const RecipeDetailsTabBar = ({
           </TouchableOpacity>
         ))}
       </View>
-      <View style={{ gap: hp(4), display: displayContent ? "flex" : "none" }}>
-        {children}
-      </View>
+      {children && (
+        <View style={{ gap: hp(4), display: displayContent ? "flex" : "none" }}>
+          {children}
+        </View>
+      )}
     </View>
   );
 };
@@ -67,8 +76,7 @@ export default RecipeDetailsTabBar;
 const styles = StyleSheet.create({
   content: {
     width: "100%",
-    gap: hp(4),
-    paddingHorizontal: wp(4),
+    gap: hp(2),
   },
   tabBarItemsContainer: {
     flexDirection: "row",

@@ -42,7 +42,7 @@ const EditProfileBio = ({
         placeholder="tell us about yourself"
         placeholderTextColor={"#A0B7D6"}
         onChangeText={(text: string) => {
-          if (bio) setBio(text);
+          if (bio !== undefined) setBio(text);
         }}
       />
     </View>

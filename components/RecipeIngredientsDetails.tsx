@@ -1,5 +1,5 @@
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
-import React, { useMemo } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -13,7 +13,6 @@ import { updateIngredientQuantities } from "@/utils/general.utils";
 import { measurements } from "@/constants/Measurements";
 import { Image } from "expo-image";
 import { getIngredientImage } from "@/utils/file.utils";
-import ingredientPlaceholder from "@/assets/images/ingredient_placeholder.png";
 import { blurhash } from "@/utils/general.utils";
 import StandardButton from "./buttons/StandardButton";
 import { LinearGradient } from "expo-linear-gradient";
@@ -26,17 +25,31 @@ const RecipeIngredientsDetails = ({
   servings: number;
 }) => {
   const [changingServings, setChangingServings] = React.useState(servings);
+  const [ingredientImages, setIngredientImages] = useState<string[]>([]);
+
+  useEffect(() => {
+    const fetchImages = async () => {
+      const images = await Promise.all(
+        ingredients.map(async (ingredient: string) => {
+          try {
+            const imageUrlString = getIngredientImage(ingredient);
+            return imageUrlString;
+          } catch (error) {
+            return "";
+          }
+        })
+      );
+      setIngredientImages(images);
+    };
+
+    fetchImages();
+  }, [ingredients]);
 
   const handleOpenConvertUnitsModal = () => {};
 
   const changedIngredients = useMemo(() => {
     return updateIngredientQuantities(ingredients, servings, changingServings);
   }, [changingServings, ingredients, servings]);
-
-  const handleGetImage = (ingredient: string) => {
-    if (ingredient === "") return ingredientPlaceholder;
-    return getIngredientImage(ingredient);
-  };
 
   /**
    * Formats an ingredient with bold text for measurements and normal font weight for the rest.
@@ -73,36 +86,27 @@ const RecipeIngredientsDetails = ({
 
   return (
     <View style={styles.container}>
-      {/* <View
-        style={{
-          flexDirection: "row",
-          width: "100%",
-          gap: wp(8),
-          justifyContent: "space-between",
-        }}
-      >
-        <RecipeServingsCounter
-          servings={changingServings}
-          setServings={(value: number) => setChangingServings(value)}
-        />
-      </View> */}
       <View style={styles.ingredientsList}>
         {changedIngredients.map((ingredient: string, index: number) => (
           <View key={index} style={styles.ingredientItem}>
             <LinearGradient
               style={styles.stepNumber}
-              colors={[Colors.secondaryWhite, Colors.primarySkyBlue]}
+              colors={[Colors.white, Colors.primarySkyBlue]}
             >
-              {ingredient !== "" ? (
+              {ingredientImages[index] ? (
                 <Image
                   style={styles.ingredientImage}
-                  source={handleGetImage(ingredient)}
+                  source={ingredientImages[index]}
                   placeholder={blurhash}
                   contentFit="cover"
                   transition={500}
                 />
               ) : (
-                <Ionicons name="image" size={hp(2.7)} color={Colors.darkGrey} />
+                <Ionicons
+                  name="image"
+                  size={hp(2.7)}
+                  color={Colors.primarySkyBlue}
+                />
               )}
             </LinearGradient>
             <Text style={[styles.text]}>

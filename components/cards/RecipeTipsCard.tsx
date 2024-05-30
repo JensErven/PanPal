@@ -1,13 +1,5 @@
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  ActivityIndicator,
-  ToastAndroid,
-  Alert,
-} from "react-native";
-import React, { useContext, useEffect } from "react";
+import { View, Text, StyleSheet, ToastAndroid, Alert } from "react-native";
+import React, { useContext, useEffect, useState } from "react";
 import Fonts from "@/constants/Fonts";
 import ComponentParams from "@/constants/ComponentParams";
 import Colors from "@/constants/Colors";
@@ -23,7 +15,7 @@ import { openaiServices } from "@/services/api/openai.services";
 import { tipsExampleJsonType } from "@/models/openai/tipsExampleJsonType";
 import FullScreenLoading from "../FullScreenLoading";
 import { recipeService } from "@/services/db/recipe.services";
-import { AuthContext } from "@/context/authContext";
+import { AuthContext, UserCreditsType } from "@/context/authContext";
 import PagerView from "react-native-pager-view";
 
 const RecipeTipsCard = ({
@@ -33,54 +25,55 @@ const RecipeTipsCard = ({
   recipe: RecipeType;
   setRecipe: (recipe: RecipeType) => void;
 }) => {
-  const { credits, subtractCredits } = React.useContext<any>(AuthContext);
-  const [isLoading, setIsLoading] = React.useState<boolean>(false);
-  const [tips, setTips] = React.useState<string[]>([]);
+  const {
+    credits,
+    substractCredits,
+  }: { credits: UserCreditsType; substractCredits: (amount: number) => void } =
+    useContext<any>(AuthContext);
 
-  useEffect(() => {
-    if (!recipe) return;
-    setTips(recipe.tips || []);
-  }, [recipe]);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [tips, setTips] = useState<string[]>(recipe.tips || []);
 
-  const handleGenerateMoreTips = () => {
+  const handleGenerateMoreTips = async () => {
     if (tips.length >= 10) return;
-    if (credits < 1) {
+    if (credits.credits < 1) {
       ToastAndroid.show("Insufficient Panpal Credits", ToastAndroid.SHORT);
       return;
     }
     setIsLoading(true);
-    openaiServices
-      .createRecipeTip(recipe)
-      .then((response) => {
-        if (typeof response.content === "string") {
-          const parsedContent = JSON.parse(response.content);
-          if (parsedContent.responseType === "tips") {
-            subtractCredits(1);
-            ToastAndroid.show("1 PanPal Credits deducted", ToastAndroid.SHORT);
-            setTips([...tips, ...parsedContent.tips]);
-            saveTipsToRecipe([...tips, ...parsedContent.tips]);
-          }
+    try {
+      const response = await openaiServices.createRecipeTip(recipe);
+      if (typeof response.content === "string") {
+        const parsedContent = JSON.parse(response.content);
+        if (parsedContent.responseType === "tips") {
+          substractCredits(1);
+          ToastAndroid.show("1 PanPal Credits deducted", ToastAndroid.SHORT);
+          const newTips = [...tips, ...parsedContent.tips];
+          setTips(newTips);
+          await saveTipsToRecipe(newTips);
         }
-      })
-      .catch((error) => {
-        Alert.alert("Error", "Failed to generate tips. Please try again.");
-      })
-      .finally(() => {
-        setIsLoading(false);
-      });
+      }
+    } catch (error) {
+      Alert.alert("Error", "Failed to generate tips. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const saveTipsToRecipe = (tips: string[]) => {
-    const updatedRecipe = { ...recipe, tips };
+  const saveTipsToRecipe = async (tips: string[]) => {
     if (!recipe.id) return;
-    recipeService.saveTipsToRecipe(recipe.id, tips).then(
-      (response) => {
-        if (response) setRecipe(updatedRecipe);
-      },
-      (error) => {
-        Alert.alert("Error", "Failed to save tips to recipe");
+    try {
+      const updatedRecipe = { ...recipe, tips };
+      const response = await recipeService.saveTipsToRecipe(recipe.id, tips);
+      if (response.success) {
+        setRecipe(updatedRecipe);
+        ToastAndroid.show("Tips saved successfully", ToastAndroid.SHORT);
+      } else {
+        throw new Error(response.message);
       }
-    );
+    } catch (error) {
+      Alert.alert("Error", "Failed to save tips to recipe");
+    }
   };
 
   return (
@@ -98,21 +91,19 @@ const RecipeTipsCard = ({
         {tips.length === 0 ? (
           <Text style={styles.cardText}>No tips available</Text>
         ) : (
-          <>
-            {tips.map((tip, index) => (
-              <LinearGradient
-                style={styles.tipItem}
-                key={index}
-                colors={[Colors.white, "#DDEBF3"]}
-                start={[0.5, 0]}
-                end={[0.5, 1]}
-              >
-                <View style={styles.tipItemInner}>
-                  <Text style={styles.cardText}>{tip}</Text>
-                </View>
-              </LinearGradient>
-            ))}
-          </>
+          tips.map((tip, index) => (
+            <LinearGradient
+              style={styles.tipItem}
+              key={index}
+              colors={[Colors.white, "#DDEBF3"]}
+              start={[0.5, 0]}
+              end={[0.5, 1]}
+            >
+              <View style={styles.tipItemInner}>
+                <Text style={styles.cardText}>{tip}</Text>
+              </View>
+            </LinearGradient>
+          ))
         )}
       </View>
 
@@ -156,14 +147,12 @@ export default RecipeTipsCard;
 
 const styles = StyleSheet.create({
   content: {
-    display: "flex",
     flexDirection: "column",
     justifyContent: "flex-start",
     alignItems: "flex-start",
     width: "100%",
   },
   contentTitleContainer: {
-    display: "flex",
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
@@ -171,14 +160,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: wp(4),
   },
   contentTitleLeft: {
-    display: "flex",
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
   },
   itemListContainer: {
     width: "100%",
-    display: "flex",
     flexDirection: "column",
     justifyContent: "flex-start",
     alignItems: "center",
@@ -188,7 +175,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: wp(4),
   },
   contentTitleRight: {
-    display: "flex",
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
@@ -207,7 +193,6 @@ const styles = StyleSheet.create({
     marginLeft: wp(2),
   },
   tipItem: {
-    display: "flex",
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "flex-start",
@@ -218,7 +203,6 @@ const styles = StyleSheet.create({
     borderRadius: hp(ComponentParams.button.height.small),
   },
   tipItemInner: {
-    display: "flex",
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "flex-start",
@@ -233,7 +217,6 @@ const styles = StyleSheet.create({
     lineHeight: Fonts.text_2.lineHeight,
   },
   panpalCreditsContainer: {
-    display: "flex",
     flexDirection: "row",
     marginRight: wp(1),
     gap: wp(1),

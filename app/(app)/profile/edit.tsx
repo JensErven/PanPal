@@ -39,12 +39,14 @@ export type UserData = {
 const editProfileScreen = () => {
   const { user, setUser } = useContext<any>(AuthContext);
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
-  const [username, setUsername] = React.useState<string>(user.username);
-  const [bio, setBio] = React.useState<string>(user.bio);
-  const [profileUrl, setProfileUrl] = React.useState<string>(user.profileUrl);
+  const [username, setUsername] = React.useState<string>(user.username || "");
+  const [bio, setBio] = React.useState<string>(user.bio || "");
+  const [profileUrl, setProfileUrl] = React.useState<string>(
+    user.profileUrl || ""
+  );
 
   const handleSubmitEditProfile = async () => {
-    if (!user.username) {
+    if (username.trim() === "" || bio.trim() === "") {
       Alert.alert("Edit Profile", "Please fill all the fields");
       return;
     }
@@ -57,11 +59,8 @@ const editProfileScreen = () => {
       bio: bio.trim(),
     };
 
-    const response = await userService.updateUser(
-      user,
-      updatedUserData,
-      setUser
-    );
+    const response = await userService.updateUser(user, updatedUserData);
+
     setIsLoading(false);
 
     if (!response.success) {
@@ -79,9 +78,9 @@ const editProfileScreen = () => {
     );
   };
 
-  useEffect(() => {
-    console.log("User", user);
-  }, [user]);
+  // useEffect(() => {
+  //   console.log("User", user);
+  // }, [user]);
 
   return (
     <LinearGradient

@@ -71,7 +71,7 @@ const SearchBarHeader = ({
             value={searchInputValue}
             style={styles.input}
             placeholderTextColor="#A0B7D6"
-            placeholder="search for recipes"
+            placeholder="Search for recipes"
           />
           {searchInputValue.length > 0 && (
             <TouchableOpacity
@@ -124,10 +124,11 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    minHeight: hp(ComponentParams.button.height.large),
+    minHeight: hp(ComponentParams.button.height.medium),
+    paddingRight: wp(2),
     paddingLeft: wp(4),
-    paddingRight: wp(1),
-    borderRadius: hp(ComponentParams.button.height.large),
+    paddingVertical: hp(1),
+    borderRadius: hp(ComponentParams.button.height.medium / 2),
 
     // borderColor: Colors.white, // "#DDEBF3"
     // borderWidth: 1,
@@ -140,9 +141,9 @@ const styles = StyleSheet.create({
     color: Colors.white,
   },
   clearInputValueButton: {
-    height: hp(ComponentParams.button.height.medium),
-    width: hp(ComponentParams.button.height.medium),
-    borderRadius: hp(ComponentParams.button.height.medium / 2),
+    height: hp(ComponentParams.button.height.small),
+    width: hp(ComponentParams.button.height.small),
+    borderRadius: hp(ComponentParams.button.height.small / 2),
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "rgba(0, 0, 0, 0.2)",

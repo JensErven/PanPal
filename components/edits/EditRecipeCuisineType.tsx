@@ -21,6 +21,7 @@ import CustomSheetModal from "../modals/CustomSheetModal";
 import { BottomSheetModal } from "@gorhom/bottom-sheet";
 import StandardButton from "../buttons/StandardButton";
 import { cuisineTypes as cuisines } from "@/constants/tastePreferences/CuisineTypes";
+import OptionTagButton from "../buttons/OptionTagButton";
 export type CuisineType = {
   id: number;
   name: string;
@@ -35,7 +36,7 @@ const EditRecipeCuisineType = ({
   setRecipe: (recipe: RecipeType) => void;
 }) => {
   const modalRef = useRef<BottomSheetModal>(null);
-  const [cuisineTypes, setCuisineTypes] = useState<CuisineType[]>(cuisines);
+  const [cuisineTypes, setCuisineTypes] = useState<string[]>(cuisines);
   const [searchInputField, setSearchInputField] = useState<string>("");
 
   const handleOpenModal = () => {
@@ -49,7 +50,7 @@ const EditRecipeCuisineType = ({
 
   const filteredCuisines = useMemo(() => {
     return cuisineTypes.filter((cuisine) =>
-      cuisine.name.toLowerCase().includes(searchInputField.toLowerCase())
+      cuisine.toLowerCase().includes(searchInputField.toLowerCase())
     );
   }, [searchInputField]);
 
@@ -86,47 +87,20 @@ const EditRecipeCuisineType = ({
         }
         scrollViewChildren={
           <View style={styles.scrollContentContainer}>
-            {filteredCuisines.map((cuisine) => (
-              <TouchableOpacity
-                key={cuisine.id}
-                onPress={() => {
-                  if (recipe.cuisineType === cuisine.name) {
+            {filteredCuisines.map((cuisine: string, index: number) => (
+              <OptionTagButton
+                key={index}
+                option={cuisine}
+                selected={recipe.cuisineType === cuisine}
+                selectOption={(option: string) => {
+                  if (recipe.cuisineType === option) {
                     setRecipe({ ...recipe, cuisineType: "" });
                     return;
+                  } else {
+                    setRecipe({ ...recipe, cuisineType: option });
                   }
-                  setRecipe({ ...recipe, cuisineType: cuisine.name });
                 }}
-                style={[
-                  styles.optionContainer,
-                  {
-                    backgroundColor:
-                      recipe.cuisineType === cuisine.name
-                        ? Colors.mediumPurple
-                        : Colors.white,
-                  },
-                ]}
-              >
-                <Text
-                  style={[
-                    styles.text,
-                    {
-                      color:
-                        recipe.cuisineType === cuisine.name
-                          ? Colors.white
-                          : Colors.darkGrey,
-                    },
-                  ]}
-                >
-                  {cuisine.name}
-                </Text>
-                {recipe.cuisineType === cuisine.name && (
-                  <Ionicons
-                    name="checkmark"
-                    size={hp(2.7)}
-                    color={Colors.white}
-                  />
-                )}
-              </TouchableOpacity>
+              />
             ))}
           </View>
         }
@@ -183,7 +157,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: wp(4),
     paddingVertical: hp(1),
     gap: wp(2),
-    marginBottom: hp(2),
   },
   text: {
     textAlignVertical: "center",
@@ -229,7 +202,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: wp(4),
     height: hp(ComponentParams.button.height.small),
     borderRadius: hp(ComponentParams.button.height.small),
-    shadowColor: Colors.darkGrey,
+    shadowColor: Colors.cardDropShadow,
     backgroundColor: Colors.white,
     elevation: 2,
   },

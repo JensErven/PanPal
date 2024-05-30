@@ -211,8 +211,10 @@ const getRecipe = async (recipeId: string) => {
 
 const saveTipsToRecipe = async (recipeId: string, tips: string[]) => {
   try {
+    console.log("Saving tips to recipe:", recipeId, tips);
     const recipeRef = doc(db, collectionName, recipeId);
-    await updateDoc(recipeRef, { tips: tips });
+    await updateDoc(recipeRef, { tips });
+    console.log("Tips saved successfully");
     return { success: true, message: "Tips saved successfully" };
   } catch (error) {
     console.error("Error saving tips:", error);

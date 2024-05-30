@@ -108,7 +108,7 @@ const setPreferencesStep1 = () => {
         JSON.stringify(updatedPreferences)
       );
 
-      console.log("Preferences:", updatedPreferences);
+      // console.log("Preferences:", updatedPreferences);
     } catch (error) {
       console.error("Error saving preferences:", error);
     }

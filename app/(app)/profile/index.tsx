@@ -18,7 +18,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import Colors from "@/constants/Colors";
 import CustomHeader from "@/components/navigation/CustomHeader";
 import { Ionicons } from "@expo/vector-icons";
-import { AuthContext } from "@/context/authContext";
+import { AuthContext, UserCreditsType } from "@/context/authContext";
 import { router } from "expo-router";
 import ComponentParams from "@/constants/ComponentParams";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -29,8 +29,17 @@ import StandardButton from "@/components/buttons/StandardButton";
 import RoundButton from "@/components/buttons/RoundButton";
 
 const ProfileScreen = () => {
-  const { user, logout, storeUserTastePreferencesToFirebase, credits } =
-    useContext<any>(AuthContext);
+  const {
+    user,
+    logout,
+    storeUserTastePreferencesToFirebase,
+    credits,
+  }: {
+    user: any;
+    logout: any;
+    storeUserTastePreferencesToFirebase: any;
+    credits: UserCreditsType;
+  } = useContext<any>(AuthContext);
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
   const [isBusinessModelOn, setIsBusinessModelOn] =
     React.useState<boolean>(false);
@@ -84,7 +93,7 @@ const ProfileScreen = () => {
               <View style={styles.profileTopContainer}>
                 <LinearGradient
                   style={styles.profileImageContainer}
-                  colors={[Colors.white, "#DDEBF3"]}
+                  colors={[Colors.white, Colors.primarySkyBlue]}
                   start={[0.5, 0]}
                   end={[0.5, 1]}
                 >
@@ -100,7 +109,7 @@ const ProfileScreen = () => {
                     <Ionicons
                       name="person"
                       size={hp(2.7 * 2)}
-                      color={Colors.darkBlue}
+                      color={Colors.primarySkyBlue}
                     />
                   )}
                 </LinearGradient>
@@ -184,7 +193,9 @@ const ProfileScreen = () => {
                     <View className="flex w-full justify-between flex-row">
                       <Text style={styles.title}>Your PanPal Credits</Text>
                       <View className="flex flex-row gap-x-1 justify-center items-center">
-                        <Text style={styles.panpalCreditsText}>{credits}</Text>
+                        <Text style={styles.panpalCreditsText}>
+                          {credits.credits}
+                        </Text>
                         <LinearGradient
                           style={styles.panpalCreditsButtonContainer}
                           colors={
@@ -305,19 +316,22 @@ const styles = StyleSheet.create({
     gap: hp(1.5),
   },
   profileImageContainer: {
-    aspectRatio: 1,
-    width: wp(25),
-    height: wp(25),
-    borderRadius: hp(ComponentParams.button.height.small),
-    elevation: 3,
+    backgroundColor: Colors.secondaryWhite,
+    borderRadius: hp(ComponentParams.button.height.large / 2),
     justifyContent: "center",
     alignItems: "center",
+    alignSelf: "flex-start",
+    aspectRatio: 1,
+    width: hp(ComponentParams.button.height.large * 2),
+    height: hp(ComponentParams.button.height.large * 2),
+    elevation: 2,
+    shadowColor: Colors.cardDropShadow,
   },
   profileImage: {
-    aspectRatio: 1,
-    width: wp(23),
-    height: wp(23),
-    borderRadius: hp(ComponentParams.button.height.small),
+    backgroundColor: "transparent",
+    width: hp(ComponentParams.button.height.small),
+    height: hp(ComponentParams.button.height.small),
+    borderRadius: hp(ComponentParams.button.height.small / 2),
   },
   userName: {
     flexWrap: "wrap",

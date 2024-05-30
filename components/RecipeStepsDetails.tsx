@@ -17,13 +17,16 @@ import * as Haptics from "expo-haptics";
 const RecipeStepsDetails = ({
   steps,
   times,
+  selectedSteps,
+  setSelectedSteps,
+  setProgress,
 }: {
   steps: string[];
   times: number[];
+  selectedSteps: number[];
+  setSelectedSteps: (steps: number[]) => void;
+  setProgress: (progress: number) => void;
 }) => {
-  const [progress, setProgress] = React.useState(0);
-  const [selectedSteps, setSelectedSteps] = React.useState<number[]>([]);
-
   const handleStepClick = (index: number) => () => {
     if (selectedSteps.includes(index)) {
       setSelectedSteps(selectedSteps.filter((step) => step !== index));
@@ -39,64 +42,6 @@ const RecipeStepsDetails = ({
 
   return (
     <View style={styles.container}>
-      <View style={styles.topContent}>
-        <View style={styles.timesContainer}>
-          <SmallInfoTag
-            text={`${times[0]} min`}
-            icon={
-              <View
-                style={{
-                  flexDirection: "row",
-                  gap: wp(1),
-                  justifyContent: "center",
-                  alignItems: "center",
-                }}
-              >
-                <Ionicons name="timer" size={hp(2)} color={Colors.darkGrey} />
-                <Text style={{ color: Colors.darkGrey }}>Cook:</Text>
-              </View>
-            }
-          />
-          <SmallInfoTag
-            text={`${times[1]} min`}
-            icon={
-              <View
-                style={{
-                  flexDirection: "row",
-                  gap: wp(1),
-                  justifyContent: "center",
-                  alignItems: "center",
-                }}
-              >
-                <Ionicons name="timer" size={hp(2)} color={Colors.darkGrey} />
-                <Text style={{ color: Colors.darkGrey }}>Prep:</Text>
-              </View>
-            }
-          />
-        </View>
-        <View style={styles.progressContainer}>
-          <Text style={[styles.progressTitle]}>Progress</Text>
-          <View
-            style={{
-              justifyContent: "center",
-              position: "relative",
-              alignItems: "center",
-            }}
-          >
-            <CircularProgress
-              progress={progress}
-              size={hp(10)}
-              strokeWidth={hp(1)}
-              backgroundColor={Colors.secondaryWhite}
-              strokeColor={Colors.primarySkyBlue}
-            />
-            <Text style={[styles.progressText]}>
-              {selectedSteps.length} / {steps.length}
-            </Text>
-          </View>
-        </View>
-      </View>
-
       <View style={styles.stepsList}>
         {steps.map((step, index) => (
           <TouchableOpacity
@@ -178,35 +123,5 @@ const styles = StyleSheet.create({
     fontSize: Fonts.text_2.fontSize,
     color: Colors.darkGrey,
     lineHeight: Fonts.text_2.lineHeight,
-  },
-  timesContainer: {
-    flexDirection: "column",
-    justifyContent: "center",
-    alignItems: "flex-start",
-
-    gap: hp(1),
-  },
-  progressContainer: {
-    gap: wp(2),
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
-  topContent: {
-    marginBottom: hp(4),
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-  },
-  progressText: {
-    fontSize: Fonts.text_1.fontSize,
-    fontFamily: Fonts.text_1.fontFamily,
-    color: Colors.darkGrey,
-    position: "absolute",
-  },
-  progressTitle: {
-    fontSize: Fonts.text_1.fontSize,
-    fontFamily: Fonts.text_1.fontFamily,
-    color: Colors.darkGrey,
   },
 });

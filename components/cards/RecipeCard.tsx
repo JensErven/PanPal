@@ -93,7 +93,7 @@ const RecipeCard = ({
           />
         ) : (
           <View style={styles.recipeImage}>
-            <Ionicons name="image" size={hp(5)} color={Colors.white} />
+            <Ionicons name="image" size={hp(5)} color={Colors.primarySkyBlue} />
           </View>
         )}
         <View style={styles.recipeTextContainer}>
