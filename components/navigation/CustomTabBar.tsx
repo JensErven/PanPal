@@ -71,11 +71,7 @@ const CustomTabBar = ({ tabs }: { tabs: TabBarItem[] }) => {
             setIsPlusButtonPressed(false);
             router.push("/recipe/add");
           }}
-          colors={[
-            Colors.light.components.button.purple.background[0],
-            Colors.light.components.button.purple.background[1],
-            Colors.light.components.button.purple.background[2],
-          ]}
+          colors={Colors.light.components.button.purple.background}
           textColor={Colors.white}
           height={ComponentParams.button.height.medium}
           borderColor={Colors.light.components.button.purple.border}
@@ -90,13 +86,15 @@ const CustomTabBar = ({ tabs }: { tabs: TabBarItem[] }) => {
         <PlusButtonContentView children={plusButtonContent()} />
       )}
       <FloatingPanPalButton />
+      <LinearGradient
+        style={styles.bottomGradient}
+        colors={["transparent", Colors.secondaryWhite, Colors.primarySkyBlue]}
+        start={[0.5, 0]}
+        end={[0.5, 1]}
+      />
       <View style={[styles.container]}>
         <LinearGradient
-          colors={[
-            Colors.light.components.button.purple.background[0],
-            Colors.light.components.button.purple.background[1],
-            Colors.light.components.button.purple.background[2],
-          ]}
+          colors={Colors.light.components.button.purple.background}
           start={[0, 0]}
           end={[0.5, 1]}
           style={styles.plusButtonGradientcontainer}
@@ -126,10 +124,8 @@ const CustomTabBar = ({ tabs }: { tabs: TabBarItem[] }) => {
                         Colors.light.components.button.purple.background[0],
                     }
                   : {
-                      borderColor: Colors.light.components.button.white.border,
+                      borderColor: Colors.primarySkyBlue,
                       borderWidth: 2,
-                      backgroundColor:
-                        Colors.light.components.button.white.background[1],
                     },
                 index === 1 ? { marginRight: wp(7) } : null,
                 index === tabs.length - 2 ? { marginLeft: wp(7) } : null,
@@ -139,15 +135,8 @@ const CustomTabBar = ({ tabs }: { tabs: TabBarItem[] }) => {
               key={tab.index}
               colors={
                 activeTab === tab.index
-                  ? [
-                      Colors.light.components.button.purple.background[0],
-                      Colors.light.components.button.purple.background[1],
-                      Colors.light.components.button.purple.background[2],
-                    ]
-                  : [
-                      Colors.light.components.button.white.background[1],
-                      Colors.light.components.button.white.background[0],
-                    ]
+                  ? Colors.light.components.button.purple.background
+                  : [Colors.white, Colors.primarySkyBlue]
               }
             >
               <TouchableOpacity
@@ -158,7 +147,9 @@ const CustomTabBar = ({ tabs }: { tabs: TabBarItem[] }) => {
                 <Ionicons
                   name={tab.icon}
                   size={hp(3)}
-                  color={activeTab === tab.index ? Colors.white : "#A0B7D6"}
+                  color={
+                    activeTab === tab.index ? Colors.white : Colors.darkGrey
+                  }
                 />
               </TouchableOpacity>
             </LinearGradient>
@@ -180,6 +171,18 @@ const styles = StyleSheet.create({
     height: hp(8),
     width: wp(100),
     zIndex: 50,
+    elevation: 2,
+    shadowColor: Colors.darkGrey,
+    shadowOffset: { width: 0, height: 2 },
+  },
+  bottomGradient: {
+    zIndex: 47,
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+    width: "100%",
+    height: hp(12),
   },
   tabContainer: {
     backgroundColor: "transparent",
@@ -190,6 +193,7 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   tabGradientContainer: {
+    backgroundColor: Colors.primarySkyBlue,
     flex: 1,
     borderRadius: hp(4),
     overflow: "hidden",

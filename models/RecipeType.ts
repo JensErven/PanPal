@@ -14,4 +14,5 @@ export type RecipeType = {
   createdAt?: string; // date string
   cuisineType?: string; // cuisine type
   mealType?: string; // meal type
+  tips?: string[]; // array of strings
 };

@@ -6,9 +6,8 @@ import {
   ScrollView,
   TouchableOpacity,
 } from "react-native";
-import React, { useEffect, useMemo, useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import { LinearGradient } from "expo-linear-gradient";
-import CustomKeyBoardView from "@/components/CustomKeyBoardView";
 import CustomHeader from "@/components/navigation/CustomHeader";
 import Colors from "@/constants/Colors";
 import {
@@ -17,24 +16,30 @@ import {
 } from "react-native-responsive-screen";
 import { StatusBar } from "expo-status-bar";
 import ComponentParams from "@/constants/ComponentParams";
-import { TextInput } from "react-native-gesture-handler";
 import { Ionicons } from "@expo/vector-icons";
 import Fonts from "@/constants/Fonts";
 import { Message } from "@/models/Message";
 import ChatInputBar from "@/components/ChatInputBar";
 import { openaiServices } from "@/services/api/openai.services";
 import MessageCard from "@/components/MessageCard";
-import { blurhash } from "@/utils/common";
-import { Image } from "expo-image";
+import * as Haptics from "expo-haptics";
 import panPalIcon from "@/assets/images/panpal-icon-medium.png";
 import IntroMessageCard from "@/components/cards/IntroMessageCard";
 import { cuisineTypes } from "@/constants/tastePreferences/CuisineTypes";
 import { mealTypes } from "@/constants/tastePreferences/MealTypes";
 import PopUp from "@/components/modals/PopUp";
-import { AuthContext, useAuth } from "@/context/authContext";
+import { AuthContext, UserCreditsType } from "@/context/authContext";
 
 const PanPalChatScreen = () => {
-  const { credits, subtractCredits } = React.useContext<any>(AuthContext);
+  const {
+    user,
+    credits,
+    substractCredits,
+  }: {
+    user: any;
+    credits: UserCreditsType;
+    substractCredits: (amount: number) => void;
+  } = React.useContext<any>(AuthContext);
 
   const [messages, setMessages] = React.useState<Message[]>([]);
   const [shouldShowCreditAlert, setShouldShowCreditAlert] =
@@ -50,30 +55,43 @@ const PanPalChatScreen = () => {
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
   const scrollViewRef = useRef<ScrollView>(null);
 
-  const handleSendMessage = (message: Message) => {
-    if (credits === 0) {
+  const handleSendMessage = async (message: Message) => {
+    if (credits.credits === 0) {
       setShouldShowCreditAlert(true);
       return;
     }
+
     setIsLoading(true);
     setMessages((prevMessages) => [...prevMessages, message]); // Using callback form of setMessages
-    openaiServices.createCompletion([...messages, message]).then((response) => {
+
+    try {
+      const response = await openaiServices.createCompletion([
+        ...messages,
+        message,
+      ]);
+
       const chatCompletionMessage: Message = {
         role: response.role,
         content: response.content || "", // Ensure content is always a string
       };
-      subtractCredits(1);
+
       setMessages((prevMessages) => [...prevMessages, chatCompletionMessage]);
+
+      // Deduct 1 credit from the user
+      substractCredits(1);
+    } catch (error) {
+      console.error("Error in getting response:", error);
+    } finally {
       setIsLoading(false);
-    });
+    }
   };
 
   const generateRandomIntro = () => {
     const greetings = [
-      "Hi there! I'm PanPal 🍳",
-      "Hello! I'm PanPal 🍳",
-      "Hey! I'm PanPal 🍳",
-      "Hi! I'm PanPal 🍳",
+      `Hi there${user.username ? " " + user.username : ""}! I'm PanPal 🍳`,
+      `Hello${user.username ? " " + user.username : ""}! I'm PanPal 🍳"`,
+      `Hey${user.username ? " " + user.username : ""}! I'm PanPal 🍳"`,
+      `Hi${user.username ? " " + user.username : ""}! I'm PanPal 🍳"`,
     ];
     const introTexts = [
       "I'm here to help you with recipes and cooking tips. What would you like to do?",
@@ -99,16 +117,15 @@ const PanPalChatScreen = () => {
   }, []);
 
   useEffect(() => {
+    // if new message a assistant message then notify user
+    if (messages[messages.length - 1]?.role !== "assistant") return;
+    // notify user that a new message has been received
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    // scroll to the end of the chat
     if (scrollViewRef.current) {
       scrollViewRef.current.scrollToEnd({ animated: true });
     }
   }, [messages]);
-
-  useEffect(() => {
-    if (credits === 0) {
-      setShouldShowCreditAlert(true);
-    }
-  }, [credits]);
 
   const handleCreditAlertClose = () => {
     // Handle closing the credit alert
@@ -130,7 +147,6 @@ const PanPalChatScreen = () => {
           title="Out of PanPal Credits"
           text="You're out of PanPal credits. Every day, your PanPal credits are reset to 50. You can wait for the next day to receive additional credits."
           close={handleCreditAlertClose}
-          children={""}
         />
       )}
       {shouldShowCreditsInfoPopUp && (
@@ -138,10 +154,8 @@ const PanPalChatScreen = () => {
           icon={<Ionicons name="help" size={hp(2.7)} color={Colors.darkBlue} />}
           title="PanPal Credits Info"
           text="PanPal credits are used to interact with PanPal features. Such as getting recipe suggestions, cooking tips, enhancing recipes, generating recipe images,
-          and more. Every day, your PanPal credits are reset to 50. In case your credits are fully used up, you can
-          wait for the next day to receive additional credits."
+          and more. Every day, your PanPal credits are reset to 50. In case your credits are fully used up, you can wait for the next day to receive additional credits."
           close={handleCreditsInfoPopUpClose}
-          children={""}
         />
       )}
 
@@ -168,7 +182,7 @@ const PanPalChatScreen = () => {
               >
                 <Ionicons name="help" size={hp(2.7)} color={Colors.white} />
               </TouchableOpacity>
-              <Text style={styles.panpalCreditsText}>{credits}</Text>
+              <Text style={styles.panpalCreditsText}>{credits.credits}</Text>
               <LinearGradient
                 style={styles.panpalCreditsButtonContainer}
                 colors={[
@@ -194,6 +208,7 @@ const PanPalChatScreen = () => {
             ref={scrollViewRef}
           >
             <IntroMessageCard
+              disableSelectOption={isLoading}
               image={panPalIcon}
               title={randomIntro.greeting}
               text={randomIntro.introText}
@@ -209,6 +224,7 @@ const PanPalChatScreen = () => {
             />
             {messages.map((message, index) => (
               <MessageCard
+                disableSelectOption={isLoading}
                 key={index}
                 message={message}
                 index={index}
@@ -216,14 +232,14 @@ const PanPalChatScreen = () => {
               />
             ))}
             {isLoading && (
-              <ActivityIndicator size="large" color={Colors.darkBlue} />
+              <ActivityIndicator size={hp(5.4)} color={Colors.primarySkyBlue} />
             )}
           </ScrollView>
         </LinearGradient>
         <ChatInputBar
           sendMessage={handleSendMessage}
           isLoading={isLoading}
-          isDisabled={credits === 0}
+          isDisabled={credits.credits === 0 || isLoading}
         />
       </LinearGradient>
     </>

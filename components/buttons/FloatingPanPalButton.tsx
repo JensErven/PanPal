@@ -1,11 +1,10 @@
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
-import React, { Component, useState } from "react";
+import React, { useEffect, useRef } from "react";
+import { TouchableOpacity, Animated, StyleSheet } from "react-native";
 import { router } from "expo-router";
-import { Ionicons } from "@expo/vector-icons";
 import { Image } from "expo-image";
 import Colors from "@/constants/Colors";
 import ComponentParams from "@/constants/ComponentParams";
-import { blurhash } from "@/utils/common";
+import { blurhash } from "@/utils/general.utils";
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -17,20 +16,45 @@ const FloatingPanPalButton = () => {
     router.push("panpal/chat");
   };
 
+  const translateYValue = useRef(new Animated.Value(0)).current;
+
+  const startFloating = () => {
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(translateYValue, {
+          toValue: -5,
+          duration: 1000,
+          useNativeDriver: true,
+        }),
+        Animated.timing(translateYValue, {
+          toValue: 0,
+          duration: 1000,
+          useNativeDriver: true,
+        }),
+      ])
+    ).start();
+  };
+
+  useEffect(() => {
+    startFloating();
+  }, []);
+
   return (
-    <TouchableOpacity
-      activeOpacity={1}
-      style={styles.panPalButtonContainer}
-      onPress={() => handlePanPalButtonPress()}
+    <Animated.View
+      style={[
+        styles.panPalButtonContainer,
+        { transform: [{ translateY: translateYValue }] },
+      ]}
     >
-      <Image
-        style={styles.recipeImage}
-        source={panPalIcon}
-        placeholder={blurhash}
-        contentFit="cover"
-        transition={1000}
-      />
-    </TouchableOpacity>
+      <TouchableOpacity activeOpacity={1} onPress={handlePanPalButtonPress}>
+        <Image
+          style={styles.recipeImage}
+          source={panPalIcon}
+          placeholder={blurhash}
+          contentFit="cover"
+        />
+      </TouchableOpacity>
+    </Animated.View>
   );
 };
 
@@ -44,7 +68,7 @@ const styles = StyleSheet.create({
     zIndex: 48,
     backgroundColor: Colors.white,
     borderRadius: hp(ComponentParams.button.height.large),
-    shadowColor: Colors.darkBlue,
+    shadowColor: Colors.cardDropShadow,
     shadowOffset: {
       width: 0,
       height: 2,

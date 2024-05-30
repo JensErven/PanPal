@@ -26,22 +26,17 @@ const TastePreferencesCard = ({
   searchInputPlaceholder,
 }: {
   title: string;
-  selectedOptions: preferenceOption[];
+  selectedOptions: string[];
   searchInputPlaceholder?: string;
 }) => {
   const [searchInputValue, setSearchInputValue] = useState<string>("");
   const filteredOptions = useMemo(() => {
     return selectedOptions.filter((option) =>
-      option.name.toLowerCase().includes(searchInputValue.trim().toLowerCase())
+      option.toLowerCase().includes(searchInputValue.trim().toLowerCase())
     );
   }, [searchInputValue, selectedOptions]);
   return (
-    <LinearGradient
-      style={styles.container}
-      colors={[Colors.white, Colors.white, "#DDEBF3"]}
-      start={[0.5, 0]}
-      end={[0.5, 1]}
-    >
+    <LinearGradient style={styles.container} colors={[Colors.white, "#DDEBF3"]}>
       <View style={styles.selectedOptionsContainer}>
         <>
           <View style={styles.titleContainer}>
@@ -77,7 +72,7 @@ const TastePreferencesCard = ({
                   style={[
                     styles.selectedOption,
                     {
-                      color: Colors.lightGrey,
+                      color: Colors.darkGrey,
                     },
                   ]}
                 >
@@ -115,7 +110,7 @@ const TastePreferencesCard = ({
                         },
                       ]}
                     >
-                      {option.name}
+                      {option}
                     </Text>
                   </View>
                 </LinearGradient>
@@ -132,12 +127,15 @@ export default TastePreferencesCard;
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    height: "auto",
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    borderRadius: hp(ComponentParams.button.height.small),
+    overflow: "hidden",
+    shadowColor: Colors.cardDropShadow,
+    elevation: 2,
     width: "100%",
-    borderRadius: hp(ComponentParams.button.height.large / 2),
-    elevation: 5,
-    shadowColor: Colors.darkBlue,
   },
   titleContainer: {
     paddingHorizontal: hp(1),

@@ -15,6 +15,7 @@ const CustomKeyBoardView = ({
       style={{ flex: 1 }}
     >
       <ScrollView
+        contentContainerStyle={{ flexGrow: 1 }}
         ref={ref}
         scrollEventThrottle={16}
         style={{ flex: 1 }}

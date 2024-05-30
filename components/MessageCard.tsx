@@ -15,10 +15,12 @@ import OthersContent from "./messageContent/OthersContent";
 import RecipeContent from "./messageContent/RecipeContent";
 
 const MessageCard = ({
+  disableSelectOption,
   message,
   index,
   selectRecipeOption,
 }: {
+  disableSelectOption: boolean;
   message: Message;
   index: number;
   selectRecipeOption: (message: Message) => void;
@@ -53,13 +55,17 @@ const MessageCard = ({
         </LinearGradient>
       ) : (
         <LinearGradient
-          colors={[...Colors.light.components.button.white.background]}
+          colors={[Colors.white, Colors.secondaryWhite]}
           start={[0, 0]}
           end={[1, 1]}
           style={styles.assistantMessageContainer}
         >
           <View style={styles.messageContent}>
-            {renderContent(message.content, handleSelectRecipeOption)}
+            {renderContent(
+              message.content,
+              handleSelectRecipeOption,
+              disableSelectOption
+            )}
           </View>
         </LinearGradient>
       )}
@@ -69,7 +75,8 @@ const MessageCard = ({
 
 const renderContent = (
   content: string,
-  selectRecipeOption: (option: string) => void
+  selectRecipeOption: (option: string) => void,
+  disableSelectContent: boolean
 ) => {
   if (typeof content === "string") {
     const parsedContent = JSON.parse(content);
@@ -82,6 +89,7 @@ const renderContent = (
     } else if (parsedContent.responseType === "recipeOptions") {
       return (
         <RecipeOptionsContent
+          disableSelectContent={disableSelectContent}
           content={parsedContent}
           selectOption={selectRecipeOption}
         />
@@ -108,7 +116,7 @@ const styles = StyleSheet.create({
   userMessageContainer: {
     maxWidth: wp(80),
     elevation: 3,
-    shadowColor: Colors.darkBlue,
+    shadowColor: Colors.darkGrey,
     backgroundColor: Colors.mediumPurple,
     paddingHorizontal: wp(4),
     paddingVertical: hp(2),
@@ -121,7 +129,7 @@ const styles = StyleSheet.create({
     maxWidth: wp(80),
     width: wp(80),
     elevation: 3,
-    shadowColor: Colors.darkBlue,
+    shadowColor: Colors.darkGrey,
     backgroundColor: Colors.mediumPurple,
     paddingHorizontal: wp(4),
     paddingVertical: hp(2),

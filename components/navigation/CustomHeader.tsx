@@ -14,6 +14,7 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import Colors from "@/constants/Colors";
+import ComponentParams from "@/constants/ComponentParams";
 
 const ios = Platform.OS === "ios";
 
@@ -58,9 +59,7 @@ const CustomHeader = ({
 
       {children && (
         <>
-          <View className="flex flex-row gap-x-2 justify-center items-center">
-            {children}
-          </View>
+          <View style={styles.childrenContainer}>{children}</View>
         </>
       )}
     </View>
@@ -72,7 +71,7 @@ export default CustomHeader;
 const styles = StyleSheet.create({
   headerTitle: {
     fontSize: hp(3),
-    color: "white",
+    color: Colors.white,
     textTransform: "capitalize",
     fontFamily: "FredokaSemiBold",
   },
@@ -90,6 +89,15 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     flexDirection: "row",
-    paddingBottom: hp(2),
+    paddingBottom: hp(1),
+  },
+  childrenContainer: {
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    minHeight: hp(ComponentParams.button.height.large),
+    gap: wp(2),
+    borderRadius: hp(ComponentParams.button.height.large),
   },
 });

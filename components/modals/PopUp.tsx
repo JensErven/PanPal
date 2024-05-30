@@ -105,9 +105,10 @@ const styles = StyleSheet.create({
     color: Colors.darkBlue,
   },
   text: {
+    marginBottom: hp(2),
     fontFamily: Fonts.text_2.fontFamily,
     fontSize: Fonts.text_2.fontSize,
-    color: Colors.darkBlue,
+    color: Colors.darkGrey,
     lineHeight: Fonts.text_2.lineHeight,
   },
 });

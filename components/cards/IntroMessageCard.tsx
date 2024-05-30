@@ -11,9 +11,10 @@ import ComponentParams from "@/constants/ComponentParams";
 import Fonts from "@/constants/Fonts";
 import { Ionicons } from "@expo/vector-icons";
 import { Image } from "expo-image";
-import { blurhash } from "@/utils/common";
+import { blurhash } from "@/utils/general.utils";
 
 const IntroMessageCard = ({
+  disableSelectOption,
   image,
   title,
   text,
@@ -21,6 +22,7 @@ const IntroMessageCard = ({
   index,
   selectOption,
 }: {
+  disableSelectOption: boolean;
   image: string;
   title: string;
   text: string;
@@ -38,7 +40,7 @@ const IntroMessageCard = ({
 
   return (
     <LinearGradient
-      colors={[...Colors.light.components.button.white.background]}
+      colors={[Colors.white, Colors.secondaryWhite]}
       start={[0, 0]}
       end={[1, 1]}
       style={styles.container}
@@ -62,6 +64,7 @@ const IntroMessageCard = ({
               style={styles.selectOptionButton}
             >
               <TouchableOpacity
+                disabled={disableSelectOption}
                 style={styles.touchable}
                 key={index}
                 onPress={() => handleSelectOption(option)}

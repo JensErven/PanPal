@@ -25,28 +25,31 @@ import {
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
 import { StatusBar } from "expo-status-bar";
-import { RecipeType } from "@/models/RecipeType";
-import { collection, onSnapshot } from "firebase/firestore";
-import { db } from "@/firebaseConfig";
 import SearchBarHeader from "@/components/headers/SearchBarHeader";
 import FilterOptionButton from "@/components/buttons/FilterOptionButton";
 import { BottomSheetModal } from "@gorhom/bottom-sheet";
-import RecipesFilterSheetModal from "@/components/modals/RecipesFilterSheetModal";
-import { testRecipes as testRecipesData } from "@/constants/testData/testRecipes";
 import RecipeCard from "@/components/cards/RecipeCard";
 import { Ionicons } from "@expo/vector-icons";
-
-export type SavedRecipeType = {
-  id: string;
-  data: RecipeType;
-};
+import CustomHeader from "@/components/navigation/CustomHeader";
+import { router } from "expo-router";
+import { Image } from "expo-image";
+import { blurhash } from "@/utils/general.utils";
+import RoundButton from "@/components/buttons/RoundButton";
+import { useRecipes } from "@/context/recipesContext";
+import FullScreenLoading from "@/components/FullScreenLoading";
+import { SavedRecipeType } from "@/models/SavedRecipeType";
+import CustomSheetModal from "@/components/modals/CustomSheetModal";
+import FilterHeader from "@/components/modals/filter/FilterHeader";
+import FilterFooter from "@/components/modals/filter/FilterFooter";
+import FilterOptionsSelectCard from "@/components/cards/FilterOptionsSelectCard";
+import { cuisineTypes } from "@/constants/tastePreferences/CuisineTypes";
+import { mealTypes } from "@/constants/tastePreferences/MealTypes";
 
 const Saved = () => {
+  const { recipes, isLoading } = useRecipes();
   const { user } = useContext<any>(AuthContext);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [initialRecipes, setInitialRecipes] = useState<SavedRecipeType[]>([]);
-  const [testRecipes, setTestRecipes] =
-    useState<SavedRecipeType[]>(testRecipesData);
+  const [initialRecipes, setInitialRecipes] =
+    useState<SavedRecipeType[]>(recipes);
 
   const [selectedCuisineTypes, setSelectedCuisineTypes] = useState<string[]>(
     []
@@ -116,12 +119,15 @@ const Saved = () => {
     )
       return [];
 
-    if (toShowRecipesType === "Generated") {
-      return ["Cuisines", "Meal types", "Generated Recipes"];
-    } else if (toShowRecipesType === "Custom") {
-      return ["Cuisines", "Meal types", "Custom Recipes"];
-    }
-    return ["Cuisines", "Meal types", "All Recipes"];
+    const options = [];
+    if (selectedCuisineTypes.length > 0) options.push("Cuisines");
+    if (selectedMealTypes.length > 0) options.push("Meal types");
+    if (toShowRecipesType !== "All" && toShowRecipesType === "Generated")
+      options.push("Generated");
+    if (toShowRecipesType !== "All" && toShowRecipesType === "Custom")
+      options.push("Custom");
+
+    return options;
   }, [
     toShowRecipesType,
     selectedCuisineTypes.length,
@@ -132,31 +138,6 @@ const Saved = () => {
     recipesFilterSheetModal.current?.present();
   }, []);
 
-  useEffect(() => {
-    if (user && user.userId) {
-      const recipesRef = collection(db, "recipes");
-      setIsLoading(true);
-      const subscriber = onSnapshot(recipesRef, {
-        next: (querySnapshot) => {
-          const recipes: SavedRecipeType[] = [];
-          querySnapshot.forEach((doc) => {
-            const data = doc.data() as RecipeType;
-            if (data.uuid === user.userId) {
-              recipes.push({ id: doc.id, data });
-            }
-          });
-          setInitialRecipes(recipes);
-          setIsLoading(false);
-        },
-        error: (error) => {
-          console.error("Error fetching recipes:", error);
-          setIsLoading(false);
-        },
-      });
-      return () => subscriber();
-    }
-  }, [user]);
-
   const returnSelectedOptions = (option: string) => {
     if (option === "Cuisines") {
       return selectedCuisineTypes;
@@ -165,6 +146,11 @@ const Saved = () => {
     }
     return [];
   };
+
+  useEffect(() => {
+    setInitialRecipes(recipes);
+  }, [recipes]);
+
   const searchBarHeaderChildren = () => {
     return (
       <>
@@ -185,9 +171,37 @@ const Saved = () => {
     );
   };
 
-  const handleSheetChanges = useCallback((index: number) => {
-    console.log("handleSheetChanges", index);
-  }, []);
+  const customHeaderChildren = () => {
+    return (
+      <>
+        {user && (
+          <RoundButton
+            handlePress={() => {
+              router.push("/profile");
+            }}
+          >
+            {user.profileUrl ? (
+              <Image
+                style={styles.profileImage}
+                source={user.profileUrl ? user.profileUrl : blurhash}
+                placeholder={blurhash}
+                contentFit="cover"
+                transition={1000}
+              />
+            ) : (
+              <Ionicons name="person" size={hp(2.7)} color={Colors.white} />
+            )}
+          </RoundButton>
+        )}
+      </>
+    );
+  };
+
+  const handleFilterReset = () => {
+    setSelectedCuisineTypes([]);
+    setSelectedMealTypes([]);
+    setToShowRecipesType("All");
+  };
 
   return (
     <LinearGradient
@@ -200,22 +214,80 @@ const Saved = () => {
       start={[0, 0]}
       end={[1, 0]}
     >
+      <StatusBar style="light" />
+      <CustomHeader
+        isTransparent={true}
+        hasGoBack={false}
+        headerTitle={"Saved Recipes"}
+        children={customHeaderChildren()}
+      />
       <SearchBarHeader
         searchInputValue={searchInputValue}
         setSearchInputValue={setSearchInputValue}
         showFilterModal={handleOpenRecipesFilterModal}
         children={searchBarHeaderChildren()}
       />
-      <RecipesFilterSheetModal
+      <CustomSheetModal
+        modalRef={recipesFilterSheetModal}
         snapPoints={[hp(100)]}
-        bottomSheetModalRef={recipesFilterSheetModal}
-        handleSheetChanges={handleSheetChanges}
-        selectedCuisineTypes={selectedCuisineTypes}
-        setSelectedCuisineTypes={setSelectedCuisineTypes}
-        selectedMealTypes={selectedMealTypes}
-        setSelectedMealTypes={setSelectedMealTypes}
-        setToShowRecipesType={setToShowRecipesType}
-        toShowRecipesType={toShowRecipesType}
+        headerChildren={<FilterHeader reset={() => handleFilterReset()} />}
+        footerChildren={
+          <FilterFooter
+            closeModal={() => recipesFilterSheetModal.current?.dismiss()}
+          />
+        }
+        scrollViewChildren={
+          <>
+            <FilterOptionsSelectCard
+              clearAll={() => setToShowRecipesType("All")}
+              showCount={false}
+              options={["Generated", "Custom"]}
+              title="To Show Recipes"
+              selectedOptions={[toShowRecipesType]}
+              selectOption={(option) => {
+                const updatedToShowRecipesType = option;
+                if (updatedToShowRecipesType === toShowRecipesType) {
+                  setToShowRecipesType("All");
+                } else {
+                  setToShowRecipesType(updatedToShowRecipesType);
+                }
+              }}
+            />
+            <FilterOptionsSelectCard
+              clearAll={() => setSelectedMealTypes([])}
+              options={mealTypes}
+              title="Meal Types"
+              selectedOptions={selectedMealTypes}
+              selectOption={(option) => {
+                const updatedSelectedMealTypes = [...selectedMealTypes];
+                if (updatedSelectedMealTypes.includes(option)) {
+                  const index = updatedSelectedMealTypes.indexOf(option);
+                  updatedSelectedMealTypes.splice(index, 1);
+                } else {
+                  updatedSelectedMealTypes.push(option);
+                }
+                setSelectedMealTypes(updatedSelectedMealTypes);
+              }}
+            />
+            <FilterOptionsSelectCard
+              clearAll={() => setSelectedCuisineTypes([])}
+              searchEnabled={true}
+              options={cuisineTypes.map((cuisine) => cuisine)}
+              title="Cuisine Types"
+              selectedOptions={selectedCuisineTypes}
+              selectOption={(option) => {
+                const updatedSelectedCuisineTypes = [...selectedCuisineTypes];
+                if (updatedSelectedCuisineTypes.includes(option)) {
+                  const index = updatedSelectedCuisineTypes.indexOf(option);
+                  updatedSelectedCuisineTypes.splice(index, 1);
+                } else {
+                  updatedSelectedCuisineTypes.push(option);
+                }
+                setSelectedCuisineTypes(updatedSelectedCuisineTypes);
+              }}
+            />
+          </>
+        }
       />
 
       <LinearGradient
@@ -224,28 +296,33 @@ const Saved = () => {
         start={[0.5, 0]}
         end={[0.5, 1]}
       >
-        <CustomKeyBoardView>
-          <StatusBar style="light" />
-          {isLoading ? (
-            <ActivityIndicator
-              size={wp(15)}
-              style={{ padding: wp(5) }}
-              color={Colors.mediumBlue}
-            />
-          ) : (
+        {isLoading ? (
+          <FullScreenLoading />
+        ) : (
+          <CustomKeyBoardView>
             <View style={styles.content}>
               <>
                 {filteredRecipes.length === 0 ? (
                   <Text style={styles.noContentText}>No recipes found</Text>
                 ) : (
-                  filteredRecipes?.map((recipe: SavedRecipeType) => (
-                    <RecipeCard key={recipe.id} recipe={recipe} />
-                  ))
+                  <>
+                    <Text style={styles.noContentText}>
+                      {filteredRecipes.length} results
+                    </Text>
+                    {filteredRecipes?.map((recipe: SavedRecipeType) => (
+                      <RecipeCard
+                        key={recipe.id}
+                        recipe={recipe}
+                        allowedToDelete={user.userId === recipe.data.uuid}
+                        allowedToEdit={user.userId === recipe.data.uuid}
+                      />
+                    ))}
+                  </>
                 )}
               </>
             </View>
-          )}
-        </CustomKeyBoardView>
+          </CustomKeyBoardView>
+        )}
       </LinearGradient>
     </LinearGradient>
   );
@@ -257,7 +334,6 @@ const styles = StyleSheet.create({
   gradientBackground: {
     flex: 1,
   },
-
   container: {
     overflow: "hidden",
     borderTopLeftRadius: hp(ComponentParams.button.height.medium),
@@ -268,7 +344,7 @@ const styles = StyleSheet.create({
   noContentText: {
     fontFamily: Fonts.text_2.fontFamily,
     fontSize: Fonts.text_2.fontSize,
-    color: Colors.lightGrey,
+    color: Colors.darkGrey,
     lineHeight: Fonts.text_2.lineHeight,
     textAlign: "center",
   },
@@ -280,7 +356,7 @@ const styles = StyleSheet.create({
     paddingBottom: hp(14),
   },
   headerRightButton: {
-    backgroundColor: Colors.darkBlue,
+    backgroundColor: "rgba(0, 0, 0, 0.2)",
     borderRadius: hp(ComponentParams.button.height.medium / 2),
     width: hp(ComponentParams.button.height.medium),
     height: hp(ComponentParams.button.height.medium),

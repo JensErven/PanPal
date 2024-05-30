@@ -1,6 +1,6 @@
 import Colors from "@/constants/Colors";
-import React from "react";
-import { View } from "react-native";
+import React, { useEffect, useRef } from "react";
+import { View, Animated } from "react-native";
 import Svg, { Circle } from "react-native-svg";
 
 const CircularProgress = ({
@@ -18,8 +18,26 @@ const CircularProgress = ({
 }) => {
   const radius = (size - strokeWidth) / 2;
   const circumference = radius * 2 * Math.PI;
-  const progressStrokeDashoffset =
-    circumference - (progress / 100) * circumference;
+
+  // Create animated value for progress
+  const animatedProgress = useRef(new Animated.Value(progress)).current;
+
+  useEffect(() => {
+    // Animate the progress value with spring effect
+    Animated.spring(animatedProgress, {
+      toValue: progress,
+      useNativeDriver: true,
+      speed: 2,
+      bounciness: 10,
+    }).start();
+  }, [progress]);
+
+  // Interpolate progress value to calculate strokeDashoffset
+  const strokeDashoffset = animatedProgress.interpolate({
+    inputRange: [0, 100],
+    outputRange: [circumference, 0],
+    extrapolate: "clamp",
+  });
 
   return (
     <View>
@@ -33,12 +51,12 @@ const CircularProgress = ({
           cy={size / 2}
           r={radius}
         />
-        <Circle
+        <AnimatedCircle
           stroke={strokeColor}
           fill="transparent"
           strokeWidth={strokeWidth}
           strokeDasharray={`${circumference} ${circumference}`}
-          strokeDashoffset={progressStrokeDashoffset}
+          strokeDashoffset={strokeDashoffset}
           strokeLinecap="round"
           cx={size / 2}
           cy={size / 2}
@@ -49,5 +67,8 @@ const CircularProgress = ({
     </View>
   );
 };
+
+// Create an Animated version of the Circle component
+const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 
 export default CircularProgress;

@@ -1,4 +1,5 @@
 import { Message } from "@/models/Message";
+import { RecipeType } from "@/models/RecipeType";
 import { othersExampleJsonType } from "@/models/openai/othersExampleJsonType.ts";
 import { recipeExampleJsonType } from "@/models/openai/recipeExampleJsonType";
 import { recipeOptionsExampleJsonType } from "@/models/openai/recipeOptionsExampleJsonType";
@@ -84,6 +85,7 @@ const roleSystemPrompt: Message = {
     "    - Always check the user's taste profile before providing any responses.\n\n" +
     "These guidelines ensure PanPal's interactions with users are consistent, engaging, and helpful, maintaining a delightful culinary experience for all queries.",
 };
+
 export const openaiServices = {
   async createCompletion(prompt: Message[]) {
     const response = await openai.chat.completions.create({
@@ -94,4 +96,73 @@ export const openaiServices = {
     });
     return response.choices[0].message;
   },
+
+  async generateRecipeImage(recipeData: RecipeType) {
+    const {
+      title,
+      description,
+      ingredients,
+      steps,
+      difficulty,
+      servings,
+      cuisineType,
+      mealType,
+    } = recipeData;
+
+    // Constructing a detailed prompt within the character limit
+    let prompt = `Generate an appetizing, hyper realistic and high-quality image for a recipe called "${title}". `;
+    if (cuisineType) {
+      prompt += `This is a ${cuisineType} dish. `;
+    }
+    if (mealType) {
+      prompt += `It is typically served as a ${mealType}. `;
+    }
+    if (description.length > 0) {
+      prompt += `Description: ${description.slice(0, 100)}. `; // Truncate description if too long
+    }
+    if (ingredients.length > 0) {
+      prompt += `Key ingredients include: ${ingredients
+        .slice(0, 5)
+        .join(", ")}. `;
+    }
+    if (steps.length > 0) {
+      prompt += `The cooking steps involve: ${steps.slice(0, 3).join(", ")}. `;
+    }
+    prompt += `The dish is for ${servings} servings and has a difficulty rating of ${difficulty}/5. `;
+    prompt += `The image should highlight the dish's texture and color.`;
+
+    // Ensure the prompt does not exceed 1000 characters
+    if (prompt.length > 1000) {
+      prompt = prompt.slice(0, 997) + "...";
+    }
+
+    const response = await openai.images.generate({
+      model: "dall-e-2",
+      prompt: prompt,
+      size: "512x512",
+      n: 1,
+    });
+    const image_url = response.data[0].url;
+    return image_url;
+  },
+
+  async createRecipeTip(recipeData: RecipeType) {
+    const prompt: Message = {
+      role: "user",
+      content: `Can you provide me with only ONE cooking tip for this recipe with following details? Look at the alreacy existing tips and make sure that you DO NOT provide the same tip to the user Provide me with a joyful answer using emoji's. recipe schema: ${JSON.stringify(
+        recipeData
+      )}"`,
+    };
+    const response = await openai.chat.completions.create({
+      model: "gpt-3.5-turbo",
+      max_tokens: 250,
+      response_format: { type: "json_object" },
+      messages: [roleSystemPrompt, prompt],
+    });
+    return response.choices[0].message;
+  },
 };
+
+("https://firebasestorage.googleapis.com/v0/b/panpal-20566.appspot.com/o/recipeImages%2F446a497e-837c-4d44-9c36-b3ac491adc69?alt=media&token=9c8de9a0-563e-4d12-99d3-fa80d9715726");
+
+("https://firebasestorage.googleapis.com/v0/b/panpal-20566.appspot.com/o/recipeImages%2F99bff098-e4df-47d3-8cdc-5bd848361ca3?alt=media&token=cab87538-2aba-470f-a1a6-35c850bcc137");

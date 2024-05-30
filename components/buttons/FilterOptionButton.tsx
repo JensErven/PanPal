@@ -64,7 +64,7 @@ const styles = StyleSheet.create({
   counterContainer: {
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: Colors.mediumBlue,
+    backgroundColor: "rgba(0, 0, 0, 0.1)",
     width: hp(ComponentParams.button.height.small),
     height: "100%",
     borderRadius: wp(4),

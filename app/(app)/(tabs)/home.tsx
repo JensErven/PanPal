@@ -14,21 +14,20 @@ import {
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
 import { StatusBar } from "expo-status-bar";
-import { blurhash } from "@/utils/common";
+import { blurhash } from "@/utils/general.utils";
 import { Ionicons } from "@expo/vector-icons";
 import UnderDevelopmentCard from "@/components/cards/UnderDevelopmentCard";
+import RoundButton from "@/components/buttons/RoundButton";
 
 const Home = () => {
-  const [searchInputValue, setSearchInputValue] = useState<string>("");
   const { user } = useContext<any>(AuthContext);
 
   const customHeaderChildren = () => {
     return (
       <>
         {user && (
-          <TouchableOpacity
-            style={styles.headerRightButton}
-            onPress={() => {
+          <RoundButton
+            handlePress={() => {
               router.push("/profile");
             }}
           >
@@ -43,7 +42,7 @@ const Home = () => {
             ) : (
               <Ionicons name="person" size={hp(2.7)} color={Colors.white} />
             )}
-          </TouchableOpacity>
+          </RoundButton>
         )}
       </>
     );
@@ -126,7 +125,7 @@ const styles = StyleSheet.create({
     color: Colors.light.text,
   },
   headerRightButton: {
-    backgroundColor: Colors.darkBlue,
+    backgroundColor: "rgba(0, 0, 0, 0.2)",
     borderRadius: hp(ComponentParams.button.height.medium / 2),
     width: hp(ComponentParams.button.height.medium),
     height: hp(ComponentParams.button.height.medium),

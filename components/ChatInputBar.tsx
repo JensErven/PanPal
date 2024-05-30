@@ -46,7 +46,8 @@ const ChatInputBar = ({
           placeholder="Type a message..."
           value={inputValue}
           onChangeText={(text) => setInputValue(text)}
-          placeholderTextColor="#A0B7D6"
+          placeholderTextColor={"#A0B7D6"}
+          onSubmitEditing={handleSend}
         />
       </LinearGradient>
       <LinearGradient
@@ -54,6 +55,7 @@ const ChatInputBar = ({
         colors={[
           Colors.light.components.button.purple.background[0],
           Colors.light.components.button.purple.background[1],
+          Colors.light.components.button.purple.background[2],
         ]}
       >
         <TouchableOpacity
@@ -87,6 +89,9 @@ const styles = StyleSheet.create({
     width: wp(100),
     zIndex: 49,
     gap: wp(2),
+    elevation: 5,
+    shadowColor: Colors.darkBlue,
+    shadowOffset: { width: 0, height: 2 },
   },
   bottomChatbar: {
     flexDirection: "row",
@@ -98,13 +103,16 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   textInput: {
-    height: "100%",
-    width: "100%",
     flex: 1,
-    fontSize: Fonts.text_2.fontSize,
+    minHeight: hp(ComponentParams.button.height.medium),
+    borderRadius: hp(ComponentParams.button.height.medium / 2),
+    backgroundColor: Colors.secondaryWhite,
+    paddingHorizontal: wp(1),
+    paddingVertical: hp(1),
     fontFamily: Fonts.text_2.fontFamily,
+    fontSize: Fonts.text_2.fontSize,
+    color: Colors.darkGrey,
     lineHeight: Fonts.text_2.lineHeight,
-    color: Colors.darkBlue,
   },
   sendButton: {
     display: "flex",

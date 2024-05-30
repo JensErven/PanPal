@@ -14,9 +14,11 @@ import { Ionicons } from "@expo/vector-icons";
 const RecipeOptionsContent = ({
   selectOption,
   content,
+  disableSelectContent,
 }: {
   selectOption: (option: string) => void;
   content: recipeOptionsExampleJsonType;
+  disableSelectContent: boolean;
 }) => {
   return (
     <View style={styles.container}>
@@ -31,6 +33,7 @@ const RecipeOptionsContent = ({
               style={styles.selectOptionButton}
             >
               <TouchableOpacity
+                disabled={disableSelectContent}
                 style={styles.touchable}
                 key={index}
                 onPress={() => selectOption(option)}

@@ -69,10 +69,6 @@ const setPreferencesStep1 = () => {
     setStep(step - 1);
   };
 
-  useEffect(() => {
-    console.log(contentSteps[step].selectedOptions);
-  }, [contentSteps]);
-
   /**
    * Handles the selection of an option in the preferences.
    * @param option - The option to be selected.
@@ -111,8 +107,8 @@ const setPreferencesStep1 = () => {
         "userTastePreferences",
         JSON.stringify(updatedPreferences)
       );
-      console.log("Preferences saved successfully!");
-      console.log("Preferences:", updatedPreferences);
+
+      // console.log("Preferences:", updatedPreferences);
     } catch (error) {
       console.error("Error saving preferences:", error);
     }
