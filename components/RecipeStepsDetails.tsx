@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, Touchable } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 import React, { useEffect } from "react";
 import {
   widthPercentageToDP as wp,
@@ -8,9 +8,6 @@ import ComponentParams from "@/constants/ComponentParams";
 import Colors from "@/constants/Colors";
 import Fonts from "@/constants/Fonts";
 import { LinearGradient } from "expo-linear-gradient";
-import SmallInfoTag from "./recipe-details/SmallInfoTag";
-import { Ionicons } from "@expo/vector-icons";
-import CircularProgress from "./ProgressBar";
 import { TouchableOpacity } from "react-native";
 import * as Haptics from "expo-haptics";
 

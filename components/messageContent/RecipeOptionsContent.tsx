@@ -25,7 +25,13 @@ const RecipeOptionsContent = ({
       <Text style={styles.title}>{content.intro}</Text>
       <View style={styles.optionListContainer}>
         {content.options.map((option: any, index: number) => (
-          <View key={index} style={styles.optionContainer}>
+          <TouchableOpacity
+            key={index}
+            style={styles.optionContainer}
+            onPress={() => {
+              selectOption(option);
+            }}
+          >
             <LinearGradient
               colors={Colors.light.components.button.purple.background}
               start={[0, 0]}
@@ -46,7 +52,7 @@ const RecipeOptionsContent = ({
               </TouchableOpacity>
             </LinearGradient>
             <Text style={styles.text}>{option}</Text>
-          </View>
+          </TouchableOpacity>
         ))}
       </View>
       <Text style={styles.text}>{content.callToAction}</Text>

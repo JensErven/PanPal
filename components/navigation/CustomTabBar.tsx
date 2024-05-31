@@ -1,5 +1,5 @@
-import React, { useEffect } from "react";
-import { View, StyleSheet, TouchableOpacity } from "react-native";
+import React, { useContext, useEffect, useMemo } from "react";
+import { View, StyleSheet, TouchableOpacity, ToastAndroid } from "react-native";
 import { router } from "expo-router";
 import Animated, {
   useAnimatedStyle,
@@ -21,6 +21,12 @@ import StandardButton from "../buttons/StandardButton";
 import ComponentParams from "@/constants/ComponentParams";
 import PlusButtonContentView from "./PlusButtonContentView";
 import FloatingPanPalButton from "../buttons/FloatingPanPalButton";
+import {
+  GroceryListType,
+  createGroceryList,
+} from "@/services/db/groceries.services";
+import { AuthContext } from "@/context/authContext";
+import { Timestamp } from "firebase/firestore";
 
 const CustomTabBar = ({ tabs }: { tabs: TabBarItem[] }) => {
   const { setActiveTab, activeTab } = useActiveTab();
@@ -61,29 +67,13 @@ const CustomTabBar = ({ tabs }: { tabs: TabBarItem[] }) => {
     };
   });
 
-  const plusButtonContent = () => {
-    return (
-      <View style={styles.plusButtonContentContainer}>
-        <StandardButton
-          icon={<Ionicons name="add" size={hp(3.5)} color={Colors.white} />}
-          textValue="add custom recipe"
-          clickHandler={() => {
-            setIsPlusButtonPressed(false);
-            router.push("/recipe/add");
-          }}
-          colors={Colors.light.components.button.purple.background}
-          textColor={Colors.white}
-          height={ComponentParams.button.height.medium}
-          borderColor={Colors.light.components.button.purple.border}
-        />
-      </View>
-    );
-  };
-
   return (
     <>
       {isPlusButtonPressed && (
-        <PlusButtonContentView children={plusButtonContent()} />
+        <PlusButtonContentView
+          activeTab={activeTab}
+          closeContentView={() => setIsPlusButtonPressed(false)}
+        />
       )}
       <FloatingPanPalButton />
       <LinearGradient
@@ -235,10 +225,6 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.light.components.button.purple.background[0],
   },
   // plusButtonContent
-  plusButtonContentContainer: {
-    padding: wp(4),
-    gap: hp(2),
-  },
 });
 
 export default CustomTabBar;

@@ -30,7 +30,7 @@ import FullScreenLoading from "@/components/FullScreenLoading";
 import StandardButton from "@/components/buttons/StandardButton";
 import { RecipesContext } from "@/context/recipesContext";
 import CustomSheetModal from "@/components/modals/CustomSheetModal";
-import CircularProgress from "@/components/ProgressBar";
+import CircularProgress from "@/components/CircularProgress";
 import SmallInfoTag from "@/components/recipe-details/SmallInfoTag";
 
 const DetailsRecipe = () => {
@@ -336,7 +336,7 @@ const DetailsRecipe = () => {
                       size={hp(10)}
                       strokeWidth={hp(1)}
                       backgroundColor={Colors.secondaryWhite}
-                      strokeColor={Colors.primarySkyBlue}
+                      strokeColor={Colors.mediumPurple}
                     />
                     <Text style={styles.progressText}>
                       {selectedSteps.length} / {recipe.steps.length}

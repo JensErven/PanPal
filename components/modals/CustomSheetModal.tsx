@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View } from "react-native";
+import { Keyboard, StyleSheet, Text, View } from "react-native";
 import React, { useEffect, useRef, useState } from "react";
 import {
   BottomSheetModal,
@@ -11,7 +11,6 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
-import { LinearGradient } from "expo-linear-gradient";
 
 const CustomSheetModal = ({
   modalRef,
@@ -32,6 +31,30 @@ const CustomSheetModal = ({
   hasBackdrop?: boolean;
   enablePanDownToClose?: boolean;
 }) => {
+  const [changedSnapPoints, setChangedSnapPoints] = useState(snapPoints);
+
+  useEffect(() => {
+    const keyboardDidShowListener = Keyboard.addListener(
+      "keyboardDidShow",
+      () => {
+        // Adjust snap points when keyboard is open
+        setChangedSnapPoints([hp(80)]);
+      }
+    );
+    const keyboardDidHideListener = Keyboard.addListener(
+      "keyboardDidHide",
+      () => {
+        // Reset snap points when keyboard is hidden
+        setChangedSnapPoints(snapPoints);
+      }
+    );
+
+    return () => {
+      keyboardDidHideListener.remove();
+      keyboardDidShowListener.remove();
+    };
+  }, []);
+
   return (
     <BottomSheetModal
       backdropComponent={(backdropProps) =>
@@ -46,10 +69,12 @@ const CustomSheetModal = ({
       )}
       ref={modalRef}
       index={0}
-      snapPoints={snapPoints}
+      snapPoints={changedSnapPoints}
       style={styles.modalContainer}
       footerComponent={() => (
-        <View style={styles.footerContainer}>{footerChildren}</View>
+        <View style={footerChildren ? styles.footerContainer : undefined}>
+          {footerChildren}
+        </View>
       )}
     >
       <BottomSheetView style={styles.headerContainer}>

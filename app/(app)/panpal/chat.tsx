@@ -99,7 +99,7 @@ const PanPalChatScreen = () => {
       "I'm here to help you with recipes and cooking tips. What can I help you with?",
     ];
     const cuisineType =
-      cuisineTypes[Math.floor(Math.random() * cuisineTypes.length)].name;
+      cuisineTypes[Math.floor(Math.random() * cuisineTypes.length)];
     const mealType = mealTypes[Math.floor(Math.random() * mealTypes.length)];
 
     const randomIntro = {
