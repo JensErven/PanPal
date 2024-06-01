@@ -30,13 +30,20 @@ const GroceryListCard = ({ groceryList }: { groceryList: GroceryListType }) => {
   const { user } = useContext<any>(AuthContext);
   const groceryListSettingsModal = React.useRef<BottomSheetModal>(null);
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
-  const [fetchedGroceries, setFetchedGroceries] = React.useState<number>(0);
   const SettingsModalHeaderChildren = (
     <>
-      <Text style={styles.title}>Grocerylist options</Text>
+      <Text style={styles.modalHeaderTitle}>Grocerylist options</Text>
       <Text style={styles.subTitle}>{groceryList.name}</Text>
     </>
   );
+
+  const progress = useMemo(() => {
+    return (
+      (groceryList?.items.filter((item) => item.checked).length /
+        groceryList.items.length) *
+      100
+    );
+  }, [groceryList.items]);
 
   const handleDeleteGroceryList = async () => {
     if (!user && !groceryList.id) return;
@@ -67,12 +74,9 @@ const GroceryListCard = ({ groceryList }: { groceryList: GroceryListType }) => {
       console.error("Error sharing the grocery list:", error);
     }
   };
-  const progress = useMemo(() => {
-    return fetchedGroceries / groceryList.items.length;
-  }, [fetchedGroceries, groceryList.items.length]);
 
   const SettingModalScrollViewChildren = (
-    <>
+    <View style={{ flexDirection: "column", gap: hp(1) }}>
       <StandardButton
         isDisabled={isLoading}
         clickHandler={handleDeleteGroceryList}
@@ -123,14 +127,14 @@ const GroceryListCard = ({ groceryList }: { groceryList: GroceryListType }) => {
           </View>
         }
       />
-    </>
+    </View>
   );
 
   return (
     <>
       <CustomSheetModal
         modalRef={groceryListSettingsModal}
-        snapPoints={[hp(31)]}
+        snapPoints={[hp(32)]}
         hasBackdrop={true}
         headerChildren={SettingsModalHeaderChildren}
         scrollViewChildren={SettingModalScrollViewChildren}
@@ -144,8 +148,11 @@ const GroceryListCard = ({ groceryList }: { groceryList: GroceryListType }) => {
         >
           <View style={styles.contentContainer}>
             <View style={styles.headerContainer}>
-              <Text style={styles.title}>{groceryList.name}</Text>
+              <Text style={styles.title} numberOfLines={2} ellipsizeMode="tail">
+                {groceryList.name}
+              </Text>
               <TouchableOpacity
+                style={{ padding: wp(2), alignSelf: "flex-start" }}
                 onPress={() => groceryListSettingsModal.current?.present()}
               >
                 <Ionicons
@@ -158,7 +165,7 @@ const GroceryListCard = ({ groceryList }: { groceryList: GroceryListType }) => {
             <View style={styles.lowerContentContainer}>
               <View style={{ flex: 1 }}>
                 <LineProgress
-                  height={hp(1)}
+                  height={hp(1.5)}
                   progress={progress}
                   strokeColor={Colors.mediumPurple}
                   backgroundColor={Colors.secondaryWhite}
@@ -166,7 +173,8 @@ const GroceryListCard = ({ groceryList }: { groceryList: GroceryListType }) => {
               </View>
               <View>
                 <Text style={styles.subTitle}>
-                  {fetchedGroceries}/{groceryList.items.length}
+                  {groceryList.items.filter((item) => item.checked).length}/
+                  {groceryList.items.length}
                 </Text>
               </View>
             </View>
@@ -196,6 +204,7 @@ const styles = StyleSheet.create({
     gap: hp(2),
   },
   headerContainer: {
+    flex: 1,
     width: "100%",
     display: "flex",
     flexDirection: "row",
@@ -211,10 +220,19 @@ const styles = StyleSheet.create({
     gap: wp(4),
   },
   title: {
+    alignSelf: "flex-start",
+    flex: 1,
     fontFamily: Fonts.text_1.fontFamily,
     fontSize: Fonts.text_1.fontSize,
     color: Colors.darkBlue,
     lineHeight: Fonts.text_1.lineHeight,
+  },
+  modalHeaderTitle: {
+    fontSize: Fonts.heading_3.fontSize,
+    fontFamily: Fonts.heading_3.fontFamily,
+    lineHeight: Fonts.heading_3.lineHeight,
+    color: Colors.darkBlue,
+    textTransform: "capitalize",
   },
   subTitle: {
     lineHeight: Fonts.text_2.lineHeight,

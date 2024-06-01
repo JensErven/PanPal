@@ -43,7 +43,7 @@ const CustomHeader = ({
         styles.container,
       ]}
     >
-      <View className="flex items-center justify-center flex-row gap-x-4">
+      <View className="flex items-center justify-start flex-row gap-x-4 flex-1">
         {hasGoBack && (
           <TouchableOpacity
             className="relative"
@@ -54,7 +54,9 @@ const CustomHeader = ({
             <Ionicons name="arrow-back" size={hp(3)} color={Colors.white} />
           </TouchableOpacity>
         )}
-        <Text style={styles.headerTitle}>{headerTitle}</Text>
+        <Text style={styles.headerTitle} ellipsizeMode="tail" numberOfLines={1}>
+          {headerTitle}
+        </Text>
       </View>
 
       {children && (
@@ -70,6 +72,7 @@ export default CustomHeader;
 
 const styles = StyleSheet.create({
   headerTitle: {
+    paddingRight: wp(2),
     fontSize: hp(3),
     color: Colors.white,
     textTransform: "capitalize",
@@ -82,6 +85,7 @@ const styles = StyleSheet.create({
     borderRadius: wp(5),
   },
   container: {
+    gap: wp(4),
     borderColor: Colors.darkBlue,
     width: wp(100),
     height: hp(13),

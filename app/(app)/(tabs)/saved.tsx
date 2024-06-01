@@ -1,11 +1,4 @@
-import {
-  View,
-  StyleSheet,
-  Text,
-  ActivityIndicator,
-  Touchable,
-  TouchableOpacity,
-} from "react-native";
+import { View, StyleSheet, Text } from "react-native";
 import React, {
   useContext,
   useEffect,

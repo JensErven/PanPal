@@ -1,16 +1,20 @@
 import Colors from "@/constants/Colors";
 import React, { useEffect, useRef } from "react";
 import { View, Animated } from "react-native";
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from "react-native-responsive-screen";
 
 const LineProgress = ({
   width,
-  height,
+  height = hp(1.5),
   progress,
   backgroundColor = Colors.secondaryWhite,
   strokeColor = Colors.mediumPurple,
 }: {
   width?: number;
-  height: number;
+  height?: number;
   progress: number;
   backgroundColor?: string;
   strokeColor?: string;

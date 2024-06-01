@@ -47,6 +47,7 @@ const DetailsRecipe = () => {
   // steps progress
   const [progress, setProgress] = React.useState<number>(0);
   const [selectedSteps, setSelectedSteps] = React.useState<number[]>([]);
+
   useFocusEffect(
     React.useCallback(() => {
       if (!recipeId) return;

@@ -111,60 +111,66 @@ const GroceriesScreen = () => {
                   <Text style={styles.noContentText}>
                     No grocery lists found
                   </Text>
-                  <StandardButton
-                    isDisabled={isLoading}
-                    clickHandler={() => handleNavigateToCreateGroceryList()}
-                    textValue="Create grocery list"
-                    colors={[Colors.primarySkyBlue, Colors.primarySkyBlue]}
-                    height={ComponentParams.button.height.medium}
-                    borderColor="transparent"
-                    textColor={Colors.darkGrey}
-                    iconRight={
-                      <View
-                        style={{
-                          justifyContent: "center",
-                          alignItems: "center",
-                          width: hp(ComponentParams.button.height.small),
-                          aspectRatio: 1,
-                          borderRadius: hp(ComponentParams.button.height.small),
-                          marginRight: wp(2),
-                        }}
-                      >
-                        <Ionicons
-                          name="add"
-                          size={hp(3.2)}
-                          color={Colors.darkGrey}
-                        />
-                      </View>
-                    }
-                  />
-                  <StandardButton
-                    isDisabled={isLoading}
-                    clickHandler={() => handleJoinGroceryList()}
-                    textValue="Join grocery list"
-                    colors={[Colors.primarySkyBlue, Colors.primarySkyBlue]}
-                    height={ComponentParams.button.height.medium}
-                    borderColor="transparent"
-                    textColor={Colors.darkGrey}
-                    iconRight={
-                      <View
-                        style={{
-                          justifyContent: "center",
-                          alignItems: "center",
-                          width: hp(ComponentParams.button.height.small),
-                          aspectRatio: 1,
-                          borderRadius: hp(ComponentParams.button.height.small),
-                          marginRight: wp(2),
-                        }}
-                      >
-                        <Ionicons
-                          name="enter"
-                          size={hp(3.2)}
-                          color={Colors.darkGrey}
-                        />
-                      </View>
-                    }
-                  />
+                  <View style={{ flexDirection: "column", gap: hp(1) }}>
+                    <StandardButton
+                      isDisabled={isLoading}
+                      clickHandler={() => handleNavigateToCreateGroceryList()}
+                      textValue="Create grocery list"
+                      colors={[Colors.primarySkyBlue, Colors.primarySkyBlue]}
+                      height={ComponentParams.button.height.medium}
+                      borderColor="transparent"
+                      textColor={Colors.darkGrey}
+                      iconRight={
+                        <View
+                          style={{
+                            justifyContent: "center",
+                            alignItems: "center",
+                            width: hp(ComponentParams.button.height.small),
+                            aspectRatio: 1,
+                            borderRadius: hp(
+                              ComponentParams.button.height.small
+                            ),
+                            marginRight: wp(2),
+                          }}
+                        >
+                          <Ionicons
+                            name="add"
+                            size={hp(3.2)}
+                            color={Colors.darkGrey}
+                          />
+                        </View>
+                      }
+                    />
+                    <StandardButton
+                      isDisabled={isLoading}
+                      clickHandler={() => handleJoinGroceryList()}
+                      textValue="Join grocery list"
+                      colors={[Colors.primarySkyBlue, Colors.primarySkyBlue]}
+                      height={ComponentParams.button.height.medium}
+                      borderColor="transparent"
+                      textColor={Colors.darkGrey}
+                      iconRight={
+                        <View
+                          style={{
+                            justifyContent: "center",
+                            alignItems: "center",
+                            width: hp(ComponentParams.button.height.small),
+                            aspectRatio: 1,
+                            borderRadius: hp(
+                              ComponentParams.button.height.small
+                            ),
+                            marginRight: wp(2),
+                          }}
+                        >
+                          <Ionicons
+                            name="enter"
+                            size={hp(3.2)}
+                            color={Colors.darkGrey}
+                          />
+                        </View>
+                      }
+                    />
+                  </View>
                 </>
               ) : (
                 <>

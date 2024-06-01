@@ -329,9 +329,9 @@ const styles = StyleSheet.create({
   },
   profileImage: {
     backgroundColor: "transparent",
-    width: hp(ComponentParams.button.height.small),
-    height: hp(ComponentParams.button.height.small),
-    borderRadius: hp(ComponentParams.button.height.small / 2),
+    width: "100%",
+    aspectRatio: 1,
+    borderRadius: hp(ComponentParams.button.height.large / 2),
   },
   userName: {
     flexWrap: "wrap",

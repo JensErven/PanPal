@@ -19,8 +19,7 @@ export type GroceryListType = {
   uuids: string[];
   items: {
     name: string;
-    quantity: number;
-    unit: string;
+    checked: boolean;
   }[];
   createdAt?: Timestamp;
 };

@@ -258,7 +258,7 @@ const styles = StyleSheet.create({
   },
   plusButtonContentContainer: {
     padding: wp(4),
-    gap: hp(2),
+    gap: hp(1),
   },
   modalTitle: {
     marginBottom: hp(1),
