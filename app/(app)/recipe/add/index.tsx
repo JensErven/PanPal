@@ -1,20 +1,5 @@
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  StyleSheet,
-  TextInput,
-  ActivityIndicator,
-  Alert,
-} from "react-native";
-import React, {
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import { View, StyleSheet, Alert } from "react-native";
+import React, { useContext, useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import {
   widthPercentageToDP as wp,
@@ -26,20 +11,11 @@ import Fonts from "@/constants/Fonts";
 import { LinearGradient } from "expo-linear-gradient";
 import CustomKeyBoardView from "@/components/CustomKeyBoardView";
 import { AuthContext } from "@/context/authContext";
-import { Image } from "expo-image";
-import { blurhash } from "@/utils/general.utils";
 import CustomHeader from "@/components/navigation/CustomHeader";
 import { StatusBar } from "expo-status-bar";
 import { RecipeType } from "@/models/RecipeType";
-import { BottomSheetModal } from "@gorhom/bottom-sheet";
-import StandardButton from "@/components/buttons/StandardButton";
-import { Picker } from "@react-native-picker/picker";
 import { recipeService } from "@/services/db/recipe.services";
 import { router } from "expo-router";
-import CustomBottomSheetModal from "@/components/modals/CustomBottomSheetModal";
-import { SheetModalContentType } from "@/models/SheetModalContentType";
-import RecipeSelectOptions from "@/constants/RecipeSelectOptions";
-import * as ImagePicker from "expo-image-picker";
 import { useActiveTab } from "@/context/activeTabContext";
 import RoundButton from "@/components/buttons/RoundButton";
 import FullScreenLoading from "@/components/FullScreenLoading";

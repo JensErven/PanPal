@@ -73,7 +73,7 @@ const RecipeContent = ({ content }: { content: recipeExampleJsonType }) => {
     // check if the recipe still exists in the context
     const recipe = recipes.find((r: RecipeType) => r.id === savedRecipeId);
     router.push({
-      pathname: `/recipe/details/`,
+      pathname: `/recipe/details/[id]`,
       params: { recipeId: recipe.id },
     });
   };

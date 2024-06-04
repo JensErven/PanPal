@@ -115,7 +115,9 @@ const EditRecipeIngredientList = ({
           style={styles.contentItemInput}
           value={ingredientTextInput}
           placeholder="add ingredient"
-          placeholderTextColor={"#A0B7D6"}
+          placeholderTextColor={
+            Colors.light.components.inputField.placeholderTextColor
+          }
           onChangeText={(text: string) => {
             setIngredientTextInput(text);
           }}
@@ -190,7 +192,9 @@ const EditRecipeIngredientList = ({
                     editable={editIngredient === index}
                     value={ingredient}
                     placeholder="ingredient"
-                    placeholderTextColor={"#A0B7D6"}
+                    placeholderTextColor={
+                      Colors.light.components.inputField.placeholderTextColor
+                    }
                     onChangeText={(text: string) => {
                       if (recipe) {
                         const newIngredients = recipe.ingredients.map(

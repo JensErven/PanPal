@@ -59,7 +59,9 @@ const EditRecipeServings = ({
               value={servingsInput}
               placeholder="ex. 4"
               onChangeText={handleServingsChange}
-              placeholderTextColor={"#A0B7D6"}
+              placeholderTextColor={
+                Colors.light.components.inputField.placeholderTextColor
+              }
             />
             <Text style={styles.unitText}>Servings</Text>
           </View>

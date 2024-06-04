@@ -11,7 +11,7 @@ import StandardButton from "@/components/buttons/StandardButton";
 import ComponentParams from "@/constants/ComponentParams";
 import { router } from "expo-router";
 import Fonts from "@/constants/Fonts";
-import CircularProgress from "@/components/ProgressBar";
+import CircularProgress from "@/components/CircularProgress";
 import PreferencesSelectCard from "@/components/cards/PreferencesSelectCard";
 import CustomKeyBoardView from "@/components/CustomKeyBoardView";
 import { allergyTypes } from "@/constants/tastePreferences/AllergyTypes";

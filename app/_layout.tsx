@@ -12,6 +12,7 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { ActiveTabContextProvider } from "@/context/activeTabContext";
 import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import { RecipesProvider } from "@/context/recipesContext";
+import { GroceriesProvider } from "@/context/GroceriesContext";
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -86,15 +87,17 @@ function RootLayoutNav() {
   return (
     <AuthContextProvider>
       <RecipesProvider>
-        <ActiveTabContextProvider>
-          <GestureHandlerRootView>
-            <BottomSheetModalProvider>
-              <PlusButtonProvider>
-                <MainLayout />
-              </PlusButtonProvider>
-            </BottomSheetModalProvider>
-          </GestureHandlerRootView>
-        </ActiveTabContextProvider>
+        <GroceriesProvider>
+          <ActiveTabContextProvider>
+            <GestureHandlerRootView>
+              <BottomSheetModalProvider>
+                <PlusButtonProvider>
+                  <MainLayout />
+                </PlusButtonProvider>
+              </BottomSheetModalProvider>
+            </GestureHandlerRootView>
+          </ActiveTabContextProvider>
+        </GroceriesProvider>
       </RecipesProvider>
     </AuthContextProvider>
   );

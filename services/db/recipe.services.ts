@@ -4,16 +4,12 @@ import {
   doc,
   getDoc,
   getDocs,
-  onSnapshot,
   query,
   setDoc,
   updateDoc,
   where,
 } from "firebase/firestore";
 import { db, storage } from "@/firebaseConfig";
-import { UserData } from "@/app/(app)/profile/edit";
-import { AuthContext, useAuth } from "@/context/authContext"; // Import the useAuth hook to access the setUser function
-import { useContext } from "react";
 import { RecipeType } from "@/models/RecipeType";
 import {
   deleteObject,
@@ -21,12 +17,9 @@ import {
   getStorage,
   ref,
   ref as storageRef,
-  uploadBytes,
   uploadBytesResumable,
 } from "firebase/storage";
 import uuid from "react-native-uuid";
-import * as FileSystem from "expo-file-system";
-import * as ImageManipulator from "expo-image-manipulator";
 import { compressImage } from "@/utils/file.utils";
 
 const collectionName: string = "recipes";

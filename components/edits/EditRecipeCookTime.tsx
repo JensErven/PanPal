@@ -81,7 +81,9 @@ const EditRecipeCookTime = ({
               value={hours}
               placeholder="hh"
               onChangeText={handleHourChange}
-              placeholderTextColor={"#A0B7D6"}
+              placeholderTextColor={
+                Colors.light.components.inputField.placeholderTextColor
+              }
               onEndEditing={() => updateCookTime(hours, minutes)}
             />
             <Text style={styles.unitText}>h</Text>
@@ -108,7 +110,9 @@ const EditRecipeCookTime = ({
               value={minutes}
               placeholder="mm"
               onChangeText={handleMinuteChange}
-              placeholderTextColor={"#A0B7D6"}
+              placeholderTextColor={
+                Colors.light.components.inputField.placeholderTextColor
+              }
               onEndEditing={() => updateCookTime(hours, minutes)}
             />
             <Text style={styles.unitText}>m</Text>

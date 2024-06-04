@@ -55,7 +55,7 @@ const styles = StyleSheet.create({
     textAlignVertical: "center",
     fontFamily: Fonts.text_2.fontFamily,
     fontSize: Fonts.text_2.fontSize,
-    color: Colors.darkBlue,
+    color: Colors.darkGrey,
     lineHeight: Fonts.text_2.lineHeight,
   },
   selectedOption: {

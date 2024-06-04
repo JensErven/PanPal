@@ -24,6 +24,13 @@ const _layout = () => {
         }}
       />
       <Stack.Screen
+        name="groceries"
+        options={{
+          animation: "slide_from_bottom",
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen
         name="(welcome)"
         options={{
           headerShown: false,

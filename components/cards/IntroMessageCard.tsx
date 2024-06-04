@@ -56,7 +56,11 @@ const IntroMessageCard = ({
       <View style={styles.optionListContainer}>
         <Text style={styles.subTitle}>Select an option:</Text>
         {options.map((option: any, index: number) => (
-          <View key={index} style={styles.optionContainer}>
+          <TouchableOpacity
+            key={index}
+            style={styles.optionContainer}
+            onPress={() => handleSelectOption(option)}
+          >
             <LinearGradient
               colors={Colors.light.components.button.purple.background}
               start={[0, 0]}
@@ -77,7 +81,7 @@ const IntroMessageCard = ({
               </TouchableOpacity>
             </LinearGradient>
             <Text style={styles.text}>{option}</Text>
-          </View>
+          </TouchableOpacity>
         ))}
       </View>
     </LinearGradient>

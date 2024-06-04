@@ -47,7 +47,8 @@
     "react-native-uuid": "^2.0.2",
     "react-native-web": "~0.19.6",
     "expo-haptics": "~13.0.1",
-    "react-native-pager-view": "6.3.0"
+    "react-native-pager-view": "6.3.0",
+    "@shopify/flash-list": "1.6.4"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
