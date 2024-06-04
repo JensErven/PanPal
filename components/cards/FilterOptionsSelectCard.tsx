@@ -73,14 +73,16 @@ const FilterOptionsSelectCard = ({
             <Ionicons
               name="search"
               size={hp(2.7)}
-              color={Colors.primarySkyBlue}
+              color={Colors.light.components.inputField.placeholderTextColor}
             />
             <TextInput
               value={searchInputField}
               onChangeText={setSearchInputField}
               style={styles.contentItemInput}
               placeholder="Search"
-              placeholderTextColor={Colors.primarySkyBlue}
+              placeholderTextColor={
+                Colors.light.components.inputField.placeholderTextColor
+              }
             />
             {searchInputField.length > 0 && (
               <TouchableOpacity

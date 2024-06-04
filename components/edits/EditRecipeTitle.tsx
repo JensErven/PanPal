@@ -49,7 +49,9 @@ const EditRecipeTitle = ({
         style={styles.contentItemInput}
         value={recipe?.title}
         placeholder="recipe title"
-        placeholderTextColor={"#A0B7D6"}
+        placeholderTextColor={
+          Colors.light.components.inputField.placeholderTextColor
+        }
         onChangeText={(text: string) => {
           if (recipe) setRecipe({ ...recipe, title: text });
         }}

@@ -4,6 +4,7 @@ import {
   TouchableOpacity,
   StyleSheet,
   ToastAndroid,
+  ViewToken,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { LinearGradient } from "expo-linear-gradient";
@@ -23,12 +24,19 @@ import { recipeService } from "@/services/db/recipe.services";
 import RoundButton from "../buttons/RoundButton";
 import * as Haptics from "expo-haptics";
 import { SavedRecipeType } from "@/models/SavedRecipeType";
+import Animated, {
+  SharedValue,
+  useAnimatedStyle,
+  withTiming,
+} from "react-native-reanimated";
 
 const RecipeCard = ({
+  viewableItems,
   recipe,
   allowedToEdit = false,
   allowedToDelete = false,
 }: {
+  viewableItems: Animated.SharedValue<ViewToken[]>;
   recipe: SavedRecipeType;
   allowedToEdit: boolean;
   allowedToDelete: boolean;
@@ -36,8 +44,25 @@ const RecipeCard = ({
   const [showOverlay, setShowOverlay] = useState(false);
   const { deleteRecipe, deleteImageFromFirebase } = recipeService;
   const handleNavigateToRecipe = async (recipeId: string) => {
-    router.push({ pathname: `/recipe/details/`, params: { recipeId } });
+    router.push({ pathname: `/recipe/details/[id]`, params: { recipeId } });
   };
+
+  const rStyle = useAnimatedStyle(() => {
+    const isVisible: boolean =
+      viewableItems.value
+        .filter((item) => item.isViewable)
+        .find((viewableItems) => viewableItems.item.id === recipe.id) !==
+      undefined;
+
+    return {
+      opacity: withTiming(isVisible ? 1 : 0, { duration: 300 }),
+      transform: [
+        {
+          scale: withTiming(isVisible ? 1 : 0.7, { duration: 300 }),
+        },
+      ],
+    };
+  }, []);
 
   const handleLongPress = () => {
     setShowOverlay(!showOverlay);
@@ -60,108 +85,121 @@ const RecipeCard = ({
   };
 
   return (
-    <LinearGradient
-      colors={[Colors.white, "#DDEBF3"]}
-      key={recipe.id}
-      style={styles.recipeContainer}
-    >
-      {recipe.data.isGenerated && (
-        <View style={[{}, styles.isGeneratedIconContainer]}>
-          {recipe.data.isGenerated && (
-            <Ionicons
-              name="sparkles"
-              size={hp(2)}
-              color={Colors.mediumPurple}
-            />
-          )}
-        </View>
-      )}
-      <TouchableOpacity
-        activeOpacity={0.8}
-        style={styles.recipeInnerContainer}
+    <Animated.View style={[rStyle, styles.outerContainer]}>
+      <LinearGradient
+        colors={[Colors.white, "#DDEBF3"]}
         key={recipe.id}
-        onPress={() => handleNavigateToRecipe(recipe.id)}
-        onLongPress={handleLongPress}
+        style={styles.recipeContainer}
       >
-        {recipe.data.image ? (
-          <Image
-            style={styles.recipeImage}
-            source={recipe.data.image ? recipe.data.image : blurhash}
-            placeholder={blurhash}
-            contentFit="cover"
-            transition={1000}
-          />
-        ) : (
-          <View style={styles.recipeImage}>
-            <Ionicons name="image" size={hp(5)} color={Colors.primarySkyBlue} />
+        {recipe.data.isGenerated && (
+          <View style={[{}, styles.isGeneratedIconContainer]}>
+            {recipe.data.isGenerated && (
+              <Ionicons
+                name="sparkles"
+                size={hp(2)}
+                color={Colors.mediumPurple}
+              />
+            )}
           </View>
         )}
-        <View style={styles.recipeTextContainer}>
-          <Text
-            style={styles.recipeTitle}
-            numberOfLines={2}
-            ellipsizeMode="tail"
-          >
-            {recipe.data.title}
-          </Text>
+        <TouchableOpacity
+          activeOpacity={0.8}
+          style={styles.recipeInnerContainer}
+          key={recipe.id}
+          onPress={() => handleNavigateToRecipe(recipe.id)}
+          onLongPress={handleLongPress}
+        >
+          {recipe.data.image ? (
+            <Image
+              style={styles.recipeImage}
+              source={recipe.data.image ? recipe.data.image : blurhash}
+              placeholder={blurhash}
+              contentFit="cover"
+              transition={1000}
+            />
+          ) : (
+            <View style={styles.recipeImage}>
+              <Ionicons
+                name="image"
+                size={hp(5)}
+                color={Colors.primarySkyBlue}
+              />
+            </View>
+          )}
+          <View style={styles.recipeTextContainer}>
+            <Text
+              style={styles.recipeTitle}
+              numberOfLines={2}
+              ellipsizeMode="tail"
+            >
+              {recipe.data.title}
+            </Text>
 
-          <Text
-            style={styles.recipeInfoText}
-            numberOfLines={2}
-            ellipsizeMode="tail"
-          >
-            {recipe.data.cuisineType ? recipe.data.cuisineType + " | " : ""}
-            {recipe.data.mealType ? recipe.data.mealType : ""}
-          </Text>
-        </View>
-      </TouchableOpacity>
-      {showOverlay && (
-        <TouchableOpacity style={styles.overlay} activeOpacity={1}>
-          <View style={styles.overlayLeft}>
-            <RoundButton handlePress={handleLongPress}>
-              <Ionicons name="close" size={hp(2.7)} color={Colors.white} />
-            </RoundButton>
-          </View>
-          <View style={styles.overlayRight}>
-            {!recipe.data.isGenerated && allowedToEdit && (
-              <RoundButton
-                transparent={false}
-                handlePress={() => handleEdit(recipe.id)}
-                backgroundColor={Colors.mediumBlue}
-              >
-                <Ionicons name="pencil" size={hp(2.7)} color={Colors.white} />
-              </RoundButton>
-            )}
-            {allowedToDelete && (
-              <RoundButton
-                handlePress={handleDelete}
-                transparent={false}
-                backgroundColor="#C70000"
-              >
-                <Ionicons name="trash" size={hp(2.7)} color={Colors.white} />
-              </RoundButton>
-            )}
+            <Text
+              style={styles.recipeInfoText}
+              numberOfLines={2}
+              ellipsizeMode="tail"
+            >
+              {recipe.data.cuisineType ? recipe.data.cuisineType + " | " : ""}
+              {recipe.data.mealType ? recipe.data.mealType : ""}
+            </Text>
           </View>
         </TouchableOpacity>
-      )}
-    </LinearGradient>
+        {showOverlay && (
+          <TouchableOpacity style={styles.overlay} activeOpacity={1}>
+            <View style={styles.overlayLeft}>
+              <RoundButton handlePress={handleLongPress}>
+                <Ionicons name="close" size={hp(2.7)} color={Colors.white} />
+              </RoundButton>
+            </View>
+            <View style={styles.overlayRight}>
+              {!recipe.data.isGenerated && allowedToEdit && (
+                <RoundButton
+                  transparent={false}
+                  handlePress={() => handleEdit(recipe.id)}
+                  backgroundColor={Colors.mediumBlue}
+                >
+                  <Ionicons name="pencil" size={hp(2.7)} color={Colors.white} />
+                </RoundButton>
+              )}
+              {allowedToDelete && (
+                <RoundButton
+                  handlePress={handleDelete}
+                  transparent={false}
+                  backgroundColor="#C70000"
+                >
+                  <Ionicons name="trash" size={hp(2.7)} color={Colors.white} />
+                </RoundButton>
+              )}
+            </View>
+          </TouchableOpacity>
+        )}
+      </LinearGradient>
+    </Animated.View>
   );
 };
 
 export default RecipeCard;
 
 const styles = StyleSheet.create({
-  recipeContainer: {
-    display: "flex",
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
+  outerContainer: {
+    marginVertical: hp(1),
+    marginHorizontal: wp(4),
+    height: hp(14),
     borderRadius: hp(ComponentParams.button.height.small),
     overflow: "hidden",
     shadowColor: Colors.cardDropShadow,
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3,
     elevation: 2,
-    height: hp(15),
-    width: "100%",
+  },
+  recipeContainer: {
+    display: "flex",
+    flexDirection: "row",
+    borderRadius: hp(ComponentParams.button.height.small),
+    overflow: "hidden",
+    backgroundColor: Colors.white,
   },
   recipeInnerContainer: {
     flex: 1,

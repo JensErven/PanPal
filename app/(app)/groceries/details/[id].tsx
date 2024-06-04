@@ -6,6 +6,7 @@ import {
   ToastAndroid,
   Share,
   TouchableOpacity,
+  FlatList,
 } from "react-native";
 import React, { useEffect, useMemo } from "react";
 import { router, useFocusEffect, useLocalSearchParams } from "expo-router";
@@ -29,22 +30,27 @@ import { StatusBar } from "expo-status-bar";
 import FullScreenLoading from "@/components/FullScreenLoading";
 import CustomKeyBoardView from "@/components/CustomKeyBoardView";
 import ComponentParams from "@/constants/ComponentParams";
-import { GroceriesContext, useGroceries } from "@/context/GroceriesContext";
+import { useGroceries } from "@/context/GroceriesContext";
 import LineProgressBarHeader from "@/components/headers/LineProgressBarHeader";
 import Fonts from "@/constants/Fonts";
-import { Image } from "expo-image";
-import { blurhash } from "@/utils/general.utils";
+import StandardButton from "@/components/buttons/StandardButton";
+import AddGroceryItemModal, {
+  itemType,
+} from "@/components/cards/groceries/AddGroceryItemModal";
+import { ScrollView } from "react-native-gesture-handler";
+import { FlashList } from "@shopify/flash-list";
+import GroceryListItem from "@/components/cards/groceries/GroceryListItem";
 
 const GroceryListDetailsScreen = () => {
   const { user } = React.useContext<any>(AuthContext);
   const { id } = useLocalSearchParams();
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
+  const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
   const [groceryList, setGroceryList] = React.useState<
     GroceryListType | undefined
   >(undefined);
   const { groceryLists } = useGroceries();
 
-  // retrieve groceryList based on id
   useFocusEffect(
     React.useCallback(() => {
       if (id === "") return;
@@ -75,8 +81,26 @@ const GroceryListDetailsScreen = () => {
               setIsLoading(false);
             });
         });
-    }, [id])
+    }, [id, groceryLists])
   );
+
+  const handleClearCheckedItems = async () => {
+    if (!groceryList?.id) return;
+    if (!groceryList?.items) return;
+    if (!groceryList.uuids.includes(user.userId)) return;
+    const updatedItems = groceryList.items.filter((item) => !item.checked);
+    const updatedGroceryList = { ...groceryList, items: updatedItems };
+
+    await updateGroceryList(groceryList.id, updatedGroceryList)
+      .then((res) => {
+        if (res.success) {
+          setGroceryList(updatedGroceryList);
+        }
+      })
+      .catch((err) => {
+        console.log("Error updating grocery list: ", err);
+      });
+  };
 
   const handleItemPress = async (index: number) => {
     if (!groceryList?.id) return;
@@ -97,31 +121,56 @@ const GroceryListDetailsScreen = () => {
       });
   };
 
-  const handleAddGroceryItem = async () => {
-    // if (!groceryList) return;
-    // if (!groceryList.uuids.includes(user.userId)) return;
-    // router.navigate("(app)/(tabs)/groceries/add-item", {
-    //   groceryListId: groceryList.id,
-    // });
-    if (!groceryList) return;
-    const newItem = { name: "New Item", checked: false };
-    groceryList.items.push(newItem);
-    await updateGroceryList(groceryList.id, {
-      ...groceryList,
-      items: groceryList.items,
-    }).then((res) => {
-      if (res.success) {
-        setGroceryList({ ...groceryList, items: groceryList.items });
-      }
-    });
+  const handleDismissItem = async (index: number) => {
+    if (!groceryList?.id) return;
+    if (!groceryList?.items) return;
+    if (!groceryList.uuids.includes(user.userId)) return;
+    const updatedItems = [...groceryList.items];
+    updatedItems.splice(index, 1);
+    const updatedGroceryList = { ...groceryList, items: updatedItems };
+
+    await updateGroceryList(groceryList.id, updatedGroceryList)
+      .then((res) => {
+        if (res.success) {
+          setGroceryList(updatedGroceryList);
+        }
+      })
+      .catch((err) => {
+        console.log("Error updating grocery list: ", err);
+      });
   };
 
-  useEffect(() => {
+  const handleOpenModal = () => {
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = (selectedItems: itemType[]) => {
+    console.log("Selected Items: ", selectedItems);
+    if (!selectedItems) return;
     if (!groceryList) return;
-    console.log("GroceryList: ", groceryList);
-    if (groceryList.uuids.includes(user.userId)) return;
-    router.back();
-  }, [groceryList]);
+    if (!groceryList.uuids.includes(user.userId)) return;
+    handleUpdateGroceryList(groceryList.id, {
+      ...groceryList,
+      items: [...selectedItems],
+    });
+    setIsModalOpen(false);
+  };
+
+  const handleUpdateGroceryList = async (
+    groceryListId: string,
+    groceryListData: GroceryListType
+  ) => {
+    if (!groceryListData.uuids.includes(user.userId)) return;
+    await updateGroceryList(groceryListId, groceryListData)
+      .then((res) => {
+        if (res.success) {
+          setGroceryList(groceryListData);
+        }
+      })
+      .catch((err) => {
+        console.log("Error updating grocery list: ", err);
+      });
+  };
 
   const handleNavigateToGroceries = () => {
     router.navigate("(app)/(tabs)/groceries");
@@ -174,6 +223,27 @@ const GroceryListDetailsScreen = () => {
     }
   };
 
+  const filteredGroceryListItems = useMemo(() => {
+    // first unchecked, then the checked items
+    // return groceryList?.items.sort((a, b) =>
+    //   a.checked === b.checked ? 0 : a.checked ? 1 : -1
+    // );
+    return groceryList?.items;
+  }, [groceryList?.items]);
+
+  const handleEditItemPress = (index: number) => {
+    if (!groceryList?.id) return;
+    if (!groceryList?.items) return;
+    if (!groceryList.uuids.includes(user.userId)) return;
+    console.log("Edit Item Pressed: ", index);
+    console.log("change unit of item: ", groceryList.items[index]);
+    // const updatedItems = [...groceryList.items];
+    // updatedItems[index].checked = !updatedItems[index].checked;
+    // const updatedGroceryList = { ...groceryList, items: updatedItems };
+
+    // handleUpdateGroceryList(groceryList.id, updatedGroceryList);
+  };
+
   const CustomHeaderChildren = () => {
     return (
       <>
@@ -199,121 +269,152 @@ const GroceryListDetailsScreen = () => {
       return groceryList;
     }
   };
+
+  const checkedItemsList = useMemo(() => {
+    return groceryList?.items.filter((item) => item.checked);
+  }, [groceryList?.items]);
+
   return (
-    <LinearGradient
-      style={styles.gradientBackground}
-      colors={[
-        Colors.light.navHeader[0],
-        Colors.light.navHeader[1],
-        Colors.light.navHeader[2],
-      ]}
-      start={[0, 0]}
-      end={[1, 0]}
-    >
-      <StatusBar style="light" />
-      <CustomHeader
-        isTransparent={true}
-        hasGoBack={true}
-        headerTitle={isLoading ? "Loading..." : groceryList?.name || ""}
-        children={CustomHeaderChildren()}
-      />
-      <LineProgressBarHeader
-        checkedItems={
-          groceryList?.items.filter((item) => item.checked).length ?? 0
-        }
-        totalItems={groceryList?.items.length ?? 0}
-      />
+    <>
       <LinearGradient
-        style={styles.container}
-        colors={[Colors.white, "#DDEBF3"]}
-        start={[0.5, 0]}
-        end={[0.5, 1]}
+        style={styles.gradientBackground}
+        colors={[
+          Colors.light.navHeader[0],
+          Colors.light.navHeader[1],
+          Colors.light.navHeader[2],
+        ]}
+        start={[0, 0]}
+        end={[1, 0]}
       >
-        <View
-          style={{
-            position: "absolute",
-            bottom: hp(2),
-            right: wp(4),
-            zIndex: 100,
-          }}
-        >
-          <RoundButton
-            transparent={false}
-            backgroundColor={Colors.mediumPurple}
-            handlePress={handleAddGroceryItem}
-            children={
-              <Ionicons name="add" size={hp(2.7)} color={Colors.white} />
+        <StatusBar style="light" />
+        <CustomHeader
+          isTransparent={true}
+          hasGoBack={true}
+          headerTitle={isLoading ? "Loading..." : groceryList?.name || ""}
+          children={CustomHeaderChildren()}
+        />
+        {groceryList && (
+          <LineProgressBarHeader
+            checkedItems={
+              groceryList?.items.filter((item) => item.checked).length
             }
+            totalItems={groceryList?.items.length ?? 0}
           />
-        </View>
+        )}
+
         <LinearGradient
-          style={styles.bottomGradient}
-          colors={["transparent", Colors.secondaryWhite, Colors.primarySkyBlue]}
+          style={styles.container}
+          colors={[Colors.white, "#DDEBF3"]}
           start={[0.5, 0]}
           end={[0.5, 1]}
-        />
-        {isLoading ? (
-          <FullScreenLoading />
-        ) : (
-          groceryList && (
-            <CustomKeyBoardView>
-              <View style={styles.content}>
-                <View style={styles.ingredientsList}>
-                  {groceryList.items.map((ingredient, index: number) => (
-                    <TouchableOpacity
-                      key={index}
-                      style={styles.groceryItem}
-                      onPress={() => {
-                        handleItemPress(index);
-                      }}
-                    >
-                      <TouchableOpacity
-                        onPress={() => {
-                          handleItemPress(index);
-                        }}
-                        style={[
-                          styles.checkItemButton,
-                          ingredient.checked
-                            ? { backgroundColor: Colors.mediumPurple }
-                            : { backgroundColor: Colors.secondaryWhite },
-                        ]}
-                      >
-                        {ingredient.checked ? (
-                          <Ionicons
-                            name="checkmark-circle-outline"
-                            size={hp(ComponentParams.button.height.small)}
-                            color={Colors.white}
+        >
+          <View style={styles.addItemButtonContainer}>
+            <StandardButton
+              clickHandler={handleOpenModal}
+              height={ComponentParams.button.height.medium}
+              textValue="Add Item"
+              textColor={Colors.white}
+              colors={Colors.light.components.button.purple.background}
+              borderColor={Colors.light.components.button.purple.border}
+              shadowColor={Colors.cardDropShadow}
+              iconRight={
+                <RoundButton
+                  handlePress={handleOpenModal}
+                  height={ComponentParams.button.height.medium}
+                  transparent={true}
+                  children={
+                    <Ionicons name="add" size={hp(2.7)} color={Colors.white} />
+                  }
+                />
+              }
+            />
+          </View>
+          <LinearGradient
+            style={styles.bottomGradient}
+            colors={[
+              "transparent",
+              Colors.secondaryWhite,
+              Colors.primarySkyBlue,
+            ]}
+            start={[0.5, 0]}
+            end={[0.5, 1]}
+          />
+          {isLoading ? (
+            <FullScreenLoading />
+          ) : (
+            groceryList && (
+              <>
+                <AddGroceryItemModal
+                  groceryList={groceryList}
+                  isModalOpen={isModalOpen}
+                  closeModal={(selectedItems: itemType[]) => {
+                    handleCloseModal(selectedItems);
+                  }}
+                />
+                <CustomKeyBoardView>
+                  <View style={styles.content}>
+                    {filteredGroceryListItems?.length === 0 ? (
+                      <Text style={styles.noContentText}>
+                        No items in the grocery list
+                      </Text>
+                    ) : (
+                      <View style={styles.ingredientsList}>
+                        {filteredGroceryListItems?.map((item, index) => (
+                          <GroceryListItem
+                            dismissItem={handleDismissItem}
+                            key={index}
+                            item={item}
+                            index={index}
+                            itemPressed={handleItemPress}
                           />
-                        ) : (
-                          <Ionicons
-                            name="ellipse-outline"
-                            size={hp(ComponentParams.button.height.small)}
-                            color={Colors.white}
-                          />
+                        ))}
+                        {checkedItemsList && checkedItemsList.length > 0 && (
+                          <View
+                            style={{
+                              paddingHorizontal: wp(4),
+                              marginVertical: hp(1),
+                            }}
+                          >
+                            <StandardButton
+                              clickHandler={handleClearCheckedItems}
+                              height={ComponentParams.button.height.medium}
+                              textValue="Clear Checked Items"
+                              textColor={Colors.darkGrey}
+                              iconRight={
+                                <RoundButton
+                                  handlePress={handleClearCheckedItems}
+                                  height={ComponentParams.button.height.medium}
+                                  transparent={false}
+                                  backgroundColor={Colors.primarySkyBlue}
+                                  children={
+                                    <Ionicons
+                                      name="trash"
+                                      size={hp(2.7)}
+                                      color={Colors.darkGrey}
+                                    />
+                                  }
+                                />
+                              }
+                              colors={
+                                Colors.light.components.button.white.background
+                              }
+                              borderColor={
+                                Colors.light.components.button.white.border
+                              }
+                              shadowColor={Colors.cardDropShadow}
+                            />
+                          </View>
                         )}
-                      </TouchableOpacity>
-                      <View style={styles.ingredientItem}>
-                        <LinearGradient
-                          style={styles.stepNumber}
-                          colors={[Colors.white, Colors.primarySkyBlue]}
-                        >
-                          <Ionicons
-                            name="image"
-                            size={hp(2.7)}
-                            color={Colors.primarySkyBlue}
-                          />
-                        </LinearGradient>
-                        <Text style={[styles.text]}>{ingredient.name}</Text>
                       </View>
-                    </TouchableOpacity>
-                  ))}
-                </View>
-              </View>
-            </CustomKeyBoardView>
-          )
-        )}
+                    )}
+                  </View>
+                </CustomKeyBoardView>
+              </>
+            )
+          )}
+        </LinearGradient>
       </LinearGradient>
-    </LinearGradient>
+    </>
   );
 };
 
@@ -330,11 +431,16 @@ const styles = StyleSheet.create({
     borderTopColor: Colors.darkBlue,
     borderTopWidth: wp(1),
   },
+  noContentText: {
+    marginTop: hp(2),
+    fontFamily: Fonts.text_2.fontFamily,
+    fontSize: Fonts.text_2.fontSize,
+    color: Colors.darkGrey,
+    lineHeight: Fonts.text_2.lineHeight,
+    textAlign: "center",
+  },
   content: {
-    borderTopLeftRadius: hp(ComponentParams.button.height.medium),
     flex: 1,
-    paddingBottom: hp(20),
-    gap: hp(4),
   },
   bottomGradient: {
     zIndex: 50,
@@ -347,11 +453,9 @@ const styles = StyleSheet.create({
   },
   // ingredientsItems:
   ingredientsList: {
-    paddingHorizontal: wp(4),
     paddingVertical: hp(2),
-    gap: hp(2),
-    flexDirection: "column",
-    paddingBottom: hp(4),
+    paddingBottom: hp(14),
+    marginBottom: hp(14),
   },
   text: {
     width: "100%",
@@ -362,49 +466,38 @@ const styles = StyleSheet.create({
     lineHeight: Fonts.text_2.lineHeight,
     textAlignVertical: "center",
   },
-  groceryItem: {
-    flexDirection: "row",
-    gap: wp(2),
-    alignItems: "center",
-    justifyContent: "space-between",
-  },
-  stepNumber: {
-    backgroundColor: Colors.secondaryWhite,
-    borderRadius: hp(ComponentParams.button.height.medium / 2),
-    justifyContent: "center",
-    alignItems: "center",
-    alignSelf: "flex-start",
-    aspectRatio: 1,
-    width: hp(ComponentParams.button.height.medium),
-    height: hp(ComponentParams.button.height.medium),
-  },
   ingredientImage: {
     backgroundColor: "transparent",
     width: hp(ComponentParams.button.height.small),
     height: hp(ComponentParams.button.height.small),
     borderRadius: hp(ComponentParams.button.height.small / 2),
   },
-  ingredientItem: {
-    backgroundColor: Colors.white,
-    flexDirection: "row",
-    gap: wp(2),
-    flex: 1,
-    alignItems: "center",
-    minHeight: hp(ComponentParams.button.height.large),
+
+  addItemButtonContainer: {
+    flexDirection: "column",
+    gap: hp(2),
+    position: "absolute",
+    bottom: hp(2),
+    zIndex: 100,
     width: "100%",
-    paddingVertical: wp(1),
-    paddingHorizontal: wp(1),
-    borderWidth: 1,
-    borderColor: Colors.primarySkyBlue,
-    borderRadius: hp(ComponentParams.button.height.large / 2),
+    paddingHorizontal: wp(4),
   },
-  checkItemButton: {
-    height: hp(ComponentParams.button.height.small),
-    width: hp(ComponentParams.button.height.small),
-    borderRadius: hp(ComponentParams.button.height.small / 2),
-    backgroundColor: Colors.primarySkyBlue,
-    borderColor: Colors.secondaryWhite,
+  clearButton: {
+    flexDirection: "row",
+    backgroundColor: Colors.secondaryWhite,
+    borderRadius: hp(ComponentParams.button.height.medium / 2),
+    height: hp(ComponentParams.button.height.medium),
+    paddingHorizontal: wp(4),
+    elevation: 2,
+    shadowColor: Colors.cardDropShadow,
     justifyContent: "center",
     alignItems: "center",
+  },
+  clearButtonText: {
+    textTransform: "capitalize",
+    fontFamily: Fonts.text_2.fontFamily,
+    fontSize: Fonts.text_2.fontSize,
+    color: Colors.darkGrey,
+    lineHeight: Fonts.text_2.lineHeight,
   },
 });

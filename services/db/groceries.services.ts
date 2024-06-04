@@ -20,6 +20,7 @@ export type GroceryListType = {
   items: {
     name: string;
     checked: boolean;
+    qty: number;
   }[];
   createdAt?: Timestamp;
 };

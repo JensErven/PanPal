@@ -13,6 +13,7 @@ const mediumPurple = "#AC70F6";
 const cardDropShadow = "#546C8E";
 const gold = "#FFD700";
 const darkGold = "#DAA520";
+
 export default {
   white: white,
   secondaryWhite: secondaryWhite,
@@ -69,6 +70,7 @@ export default {
       inputField: {
         background: white,
         innerShadow: lightGrey,
+        placeholderTextColor: "#A0B7D6",
       },
     },
   },

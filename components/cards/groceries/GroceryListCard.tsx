@@ -38,11 +38,11 @@ const GroceryListCard = ({ groceryList }: { groceryList: GroceryListType }) => {
   );
 
   const progress = useMemo(() => {
-    return (
-      (groceryList?.items.filter((item) => item.checked).length /
-        groceryList.items.length) *
-      100
-    );
+    const totalItems = groceryList.items.length;
+    const checkedItems = groceryList.items.filter(
+      (item) => item.checked
+    ).length;
+    return totalItems === 0 ? 0 : (checkedItems / totalItems) * 100;
   }, [groceryList.items]);
 
   const handleDeleteGroceryList = async () => {

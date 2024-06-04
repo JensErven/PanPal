@@ -1,5 +1,5 @@
 import { View, Text, Platform, StyleSheet } from "react-native";
-import React from "react";
+import React, { useMemo } from "react";
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -21,6 +21,10 @@ const LineProgressBarHeader = ({
   totalItems: number;
 }) => {
   const { top } = useSafeAreaInsets();
+
+  const progress = useMemo(() => {
+    return totalItems === 0 ? 0 : (checkedItems / totalItems) * 100;
+  }, [checkedItems, totalItems]);
 
   return (
     <View
@@ -44,7 +48,7 @@ const LineProgressBarHeader = ({
         <View style={{ flex: 1 }}>
           <LineProgress
             height={hp(1.5)}
-            progress={(checkedItems / totalItems) * 100}
+            progress={progress}
             strokeColor={Colors.mediumPurple}
             backgroundColor="rgba(0, 0, 0, 0.2)"
           />

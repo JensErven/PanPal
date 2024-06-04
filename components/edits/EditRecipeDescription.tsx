@@ -49,7 +49,9 @@ const EditRecipeDescription = ({
         style={styles.contentItemInput}
         value={recipe?.description}
         placeholder="about this recipe"
-        placeholderTextColor={"#A0B7D6"}
+        placeholderTextColor={
+          Colors.light.components.inputField.placeholderTextColor
+        }
         onChangeText={(text: string) => {
           if (recipe) setRecipe({ ...recipe, description: text });
         }}

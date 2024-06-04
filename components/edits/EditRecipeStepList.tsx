@@ -55,7 +55,9 @@ const EditRecipeStepList = ({
           style={styles.contentItemInput}
           value={stepsTextInput}
           placeholder="add steps"
-          placeholderTextColor={"#A0B7D6"}
+          placeholderTextColor={
+            Colors.light.components.inputField.placeholderTextColor
+          }
           onChangeText={(text: string) => {
             setStepsTextInput(text);
           }}
@@ -132,7 +134,9 @@ const EditRecipeStepList = ({
                   editable={editStep === index}
                   value={step}
                   placeholder="step"
-                  placeholderTextColor={"#A0B7D6"}
+                  placeholderTextColor={
+                    Colors.light.components.inputField.placeholderTextColor
+                  }
                   onChangeText={(text: string) => {
                     if (recipe) {
                       const newSteps = recipe.steps.map((item, i) => {

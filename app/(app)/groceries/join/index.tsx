@@ -90,7 +90,7 @@ const GroceryListAddScreen = () => {
       <CustomHeader
         isTransparent={true}
         hasGoBack={true}
-        headerTitle={"Create Grocery List"}
+        headerTitle={"Join Grocery List"}
         children={headerChildren()}
       />
       <View
@@ -118,27 +118,30 @@ const GroceryListAddScreen = () => {
                     <Ionicons
                       name="code-outline"
                       size={hp(2.7)}
-                      color={Colors.primarySkyBlue}
+                      color={"#A0B7D6"}
                     />
                     <TextInput
                       value={groceryListSharedCode}
                       onChangeText={setGroceryListSharedCode}
                       style={styles.contentItemInput}
                       placeholder="Enter shared code"
-                      placeholderTextColor={Colors.primarySkyBlue}
+                      placeholderTextColor={"#A0B7D6"}
                     />
                     {groceryListSharedCode.length > 0 && (
-                      <RoundButton
-                        transparent={false}
-                        backgroundColor={Colors.primarySkyBlue}
-                        handlePress={() => setGroceryListSharedCode("")}
-                      >
-                        <Ionicons
-                          name="close"
-                          size={hp(2.7)}
-                          color={Colors.darkGrey}
-                        />
-                      </RoundButton>
+                      <View style={styles.clearButton}>
+                        <RoundButton
+                          height={ComponentParams.button.height.small}
+                          transparent={false}
+                          backgroundColor={Colors.primarySkyBlue}
+                          handlePress={() => setGroceryListSharedCode("")}
+                        >
+                          <Ionicons
+                            name="close"
+                            size={hp(2.7)}
+                            color={Colors.darkGrey}
+                          />
+                        </RoundButton>
+                      </View>
                     )}
                   </View>
                 </View>
@@ -146,11 +149,19 @@ const GroceryListAddScreen = () => {
 
               <StandardButton
                 iconRight={
-                  <Ionicons
-                    name="enter"
-                    size={hp(2.7)}
-                    color={Colors.white}
-                    style={{ marginRight: wp(4) }}
+                  <RoundButton
+                    height={ComponentParams.button.height.medium}
+                    transparent={true}
+                    children={
+                      <Ionicons
+                        name="enter"
+                        size={hp(2.7)}
+                        color={Colors.white}
+                      />
+                    }
+                    handlePress={() =>
+                      handleJoinGroceryList(groceryListSharedCode.trim())
+                    }
                   />
                 }
                 textValue="Join"
@@ -211,13 +222,7 @@ const styles = StyleSheet.create({
     gap: wp(2),
   },
   clearButton: {
-    height: hp(ComponentParams.button.height.small),
-    flexDirection: "row",
-    textAlignVertical: "center",
-    gap: wp(1),
-    borderRadius: hp(ComponentParams.button.height.small / 2),
-    justifyContent: "center",
-    alignItems: "center",
+    marginRight: wp(2),
   },
   contentItem: {
     gap: hp(1),

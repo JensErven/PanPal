@@ -65,7 +65,7 @@ const StandardButton = ({
         {loading ? (
           <ActivityIndicator size={hp(2.7)} color={textColor} />
         ) : (
-          <View className="flex flex-row items-center justify-center gap-x-2 w-full">
+          <View className="flex flex-row items-center justify-center w-full">
             <Text
               style={{
                 textAlign: "center",

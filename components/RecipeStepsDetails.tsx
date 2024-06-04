@@ -11,18 +11,20 @@ import { LinearGradient } from "expo-linear-gradient";
 import { TouchableOpacity } from "react-native";
 import * as Haptics from "expo-haptics";
 
-const RecipeStepsDetails = ({
-  steps,
-  times,
-  selectedSteps,
-  setSelectedSteps,
-  setProgress,
-}: {
+interface RecipeStepsDetailsProps {
   steps: string[];
   times: number[];
   selectedSteps: number[];
   setSelectedSteps: (steps: number[]) => void;
   setProgress: (progress: number) => void;
+}
+
+const RecipeStepsDetails: React.FC<RecipeStepsDetailsProps> = ({
+  steps,
+  times,
+  selectedSteps,
+  setSelectedSteps,
+  setProgress,
 }) => {
   const handleStepClick = (index: number) => () => {
     if (selectedSteps.includes(index)) {
@@ -38,37 +40,35 @@ const RecipeStepsDetails = ({
   }, [selectedSteps]);
 
   return (
-    <View style={styles.container}>
-      <View style={styles.stepsList}>
-        {steps.map((step, index) => (
-          <TouchableOpacity
-            activeOpacity={0.7}
-            key={index}
-            style={styles.stepItem}
-            onPress={handleStepClick(index)}
+    <View style={styles.stepsList}>
+      {steps.map((step, index) => (
+        <TouchableOpacity
+          activeOpacity={0.7}
+          key={index}
+          style={styles.stepItem}
+          onPress={handleStepClick(index)}
+        >
+          <LinearGradient
+            style={styles.stepNumber}
+            colors={[Colors.secondaryWhite, Colors.primarySkyBlue]}
           >
-            <LinearGradient
-              style={styles.stepNumber}
-              colors={[Colors.secondaryWhite, Colors.primarySkyBlue]}
-            >
-              <Text style={styles.bulletPointText}>{index + 1}</Text>
-            </LinearGradient>
+            <Text style={styles.bulletPointText}>{index + 1}</Text>
+          </LinearGradient>
 
-            <Text
-              style={[
-                styles.text,
-                {
-                  textDecorationLine: selectedSteps.includes(index)
-                    ? "line-through"
-                    : "none",
-                },
-              ]}
-            >
-              {step}
-            </Text>
-          </TouchableOpacity>
-        ))}
-      </View>
+          <Text
+            style={[
+              styles.text,
+              {
+                textDecorationLine: selectedSteps.includes(index)
+                  ? "line-through"
+                  : "none",
+              },
+            ]}
+          >
+            {step}
+          </Text>
+        </TouchableOpacity>
+      ))}
     </View>
   );
 };
@@ -76,9 +76,6 @@ const RecipeStepsDetails = ({
 export default RecipeStepsDetails;
 
 const styles = StyleSheet.create({
-  container: {
-    width: "100%",
-  },
   stepsList: {
     gap: hp(2),
     flexDirection: "column",

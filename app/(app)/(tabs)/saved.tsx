@@ -1,4 +1,4 @@
-import { View, StyleSheet, Text } from "react-native";
+import { View, StyleSheet, Text, FlatList, ViewToken } from "react-native";
 import React, {
   useContext,
   useEffect,
@@ -37,6 +37,8 @@ import FilterFooter from "@/components/modals/filter/FilterFooter";
 import FilterOptionsSelectCard from "@/components/cards/FilterOptionsSelectCard";
 import { cuisineTypes } from "@/constants/tastePreferences/CuisineTypes";
 import { mealTypes } from "@/constants/tastePreferences/MealTypes";
+import { useSharedValue } from "react-native-reanimated";
+import { FlashList } from "@shopify/flash-list";
 
 const Saved = () => {
   const { recipes, isLoading } = useRecipes();
@@ -49,7 +51,7 @@ const Saved = () => {
   );
 
   const [toShowRecipesType, setToShowRecipesType] = useState<string>("All");
-
+  const viewableItems = useSharedValue<ViewToken[]>([]);
   const [selectedMealTypes, setSelectedMealTypes] = useState<string[]>([]);
   const [searchInputValue, setSearchInputValue] = useState<string>("");
   const recipesFilterSheetModal = useRef<BottomSheetModal>(null);
@@ -196,6 +198,9 @@ const Saved = () => {
     setToShowRecipesType("All");
   };
 
+  useEffect(() => {
+    console.log("viewableItems", viewableItems.value);
+  }, [viewableItems]);
   return (
     <LinearGradient
       style={styles.gradientBackground}
@@ -292,29 +297,34 @@ const Saved = () => {
         {isLoading ? (
           <FullScreenLoading />
         ) : (
-          <CustomKeyBoardView>
-            <View style={styles.content}>
-              <>
-                {filteredRecipes.length === 0 ? (
-                  <Text style={styles.noContentText}>No recipes found</Text>
-                ) : (
-                  <>
-                    <Text style={styles.noContentText}>
-                      {filteredRecipes.length} results
-                    </Text>
-                    {filteredRecipes?.map((recipe: SavedRecipeType) => (
-                      <RecipeCard
-                        key={recipe.id}
-                        recipe={recipe}
-                        allowedToDelete={user.userId === recipe.data.uuid}
-                        allowedToEdit={user.userId === recipe.data.uuid}
-                      />
-                    ))}
-                  </>
-                )}
-              </>
-            </View>
-          </CustomKeyBoardView>
+          <FlashList
+            contentContainerStyle={{
+              paddingBottom: hp(14),
+            }}
+            estimatedItemSize={hp(14)}
+            data={filteredRecipes}
+            keyExtractor={(item) => item.id}
+            onViewableItemsChanged={({ viewableItems: vItems }) => {
+              viewableItems.value = vItems;
+            }}
+            renderItem={({ item }) => (
+              <RecipeCard
+                viewableItems={viewableItems}
+                key={item.id}
+                recipe={item}
+                allowedToDelete={user.userId === item.data.uuid}
+                allowedToEdit={user.userId === item.data.uuid}
+              />
+            )}
+            ListEmptyComponent={() => (
+              <Text style={styles.noContentText}>No recipes found</Text>
+            )}
+            ListHeaderComponent={() => (
+              <Text style={styles.noContentText}>
+                {filteredRecipes.length} results
+              </Text>
+            )}
+          />
         )}
       </LinearGradient>
     </LinearGradient>
@@ -335,18 +345,12 @@ const styles = StyleSheet.create({
     borderTopWidth: wp(1),
   },
   noContentText: {
+    marginTop: hp(2),
     fontFamily: Fonts.text_2.fontFamily,
     fontSize: Fonts.text_2.fontSize,
     color: Colors.darkGrey,
     lineHeight: Fonts.text_2.lineHeight,
     textAlign: "center",
-  },
-  content: {
-    borderTopLeftRadius: hp(ComponentParams.button.height.medium),
-    flex: 1,
-    padding: wp(4),
-    gap: hp(2),
-    paddingBottom: hp(14),
   },
   headerRightButton: {
     backgroundColor: "rgba(0, 0, 0, 0.2)",

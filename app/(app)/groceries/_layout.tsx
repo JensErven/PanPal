@@ -7,6 +7,7 @@ const _layout = () => {
     <Stack screenOptions={{ headerShown: false }}>
       <Stack.Screen name="add" />
       <Stack.Screen name="details/[id]" />
+      <Stack.Screen name="join" />
     </Stack>
   );
 };

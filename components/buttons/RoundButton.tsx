@@ -7,11 +7,13 @@ import {
 } from "react-native-responsive-screen";
 import Colors from "@/constants/Colors";
 const RoundButton = ({
+  height = ComponentParams.button.height.medium,
   transparent = true,
   backgroundColor,
   children,
   handlePress,
 }: {
+  height?: number;
   transparent?: boolean;
   backgroundColor?: string;
   children: React.ReactNode;
@@ -24,6 +26,8 @@ const RoundButton = ({
         styles.container,
         {
           backgroundColor: transparent ? "rgba(0, 0, 0, 0.2)" : backgroundColor,
+          height: hp(height),
+          borderRadius: hp(height / 2),
         },
       ]}
     >
@@ -37,9 +41,7 @@ export default RoundButton;
 const styles = StyleSheet.create({
   container: {
     backgroundColor: "rgba(0, 0, 0, 0.2)",
-    borderRadius: hp(ComponentParams.button.height.medium / 2),
-    width: hp(ComponentParams.button.height.medium),
-    height: hp(ComponentParams.button.height.medium),
+    aspectRatio: 1,
     justifyContent: "center",
     alignItems: "center",
   },

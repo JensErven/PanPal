@@ -23,11 +23,14 @@ const LineProgress = ({
   const animatedProgress = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
+    // Sanity check for progress value
+    const safeProgress = Math.max(0, Math.min(progress, 100));
+
     // Animate the progress value with timing function
     Animated.timing(animatedProgress, {
-      toValue: progress,
-      duration: 1000, // Animation duration in milliseconds
+      toValue: safeProgress,
       useNativeDriver: false,
+      duration: 1000,
     }).start();
   }, [progress]);
 

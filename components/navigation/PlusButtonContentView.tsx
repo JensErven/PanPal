@@ -20,6 +20,7 @@ import { BottomSheetModal } from "@gorhom/bottom-sheet";
 import CustomSheetModal from "../modals/CustomSheetModal";
 import { TextInput } from "react-native-gesture-handler";
 import Fonts from "@/constants/Fonts";
+import RoundButton from "../buttons/RoundButton";
 
 const PlusButtonContentView = ({
   activeTab,
@@ -83,11 +84,15 @@ const PlusButtonContentView = ({
           <View style={styles.plusButtonContentContainer}>
             <StandardButton
               iconRight={
-                <Ionicons
-                  name="add"
-                  size={hp(3.5)}
-                  color={Colors.white}
-                  style={{ marginRight: wp(2) }}
+                <RoundButton
+                  handlePress={() =>
+                    console.log("Add custom recipe button pressed")
+                  }
+                  height={ComponentParams.button.height.medium}
+                  transparent={true}
+                  children={
+                    <Ionicons name="add" size={hp(2.7)} color={Colors.white} />
+                  }
                 />
               }
               textValue="add custom recipe"
@@ -107,11 +112,16 @@ const PlusButtonContentView = ({
           <View style={styles.plusButtonContentContainer}>
             <StandardButton
               iconRight={
-                <Ionicons
-                  name="add"
-                  size={hp(3.5)}
-                  color={Colors.white}
-                  style={{ marginRight: wp(2) }}
+                <RoundButton
+                  handlePress={() => {
+                    closeContentView();
+                    router.push("/recipe/add");
+                  }}
+                  height={ComponentParams.button.height.medium}
+                  transparent={true}
+                  children={
+                    <Ionicons name="add" size={hp(2.7)} color={Colors.white} />
+                  }
                 />
               }
               textValue="add custom recipe"
@@ -131,11 +141,16 @@ const PlusButtonContentView = ({
           <View style={styles.plusButtonContentContainer}>
             <StandardButton
               iconRight={
-                <Ionicons
-                  style={{ marginRight: wp(2) }}
-                  name="add"
-                  size={hp(3.5)}
-                  color={Colors.white}
+                <RoundButton
+                  handlePress={() => {
+                    // modalRefAddGroceryList.current?.present();
+                    router.push("/groceries/add");
+                  }}
+                  height={ComponentParams.button.height.medium}
+                  transparent={true}
+                  children={
+                    <Ionicons name="add" size={hp(2.7)} color={Colors.white} />
+                  }
                 />
               }
               textValue="create grocery list"
@@ -150,11 +165,19 @@ const PlusButtonContentView = ({
             />
             <StandardButton
               iconRight={
-                <Ionicons
-                  style={{ marginRight: wp(2) }}
-                  name="enter"
-                  size={hp(3.5)}
-                  color={Colors.white}
+                <RoundButton
+                  handlePress={() => {
+                    handleJoinGroceryList();
+                  }}
+                  height={ComponentParams.button.height.medium}
+                  transparent={true}
+                  children={
+                    <Ionicons
+                      name="enter"
+                      size={hp(2.7)}
+                      color={Colors.white}
+                    />
+                  }
                 />
               }
               textValue="join grocery list"

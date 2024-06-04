@@ -43,6 +43,9 @@ const GroceryListAddScreen = () => {
     "Grocery List",
     "Market List",
     "Supermarket List",
+    "Household Supplies",
+    "Dinner Ingredients",
+    "Cooking Supplies",
   ];
 
   // const handleNavigateToGroceryList = async (groceryListId: string) => {
@@ -85,7 +88,7 @@ const GroceryListAddScreen = () => {
       <RoundButton
         handlePress={() => handleAddGroceryList(groceryListName.trim())}
       >
-        <Ionicons name="checkmark" size={hp(2.7)} color={Colors.white} />
+        <Ionicons name="save" size={hp(2.7)} color={Colors.white} />
       </RoundButton>
     );
   };
@@ -129,27 +132,34 @@ const GroceryListAddScreen = () => {
                     <Ionicons
                       name="pencil"
                       size={hp(2.7)}
-                      color={Colors.primarySkyBlue}
+                      color={
+                        Colors.light.components.inputField.placeholderTextColor
+                      }
                     />
                     <TextInput
                       value={groceryListName}
                       onChangeText={setGroceryListName}
                       style={styles.contentItemInput}
                       placeholder="Grocery list name"
-                      placeholderTextColor={Colors.primarySkyBlue}
+                      placeholderTextColor={
+                        Colors.light.components.inputField.placeholderTextColor
+                      }
                     />
                     {groceryListName.length > 0 && (
-                      <RoundButton
-                        transparent={false}
-                        backgroundColor={Colors.primarySkyBlue}
-                        handlePress={() => setGroceryListName("")}
-                      >
-                        <Ionicons
-                          name="close"
-                          size={hp(2.7)}
-                          color={Colors.darkGrey}
-                        />
-                      </RoundButton>
+                      <View style={styles.clearButton}>
+                        <RoundButton
+                          height={ComponentParams.button.height.small}
+                          transparent={false}
+                          backgroundColor={Colors.primarySkyBlue}
+                          handlePress={() => setGroceryListName("")}
+                        >
+                          <Ionicons
+                            name="close"
+                            size={hp(2.7)}
+                            color={Colors.darkGrey}
+                          />
+                        </RoundButton>
+                      </View>
                     )}
                   </View>
                 </View>
@@ -170,11 +180,19 @@ const GroceryListAddScreen = () => {
 
               <StandardButton
                 iconRight={
-                  <Ionicons
-                    name="checkmark"
-                    size={hp(2.7)}
-                    color={Colors.white}
-                    style={{ marginRight: wp(4) }}
+                  <RoundButton
+                    handlePress={() =>
+                      handleAddGroceryList(groceryListName.trim())
+                    }
+                    height={ComponentParams.button.height.medium}
+                    transparent={true}
+                    children={
+                      <Ionicons
+                        name="save"
+                        size={hp(2.7)}
+                        color={Colors.white}
+                      />
+                    }
                   />
                 }
                 textValue="Save"
@@ -235,13 +253,8 @@ const styles = StyleSheet.create({
     gap: wp(2),
   },
   clearButton: {
-    height: hp(ComponentParams.button.height.small),
-    flexDirection: "row",
-    textAlignVertical: "center",
-    gap: wp(1),
-    borderRadius: hp(ComponentParams.button.height.small / 2),
-    justifyContent: "center",
-    alignItems: "center",
+    marginRight: wp(2),
+    aspectRatio: 1,
   },
   contentItem: {
     gap: hp(1),

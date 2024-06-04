@@ -14,7 +14,6 @@ import { measurements } from "@/constants/Measurements";
 import { Image } from "expo-image";
 import { getIngredientImage } from "@/utils/file.utils";
 import { blurhash } from "@/utils/general.utils";
-import StandardButton from "./buttons/StandardButton";
 import { LinearGradient } from "expo-linear-gradient";
 
 const RecipeIngredientsDetails = ({
@@ -85,36 +84,34 @@ const RecipeIngredientsDetails = ({
   };
 
   return (
-    <View style={styles.container}>
-      <View style={styles.ingredientsList}>
-        {changedIngredients.map((ingredient: string, index: number) => (
-          <View key={index} style={styles.ingredientItem}>
-            <LinearGradient
-              style={styles.stepNumber}
-              colors={[Colors.white, Colors.primarySkyBlue]}
-            >
-              {ingredientImages[index] ? (
-                <Image
-                  style={styles.ingredientImage}
-                  source={ingredientImages[index]}
-                  placeholder={blurhash}
-                  contentFit="cover"
-                  transition={500}
-                />
-              ) : (
-                <Ionicons
-                  name="image"
-                  size={hp(2.7)}
-                  color={Colors.primarySkyBlue}
-                />
-              )}
-            </LinearGradient>
-            <Text style={[styles.text]}>
-              {formatIngredient(ingredient, measurements)}
-            </Text>
-          </View>
-        ))}
-      </View>
+    <View style={styles.ingredientsList}>
+      {changedIngredients.map((ingredient: string, index: number) => (
+        <View key={index} style={styles.ingredientItem}>
+          <LinearGradient
+            style={styles.stepNumber}
+            colors={[Colors.white, Colors.primarySkyBlue]}
+          >
+            {ingredientImages[index] ? (
+              <Image
+                style={styles.ingredientImage}
+                source={ingredientImages[index]}
+                placeholder={blurhash}
+                contentFit="cover"
+                transition={500}
+              />
+            ) : (
+              <Ionicons
+                name="image"
+                size={hp(2.7)}
+                color={Colors.primarySkyBlue}
+              />
+            )}
+          </LinearGradient>
+          <Text style={[styles.text]}>
+            {formatIngredient(ingredient, measurements)}
+          </Text>
+        </View>
+      ))}
     </View>
   );
 };
@@ -122,10 +119,6 @@ const RecipeIngredientsDetails = ({
 export default RecipeIngredientsDetails;
 
 const styles = StyleSheet.create({
-  container: {
-    width: "100%",
-    gap: hp(4),
-  },
   ingredientsList: {
     gap: hp(2),
     flexDirection: "column",
