@@ -20,7 +20,7 @@ import RecipeDetailsTabBar from "@/components/navigation/RecipeDetailsTabBar";
 import RecipeTipsCard from "@/components/cards/RecipeTipsCard";
 import RecipeIngredientsDetails from "@/components/RecipeIngredientsDetails";
 import RecipeStepsDetails from "@/components/RecipeStepsDetails";
-import { AuthContext } from "@/context/authContext";
+import { AuthContext, useAuth } from "@/context/authContext";
 import RecipeImageContainer from "@/components/RecipeImageContainer";
 import RecipeHeaderContainer from "@/components/RecipeHeaderContainer";
 import { BottomSheetModal } from "@gorhom/bottom-sheet";
@@ -34,8 +34,8 @@ import CircularProgress from "@/components/CircularProgress";
 import SmallInfoTag from "@/components/recipe-details/SmallInfoTag";
 
 const DetailsRecipe = () => {
-  const { user } = useContext<any>(AuthContext);
-  const { recipeId } = useLocalSearchParams();
+  const { user } = useAuth();
+  const { id } = useLocalSearchParams();
   const { deleteRecipe, updateRecipe, deleteImageFromFirebase, getRecipe } =
     recipeService;
   const [recipe, setRecipe] = useState<RecipeType | undefined>(undefined);
@@ -45,14 +45,14 @@ const DetailsRecipe = () => {
   const recipesDetailsTabBarSheetModal = useRef<BottomSheetModal>(null);
   const { recipes } = useContext<any>(RecipesContext);
   // steps progress
-  const [progress, setProgress] = React.useState<number>(0);
-  const [selectedSteps, setSelectedSteps] = React.useState<number[]>([]);
+  const [progress, setProgress] = useState<number>(0);
+  const [selectedSteps, setSelectedSteps] = useState<number[]>([]);
 
   useFocusEffect(
     React.useCallback(() => {
-      if (!recipeId) return;
+      if (!id) return;
       setIsLoading(true);
-      findRecipeInContext(recipeId as string)
+      findRecipeInContext(id as string)
         .then((res) => {
           if (res) {
             console.log("Found recipe in context");
@@ -61,7 +61,7 @@ const DetailsRecipe = () => {
           }
         })
         .catch((err) => {
-          getRecipe(recipeId as string)
+          getRecipe(id as string)
             .then((res) => {
               if (res) {
                 console.log("Fetched recipe from db");
@@ -75,7 +75,11 @@ const DetailsRecipe = () => {
               router.back();
             });
         });
-    }, [recipeId])
+      return () => {
+        // Close the modal when the screen loses focus
+        recipesDetailsTabBarSheetModal.current?.close();
+      };
+    }, [id])
   );
 
   const findRecipeInContext = async (recipeId: string) => {
@@ -90,15 +94,15 @@ const DetailsRecipe = () => {
     if (!recipe) return;
     if (recipe.isGenerated) return;
     if (recipe.uuid !== user.userId) return;
-    router.push({ pathname: `/recipe/edit/`, params: { recipeId } });
+    router.push({ pathname: `/recipe/edit/${id}` });
   };
 
   const handleDeleteRecipe = () => {
-    if (!recipeId) return;
+    if (!id) return;
     if (recipe?.uuid !== user.userId) return;
 
     deleteImageFromFirebase(recipe?.image as string).then((res) => {
-      deleteRecipe(recipeId as string).then((res) => {
+      deleteRecipe(id as string).then((res) => {
         if (res.success) {
           router.back();
           ToastAndroid.show("Recipe deleted successfully", ToastAndroid.SHORT);
@@ -112,7 +116,7 @@ const DetailsRecipe = () => {
   useEffect(() => {
     if (generatedImage && recipe) {
       const updatedRecipe = { ...recipe, image: generatedImage };
-      updateRecipe(recipeId as string, updatedRecipe).then(
+      updateRecipe(id as string, updatedRecipe).then(
         (res) => {
           if (res.success) {
             setRecipe(res.recipeData);
@@ -158,6 +162,13 @@ const DetailsRecipe = () => {
     return true;
   };
 
+  const handleNavigateToVoiceAssistant = async (recipeId: string) => {
+    router.push({
+      pathname: `/recipe/voice-assistant/${recipeId}`,
+      params: { steps: recipe?.steps },
+    });
+  };
+
   const handleUpdateImage = async (image: string) => {
     if (!recipe) return;
     const updatedRecipe = { ...recipe, image };
@@ -170,7 +181,7 @@ const DetailsRecipe = () => {
         return;
       }
 
-      await updateRecipe(recipeId as string, updatedRecipe).then(
+      await updateRecipe(id as string, updatedRecipe).then(
         (res) => {
           if (res.success) {
             setRecipe(res.recipeData);
@@ -239,7 +250,9 @@ const DetailsRecipe = () => {
               />
             }
             textValue="Start Cooking Assistance"
-            clickHandler={() => console.log("Start Cooking")}
+            clickHandler={() => {
+              recipe.id && handleNavigateToVoiceAssistant(recipe.id);
+            }}
             colors={Colors.light.components.button.purple.background}
             textColor={Colors.white}
             height={ComponentParams.button.height.medium}
@@ -415,6 +428,7 @@ const DetailsRecipe = () => {
                       cookTime: recipe?.cookTime,
                       mealType: recipe?.mealType,
                       cuisineType: recipe?.cuisineType,
+                      dietType: recipe?.dietType,
                       isGenerated: recipe?.isGenerated,
                     }}
                   />

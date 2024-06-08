@@ -38,13 +38,6 @@ const setPreferencesStep1 = () => {
       options: cuisineTypes,
       selectedOptions: [],
     },
-    {
-      title: "Disliked Ingredients",
-      searchInputPlaceholder: "search ingredients...",
-      addInputPlaceholder: "add other ingredients...",
-      options: dislikedIngredientTypes,
-      selectedOptions: [],
-    },
   ]);
 
   const [progress, setProgress] = React.useState(

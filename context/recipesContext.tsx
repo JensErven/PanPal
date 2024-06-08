@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
-import { collection, onSnapshot } from "firebase/firestore";
+import { collection, onSnapshot, query, where } from "firebase/firestore";
 import { db } from "@/firebaseConfig";
-import { AuthContext } from "@/context/authContext";
+import { AuthContext, useAuth } from "@/context/authContext";
 import { RecipeType } from "@/models/RecipeType";
 import { SavedRecipeType } from "@/models/SavedRecipeType";
 
@@ -22,28 +22,25 @@ export const RecipesProvider = ({
 }: {
   children: React.ReactNode;
 }) => {
-  const { user } = useContext<any>(AuthContext);
+  const { user } = useContext(AuthContext);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [recipes, setRecipes] = useState<SavedRecipeType[]>([]);
 
   useEffect(() => {
     if (user && user.userId) {
       const recipesRef = collection(db, "recipes");
+      const q = query(recipesRef, where("uuid", "==", user.userId));
       setIsLoading(true);
       const subscriber = onSnapshot(
-        recipesRef,
+        q,
         (querySnapshot) => {
           const fetchedRecipes: SavedRecipeType[] = [];
           querySnapshot.forEach((doc) => {
             const data = doc.data() as RecipeType;
-            if (data.uuid === user.userId) {
-              fetchedRecipes.push({ id: doc.id, data });
-            }
+            fetchedRecipes.push({ id: doc.id, data });
           });
           setRecipes(fetchedRecipes);
-          setTimeout(() => {
-            setIsLoading(false);
-          }, 1000);
+          setIsLoading(false);
         },
         (error) => {
           console.error("Error fetching recipes:", error);
@@ -51,6 +48,8 @@ export const RecipesProvider = ({
         }
       );
       return () => subscriber();
+    } else {
+      console.log("User is not authenticated");
     }
   }, [user]);
 

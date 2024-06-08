@@ -1,14 +1,12 @@
-import { View, StyleSheet, Text, FlatList, ViewToken } from "react-native";
+import { StyleSheet, Text, View, ViewToken } from "react-native";
 import React, {
-  useContext,
   useEffect,
   useMemo,
   useState,
   useCallback,
   useRef,
 } from "react";
-import { AuthContext } from "@/context/authContext";
-import CustomKeyBoardView from "@/components/CustomKeyBoardView";
+import { useAuth } from "@/context/authContext";
 import { LinearGradient } from "expo-linear-gradient";
 import Colors from "@/constants/Colors";
 import Fonts from "@/constants/Fonts";
@@ -42,14 +40,12 @@ import { FlashList } from "@shopify/flash-list";
 
 const Saved = () => {
   const { recipes, isLoading } = useRecipes();
-  const { user } = useContext<any>(AuthContext);
+  const { user } = useAuth();
   const [initialRecipes, setInitialRecipes] =
     useState<SavedRecipeType[]>(recipes);
-
   const [selectedCuisineTypes, setSelectedCuisineTypes] = useState<string[]>(
     []
   );
-
   const [toShowRecipesType, setToShowRecipesType] = useState<string>("All");
   const viewableItems = useSharedValue<ViewToken[]>([]);
   const [selectedMealTypes, setSelectedMealTypes] = useState<string[]>([]);
@@ -235,7 +231,7 @@ const Saved = () => {
           />
         }
         scrollViewChildren={
-          <>
+          <View style={styles.contentListContainer}>
             <FilterOptionsSelectCard
               clearAll={() => setToShowRecipesType("All")}
               showCount={false}
@@ -284,7 +280,7 @@ const Saved = () => {
                 setSelectedCuisineTypes(updatedSelectedCuisineTypes);
               }}
             />
-          </>
+          </View>
         }
       />
 
@@ -343,6 +339,13 @@ const styles = StyleSheet.create({
     flex: 1,
     borderTopColor: Colors.darkBlue,
     borderTopWidth: wp(1),
+  },
+  contentListContainer: {
+    flex: 1,
+    flexDirection: "column",
+    paddingTop: hp(2),
+    paddingBottom: hp(8),
+    paddingHorizontal: wp(4),
   },
   noContentText: {
     marginTop: hp(2),

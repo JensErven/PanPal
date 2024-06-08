@@ -38,3 +38,41 @@ export const updateIngredientQuantities = (
     return `${newQuantity} ${unit} ${name}`.trim();
   });
 };
+
+/**
+ * Returns a random index from the given array.
+ * @param array - The array from which to select a random index.
+ * @returns A random index from the array.
+ */
+export const randomArrayIndex = (array: any[]) => {
+  return Math.floor(Math.random() * array.length);
+};
+
+/**
+ * Adds emojis to a given prompt based on predefined keywords.
+ * @param prompt - The prompt to add emojis to.
+ * @returns The modified prompt with emojis added.
+ */
+export const addEmojisToPrompt = (prompt: string) => {
+  const keywordEmojiMap = {
+    "don’t": "🚫",
+    "don't": "🚫",
+    without: "🚫",
+    "quick and easy": "⏱️👍",
+    ingredients: "🥕",
+    healthy: "🥗",
+    diet: "🍏",
+    picky: "🤔",
+    busy: "🏃",
+    allergy: "⚠️",
+    recipes: "🍽️",
+    cuisine: "🍜",
+    vegan: "🌱",
+  };
+  let modifiedPrompt = prompt;
+  for (const [keyword, emoji] of Object.entries(keywordEmojiMap)) {
+    const regex = new RegExp(`\\b${keyword}\\b`, "gi");
+    modifiedPrompt = modifiedPrompt.replace(regex, `${keyword} ${emoji}`);
+  }
+  return modifiedPrompt;
+};

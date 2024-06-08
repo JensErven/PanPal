@@ -1,5 +1,5 @@
 import { View, Text, TextInput, Image, StyleSheet, Alert } from "react-native";
-import React, { useContext } from "react";
+import React, { useState } from "react";
 import { LinearGradient } from "expo-linear-gradient";
 import {
   widthPercentageToDP as wp,
@@ -7,9 +7,8 @@ import {
 } from "react-native-responsive-screen";
 import { StatusBar } from "expo-status-bar";
 import { Ionicons } from "@expo/vector-icons";
-import { router } from "expo-router";
 import CustomKeyBoardView from "@/components/CustomKeyBoardView";
-import { AuthContext } from "@/context/authContext";
+import { useAuth } from "@/context/authContext";
 import Colors from "@/constants/Colors";
 import ComponentParams from "@/constants/ComponentParams";
 import Fonts from "@/constants/Fonts";
@@ -17,10 +16,9 @@ import CustomHeader from "@/components/navigation/CustomHeader";
 import StandardButton from "@/components/buttons/StandardButton";
 
 const ForgotPassword = () => {
-  const { handleSendPasswordResetEmail } = useContext<any>(AuthContext);
-
-  const [email, setEmail] = React.useState<string>("");
-  const [loading, setLoading] = React.useState<boolean>(false);
+  const { handleSendPasswordResetEmail } = useAuth();
+  const [email, setEmail] = useState<string>("");
+  const [loading, setLoading] = useState<boolean>(false);
   const handleForgotPassword = async () => {
     if (!email.includes("@")) {
       Alert.alert("Unvalid Email", "Please give up a valid email address");

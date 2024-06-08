@@ -23,6 +23,8 @@ const recipeExampleJson: recipeExampleJsonType = {
   prepTime: "number of minutes, representing the preparation time (e.g., 10)",
   cookTime: "number of minutes, representing the cooking time (e.g., 20)",
   extraTime: "number of minutes, representing the extra time (e.g., 5)",
+  dietType:
+    "a string value representing the diet type (e.g., Vegetarian, Vegan, Gluten-Free, Dairy-Free, Nut-Free, Low-Carb, Keto, Paleo, Pescatarian, Whole30, Halal, Kosher, Omnivore, Carnivore, Flexitarian, Raw, Fruitarian, Lacto-Vegetarian, Ovo-Vegetarian, Lacto-Ovo-Vegetarian, Pescetarian, Pollotarian, Pollo-Pescetarian)",
   cuisineType:
     "a string value representing the cuisine type (e.g., 🇳🇱 Dutch, 🇸🇰 Slovak, 🇧🇪 Belgian). VERY IMPORTANT!: Should always be in English AND should ALWAYS add the country flag before the country name.",
   mealType:
@@ -87,6 +89,24 @@ const roleSystemPrompt: Message = {
 };
 
 export const openaiServices = {
+  async generateRecipeSuggestion(prompt: Message) {
+    const roleSystemPrompt: Message = {
+      role: "system",
+      content:
+        "Generate a recipe suggestion based on the user's preferences. The JSON object response should look like this **Recipe Details**: \n" +
+        `${JSON.stringify(recipeExampleJson)}\n` +
+        "- Provide full recipe details upon request, without step numbers or bullet points.",
+    };
+    const response = await openai.chat.completions.create({
+      model: "gpt-3.5-turbo",
+      max_tokens: 750,
+      response_format: { type: "json_object" },
+      messages: [roleSystemPrompt, prompt],
+    });
+    console.log(response.choices[0].message);
+    return response.choices[0].message;
+  },
+
   async createCompletion(prompt: Message[]) {
     const response = await openai.chat.completions.create({
       model: "gpt-3.5-turbo",
@@ -106,16 +126,20 @@ export const openaiServices = {
       difficulty,
       servings,
       cuisineType,
+      dietType,
       mealType,
     } = recipeData;
 
     // Constructing a detailed prompt within the character limit
-    let prompt = `Generate an appetizing, hyper realistic and high-quality image for a recipe called "${title}". `;
+    let prompt = `Generate an appetizing, hyper realistic and high-quality image with a blackslate background for a recipe called "${title}". `;
     if (cuisineType) {
       prompt += `This is a ${cuisineType} dish. `;
     }
     if (mealType) {
       prompt += `It is typically served as a ${mealType}. `;
+    }
+    if (dietType) {
+      prompt += `The dish is suitable for ${dietType} diets. `;
     }
     if (description.length > 0) {
       prompt += `Description: ${description.slice(0, 100)}. `; // Truncate description if too long

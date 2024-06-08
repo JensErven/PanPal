@@ -308,6 +308,12 @@ const AddGroceryItemModal = ({
                       }
                     />
                     <View style={styles.ingredientItem}>
+                      <LinearGradient
+                        style={styles.itemGradientContainer}
+                        colors={[Colors.white, Colors.secondaryWhite]}
+                        start={[0, 0]}
+                        end={[1, 1]}
+                      />
                       <View
                         style={{
                           height: hp(ComponentParams.button.height.medium),
@@ -493,14 +499,27 @@ const styles = StyleSheet.create({
     borderRadius: hp(ComponentParams.button.height.small / 2),
   },
   ingredientItem: {
-    elevation: 2,
+    flex: 1,
+    borderTopColor: Colors.white,
+    borderTopWidth: 1,
+    borderLeftWidth: 1,
+    borderLeftColor: Colors.white,
+    backgroundColor: Colors.white,
+    alignItems: "center",
+    elevation: 10,
     shadowColor: Colors.cardDropShadow,
     flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    flex: 1,
-    backgroundColor: Colors.white,
+    gap: wp(2),
+    height: hp(ComponentParams.button.height.medium),
     borderRadius: hp(ComponentParams.button.height.medium / 2),
+  },
+  itemGradientContainer: {
+    borderRadius: hp(ComponentParams.button.height.medium / 2),
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
   },
   text: {
     width: "100%",
@@ -515,6 +534,8 @@ const styles = StyleSheet.create({
     width: "100%",
     flexDirection: "column",
     marginBottom: hp(8),
+    paddingTop: hp(2),
+    paddingHorizontal: wp(4),
     gap: hp(2),
   },
   groceryCategryItemContainer: {

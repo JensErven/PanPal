@@ -76,7 +76,14 @@ const GroceryListCard = ({ groceryList }: { groceryList: GroceryListType }) => {
   };
 
   const SettingModalScrollViewChildren = (
-    <View style={{ flexDirection: "column", gap: hp(1) }}>
+    <View
+      style={{
+        flexDirection: "column",
+        gap: hp(1),
+        paddingHorizontal: wp(4),
+        paddingTop: hp(2),
+      }}
+    >
       <StandardButton
         isDisabled={isLoading}
         clickHandler={handleDeleteGroceryList}
@@ -139,47 +146,49 @@ const GroceryListCard = ({ groceryList }: { groceryList: GroceryListType }) => {
         headerChildren={SettingsModalHeaderChildren}
         scrollViewChildren={SettingModalScrollViewChildren}
       />
-      <TouchableOpacity onPress={() => handleNavigateToRecipe(groceryList.id)}>
+      <TouchableOpacity
+        onPress={() => handleNavigateToRecipe(groceryList.id)}
+        style={styles.container}
+      >
         <LinearGradient
-          style={styles.container}
-          colors={[Colors.white, Colors.white, Colors.secondaryWhite]}
-          start={[0.5, 0]}
-          end={[0.5, 1]}
-        >
-          <View style={styles.contentContainer}>
-            <View style={styles.headerContainer}>
-              <Text style={styles.title} numberOfLines={2} ellipsizeMode="tail">
-                {groceryList.name}
-              </Text>
-              <TouchableOpacity
-                style={{ padding: wp(2), alignSelf: "flex-start" }}
-                onPress={() => groceryListSettingsModal.current?.present()}
-              >
-                <Ionicons
-                  name="ellipsis-vertical"
-                  size={hp(2.5)}
-                  color={Colors.darkGrey}
-                />
-              </TouchableOpacity>
+          style={styles.gradientContainer}
+          colors={[Colors.white, Colors.secondaryWhite]}
+          start={[0, 0]}
+          end={[1, 1]}
+        />
+        <View style={styles.contentContainer}>
+          <View style={styles.headerContainer}>
+            <Text style={styles.title} numberOfLines={2} ellipsizeMode="tail">
+              {groceryList.name}
+            </Text>
+            <TouchableOpacity
+              style={{ padding: wp(2), alignSelf: "flex-start" }}
+              onPress={() => groceryListSettingsModal.current?.present()}
+            >
+              <Ionicons
+                name="ellipsis-vertical"
+                size={hp(2.5)}
+                color={Colors.darkGrey}
+              />
+            </TouchableOpacity>
+          </View>
+          <View style={styles.lowerContentContainer}>
+            <View style={{ flex: 1 }}>
+              <LineProgress
+                height={hp(1.5)}
+                progress={progress}
+                strokeColor={Colors.mediumPurple}
+                backgroundColor={Colors.secondaryWhite}
+              />
             </View>
-            <View style={styles.lowerContentContainer}>
-              <View style={{ flex: 1 }}>
-                <LineProgress
-                  height={hp(1.5)}
-                  progress={progress}
-                  strokeColor={Colors.mediumPurple}
-                  backgroundColor={Colors.secondaryWhite}
-                />
-              </View>
-              <View>
-                <Text style={styles.subTitle}>
-                  {groceryList.items.filter((item) => item.checked).length}/
-                  {groceryList.items.length}
-                </Text>
-              </View>
+            <View>
+              <Text style={styles.subTitle}>
+                {groceryList.items.filter((item) => item.checked).length}/
+                {groceryList.items.length}
+              </Text>
             </View>
           </View>
-        </LinearGradient>
+        </View>
       </TouchableOpacity>
     </>
   );
@@ -189,15 +198,30 @@ export default GroceryListCard;
 
 const styles = StyleSheet.create({
   container: {
-    width: "100%",
-    padding: hp(2),
-    display: "flex",
+    borderTopColor: Colors.white,
+    borderTopWidth: 1,
+    borderLeftWidth: 1,
+    borderLeftColor: Colors.white,
     flexDirection: "column",
-    justifyContent: "space-between",
-    alignItems: "flex-start",
-    borderRadius: hp(ComponentParams.button.height.small),
-    elevation: 3,
-    shadowColor: Colors.cardDropShadow,
+    gap: hp(2),
+    display: "flex",
+    padding: wp(4),
+    shadowColor: Colors.darkBlue,
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3,
+    elevation: 4,
+    backgroundColor: Colors.white,
+    borderRadius: hp(ComponentParams.button.height.large / 2),
+    overflow: "visible",
+  },
+  gradientContainer: {
+    borderRadius: hp(ComponentParams.button.height.large / 2),
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
   },
   contentContainer: {
     width: "100%",

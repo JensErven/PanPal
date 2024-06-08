@@ -15,6 +15,7 @@ type RecipeHeaderContainerProps = {
   description?: string;
   cuisineType?: string;
   mealType?: string;
+  dietType?: string;
   cookTime?: number;
   prepTime?: number;
   extraTime?: number;
@@ -84,6 +85,7 @@ const RecipeHeaderContainer = ({
               }
             />
           )}
+          {headerData.dietType && <SmallInfoTag text={headerData.dietType} />}
         </View>
       </View>
     </LinearGradient>

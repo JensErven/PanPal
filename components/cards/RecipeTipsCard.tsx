@@ -15,8 +15,9 @@ import { openaiServices } from "@/services/api/openai.services";
 import { tipsExampleJsonType } from "@/models/openai/tipsExampleJsonType";
 import FullScreenLoading from "../FullScreenLoading";
 import { recipeService } from "@/services/db/recipe.services";
-import { AuthContext, UserCreditsType } from "@/context/authContext";
+import { AuthContext, UserCreditsType, useAuth } from "@/context/authContext";
 import PagerView from "react-native-pager-view";
+import CoinCount from "../common/CoinCount";
 
 const RecipeTipsCard = ({
   recipe,
@@ -25,11 +26,7 @@ const RecipeTipsCard = ({
   recipe: RecipeType;
   setRecipe: (recipe: RecipeType) => void;
 }) => {
-  const {
-    credits,
-    substractCredits,
-  }: { credits: UserCreditsType; substractCredits: (amount: number) => void } =
-    useContext<any>(AuthContext);
+  const { credits, substractCredits } = useAuth();
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [tips, setTips] = useState<string[]>(recipe.tips || []);
@@ -47,7 +44,6 @@ const RecipeTipsCard = ({
         const parsedContent = JSON.parse(response.content);
         if (parsedContent.responseType === "tips") {
           substractCredits(1);
-          ToastAndroid.show("1 PanPal Credits deducted", ToastAndroid.SHORT);
           const newTips = [...tips, ...parsedContent.tips];
           setTips(newTips);
           await saveTipsToRecipe(newTips);
@@ -67,7 +63,6 @@ const RecipeTipsCard = ({
       const response = await recipeService.saveTipsToRecipe(recipe.id, tips);
       if (response.success) {
         setRecipe(updatedRecipe);
-        ToastAndroid.show("Tips saved successfully", ToastAndroid.SHORT);
       } else {
         throw new Error(response.message);
       }
@@ -92,17 +87,20 @@ const RecipeTipsCard = ({
           <Text style={styles.cardText}>No tips available</Text>
         ) : (
           tips.map((tip, index) => (
-            <LinearGradient
-              style={styles.tipItem}
-              key={index}
-              colors={[Colors.white, "#DDEBF3"]}
-              start={[0.5, 0]}
-              end={[0.5, 1]}
-            >
-              <View style={styles.tipItemInner}>
-                <Text style={styles.cardText}>{tip}</Text>
-              </View>
-            </LinearGradient>
+            <View style={styles.tipCardContainer} key={index}>
+              <LinearGradient
+                style={styles.tipCardGradientContainer}
+                colors={[
+                  Colors.white,
+                  Colors.secondaryWhite,
+                  Colors.primarySkyBlue,
+                ]}
+                start={[0, 0]}
+                end={[1, 1]}
+              />
+
+              <Text style={styles.cardText}>{tip}</Text>
+            </View>
           ))
         )}
       </View>
@@ -121,18 +119,7 @@ const RecipeTipsCard = ({
             }
             iconRight={
               <View style={styles.panpalCreditsContainer}>
-                <Text style={styles.panpalCreditsText}>1</Text>
-                <LinearGradient
-                  style={styles.panpalCreditsButtonContainer}
-                  colors={[
-                    Colors.light.components.button.gold.background[0],
-                    Colors.light.components.button.gold.background[1],
-                  ]}
-                  start={[0.5, 0]}
-                  end={[0.5, 1]}
-                >
-                  <Text style={styles.panpalCreditsButtonText}>pp</Text>
-                </LinearGradient>
+                <CoinCount count={1} isTransparent={false} />
               </View>
             }
             clickHandler={handleGenerateMoreTips}
@@ -185,6 +172,21 @@ const styles = StyleSheet.create({
     lineHeight: Fonts.text_2.lineHeight,
     color: Colors.darkGrey,
   },
+  tipCardContainer: {
+    borderTopColor: Colors.white,
+    borderTopWidth: 1,
+    borderLeftWidth: 1,
+    borderLeftColor: Colors.white,
+    width: "100%",
+    padding: wp(4),
+    shadowColor: Colors.darkBlue,
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3,
+    elevation: 4,
+    backgroundColor: Colors.white,
+    borderRadius: hp(ComponentParams.button.height.medium / 2),
+  },
   cardTitle: {
     lineHeight: Fonts.text_1.lineHeight,
     fontFamily: Fonts.text_1.fontFamily,
@@ -192,24 +194,15 @@ const styles = StyleSheet.create({
     color: Colors.darkBlue,
     marginLeft: wp(2),
   },
-  tipItem: {
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "flex-start",
-    width: "100%",
-    elevation: 2,
-    shadowColor: Colors.cardDropShadow,
-    padding: wp(2),
-    borderRadius: hp(ComponentParams.button.height.small),
+  tipCardGradientContainer: {
+    borderRadius: hp(ComponentParams.button.height.medium / 2),
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
   },
-  tipItemInner: {
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "flex-start",
-    width: "100%",
-    padding: wp(2),
-    shadowColor: Colors.cardDropShadow,
-  },
+
   cardText: {
     fontFamily: Fonts.text_2.fontFamily,
     fontSize: Fonts.text_2.fontSize,

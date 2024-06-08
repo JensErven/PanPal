@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
-import { AuthContext } from "@/context/authContext";
+import { AuthContext, useAuth } from "@/context/authContext";
 import { GroceryListType } from "@/services/db/groceries.services";
 import { collection, onSnapshot, query, where } from "firebase/firestore";
 import { db } from "@/firebaseConfig";
@@ -22,7 +22,7 @@ export const GroceriesProvider = ({
 }: {
   children: React.ReactNode;
 }) => {
-  const { user } = useContext<any>(AuthContext);
+  const { user } = useAuth();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [groceryLists, setGroceryLists] = useState<GroceryListType[]>([]);
 

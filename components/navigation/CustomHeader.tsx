@@ -15,6 +15,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import Colors from "@/constants/Colors";
 import ComponentParams from "@/constants/ComponentParams";
+import { StatusBar } from "expo-status-bar";
 
 const ios = Platform.OS === "ios";
 
@@ -43,6 +44,7 @@ const CustomHeader = ({
         styles.container,
       ]}
     >
+      <StatusBar style="light" />
       <View className="flex items-center justify-start flex-row gap-x-4 flex-1">
         {hasGoBack && (
           <TouchableOpacity

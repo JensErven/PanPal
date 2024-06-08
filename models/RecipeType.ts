@@ -12,6 +12,7 @@ export type RecipeType = {
   isGenerated?: boolean; // is the recipe generated or not
   uuid?: string; // unique identifier
   createdAt?: string; // date string
+  dietType?: string; // diet type
   cuisineType?: string; // cuisine type
   mealType?: string; // meal type
   tips?: string[]; // array of strings
