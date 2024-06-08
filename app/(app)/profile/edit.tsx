@@ -1,13 +1,5 @@
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  StyleSheet,
-  ActivityIndicator,
-  Alert,
-  TextInput,
-} from "react-native";
-import React, { useContext, useEffect, useMemo } from "react";
+import { View, StyleSheet, Alert } from "react-native";
+import React, { useState } from "react";
 import { LinearGradient } from "expo-linear-gradient";
 import CustomKeyBoardView from "@/components/CustomKeyBoardView";
 import Colors from "@/constants/Colors";
@@ -21,9 +13,7 @@ import { StatusBar } from "expo-status-bar";
 import CustomHeader from "@/components/navigation/CustomHeader";
 import { router } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
-import { AuthContext } from "@/context/authContext";
-import { Image } from "expo-image";
-import { blurhash } from "@/utils/general.utils";
+import { useAuth } from "@/context/authContext";
 import { userService } from "@/services/db/user.services";
 import RoundButton from "@/components/buttons/RoundButton";
 import FullScreenLoading from "@/components/FullScreenLoading";
@@ -37,13 +27,11 @@ export type UserData = {
   bio: string;
 };
 const editProfileScreen = () => {
-  const { user, setUser } = useContext<any>(AuthContext);
-  const [isLoading, setIsLoading] = React.useState<boolean>(false);
-  const [username, setUsername] = React.useState<string>(user.username || "");
-  const [bio, setBio] = React.useState<string>(user.bio || "");
-  const [profileUrl, setProfileUrl] = React.useState<string>(
-    user.profileUrl || ""
-  );
+  const { user } = useAuth();
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [username, setUsername] = useState<string>(user.username || "");
+  const [bio, setBio] = useState<string>(user.bio || "");
+  const [profileUrl, setProfileUrl] = useState<string>(user.profileUrl || "");
 
   const handleSubmitEditProfile = async () => {
     if (username.trim() === "" || bio.trim() === "") {
@@ -77,10 +65,6 @@ const editProfileScreen = () => {
       </RoundButton>
     );
   };
-
-  // useEffect(() => {
-  //   console.log("User", user);
-  // }, [user]);
 
   return (
     <LinearGradient

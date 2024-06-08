@@ -10,7 +10,7 @@ import {
 } from "react-native-responsive-screen";
 import { StatusBar } from "expo-status-bar";
 import Fonts from "@/constants/Fonts";
-import { AuthContext } from "@/context/authContext";
+import { AuthContext, useAuth } from "@/context/authContext";
 import StandardButton from "@/components/buttons/StandardButton";
 import Animated, {
   useSharedValue,
@@ -18,7 +18,7 @@ import Animated, {
   useAnimatedStyle,
 } from "react-native-reanimated";
 const WelcomeScreen = () => {
-  const { user } = useContext<any>(AuthContext);
+  const { user } = useAuth();
   // Define animated values
   const opacity = useSharedValue(0);
   const translateY = useSharedValue(20);

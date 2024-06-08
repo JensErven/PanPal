@@ -8,7 +8,7 @@ import {
   TouchableOpacity,
   Alert,
 } from "react-native";
-import React, { useContext } from "react";
+import React, { useState } from "react";
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -17,7 +17,7 @@ import { StatusBar } from "expo-status-bar";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import CustomKeyBoardView from "@/components/CustomKeyBoardView";
-import { AuthContext } from "@/context/authContext";
+import { useAuth } from "@/context/authContext";
 import Colors from "@/constants/Colors";
 import ComponentParams from "@/constants/ComponentParams";
 import { LinearGradient } from "expo-linear-gradient";
@@ -25,12 +25,12 @@ import Fonts from "@/constants/Fonts";
 import StandardButton from "@/components/buttons/StandardButton";
 
 const SignUp = () => {
-  const { register } = useContext<any>(AuthContext);
-  const [email, setEmail] = React.useState<string>("");
-  const [password, setPassword] = React.useState<string>("");
-  const [repeatPassword, setRepeatPassword] = React.useState<string>("");
-  const [loading, setLoading] = React.useState<boolean>(false);
-  const [showpassword, setShowPassword] = React.useState<boolean>(false);
+  const { register } = useAuth();
+  const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+  const [repeatPassword, setRepeatPassword] = useState<string>("");
+  const [loading, setLoading] = useState<boolean>(false);
+  const [showpassword, setShowPassword] = useState<boolean>(false);
 
   const handleSignUp = async () => {
     if (!email || !password || !repeatPassword) {

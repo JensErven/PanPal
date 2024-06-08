@@ -28,9 +28,11 @@ export default TipsContent;
 
 const styles = StyleSheet.create({
   container: {
+    flexDirection: "column",
     justifyContent: "center",
     alignItems: "flex-start",
     gap: hp(2),
+    width: "100%",
   },
   title: {
     fontFamily: Fonts.QuickSandBold.fontFamily,

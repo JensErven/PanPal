@@ -1,10 +1,4 @@
-import {
-  View,
-  Text,
-  TextInput,
-  StyleSheet,
-  TouchableOpacity,
-} from "react-native";
+import { View, TextInput, StyleSheet, TouchableOpacity } from "react-native";
 import React, { useState } from "react";
 import { LinearGradient } from "expo-linear-gradient";
 import Colors from "@/constants/Colors";
@@ -16,6 +10,7 @@ import {
 import Fonts from "@/constants/Fonts";
 import ComponentParams from "@/constants/ComponentParams";
 import { Message } from "@/models/Message";
+import AnsweringAnimationItem from "./chat/AnsweringAnimationItem";
 
 const ChatInputBar = ({
   sendMessage,
@@ -37,8 +32,21 @@ const ChatInputBar = ({
   return (
     <View style={styles.bottomChatbarContainer}>
       <LinearGradient
-        colors={["#DDEBF3", "#DDEBF3"]}
+        style={styles.gradientContainer}
+        colors={[Colors.white, Colors.secondaryWhite]}
+        start={[0, 0]}
+        end={[1, 1]}
+      />
+      {isLoading && (
+        <View style={styles.animationContainer}>
+          <AnsweringAnimationItem />
+        </View>
+      )}
+      <LinearGradient
+        colors={[Colors.primarySkyBlue, Colors.secondaryWhite, Colors.white]}
         style={styles.bottomChatbar}
+        start={[0.5, 0]}
+        end={[0.5, 1]}
       >
         <TextInput
           editable={!isLoading && !isDisabled}
@@ -50,26 +58,20 @@ const ChatInputBar = ({
           onSubmitEditing={handleSend}
         />
       </LinearGradient>
-      <LinearGradient
+
+      <TouchableOpacity
+        disabled={isLoading || isDisabled}
+        onPress={handleSend}
         style={styles.sendButton}
-        colors={[
-          Colors.light.components.button.purple.background[0],
-          Colors.light.components.button.purple.background[1],
-          Colors.light.components.button.purple.background[2],
-        ]}
       >
-        <TouchableOpacity
-          disabled={isLoading || isDisabled}
-          onPress={handleSend}
-          style={{
-            flex: 1,
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-        >
-          <Ionicons name="send" size={hp(2.7)} color={Colors.white} />
-        </TouchableOpacity>
-      </LinearGradient>
+        <LinearGradient
+          style={styles.sendButtonGradientContainer}
+          start={[0, 0]}
+          end={[1, 1]}
+          colors={Colors.light.components.button.purple.background}
+        />
+        <Ionicons name="send" size={hp(2.7)} color={Colors.white} />
+      </TouchableOpacity>
     </View>
   );
 };
@@ -79,7 +81,7 @@ export default ChatInputBar;
 const styles = StyleSheet.create({
   bottomChatbarContainer: {
     borderTopWidth: 1,
-    borderColor: "#DDEBF3",
+    borderColor: Colors.white,
     backgroundColor: Colors.white,
     flexDirection: "row",
     justifyContent: "space-between",
@@ -92,6 +94,30 @@ const styles = StyleSheet.create({
     elevation: 5,
     shadowColor: Colors.darkBlue,
     shadowOffset: { width: 0, height: 2 },
+  },
+  gradientContainer: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+  },
+
+  animationContainer: {
+    position: "absolute",
+    right: wp(4),
+    left: wp(4),
+    top: hp(-8),
+    zIndex: 50,
+    alignItems: "center",
+  },
+  sendButtonGradientContainer: {
+    borderRadius: hp(ComponentParams.button.height.medium / 2),
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
   },
   bottomChatbar: {
     flexDirection: "row",
@@ -106,7 +132,6 @@ const styles = StyleSheet.create({
     flex: 1,
     minHeight: hp(ComponentParams.button.height.medium),
     borderRadius: hp(ComponentParams.button.height.medium / 2),
-    backgroundColor: Colors.secondaryWhite,
     paddingHorizontal: wp(1),
     paddingVertical: hp(1),
     fontFamily: Fonts.text_2.fontFamily,
@@ -115,12 +140,22 @@ const styles = StyleSheet.create({
     lineHeight: Fonts.text_2.lineHeight,
   },
   sendButton: {
-    display: "flex",
-    width: hp(ComponentParams.button.height.medium),
-    height: hp(ComponentParams.button.height.medium),
-    borderRadius: hp(ComponentParams.button.height.medium / 2),
     justifyContent: "center",
+    borderBottomColor: Colors.darkBlue,
+    borderLeftColor: Colors.darkBlue,
+    borderLeftWidth: 0.25,
+    borderBottomWidth: 2,
+    borderRightWidth: 1,
+    borderRightColor: Colors.darkBlue,
+    backgroundColor: Colors.darkBlue,
     alignItems: "center",
+    elevation: 10,
+    shadowColor: Colors.cardDropShadow,
+    flexDirection: "row",
+    gap: wp(2),
+    height: hp(ComponentParams.button.height.medium),
+    aspectRatio: 1,
+    borderRadius: hp(ComponentParams.button.height.medium / 2),
   },
   sendButtonInnerContainer: {
     justifyContent: "center",

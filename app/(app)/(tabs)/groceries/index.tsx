@@ -1,5 +1,5 @@
 import { View, StyleSheet, Text } from "react-native";
-import React, { useContext, useEffect, useMemo, useState } from "react";
+import React, { useMemo } from "react";
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -10,26 +10,21 @@ import { LinearGradient } from "expo-linear-gradient";
 import CustomKeyBoardView from "@/components/CustomKeyBoardView";
 import CustomHeader from "@/components/navigation/CustomHeader";
 import { StatusBar } from "expo-status-bar";
-import RoundButton from "@/components/buttons/RoundButton";
-import { AuthContext } from "@/context/authContext";
-import { router } from "expo-router";
-import { Image } from "expo-image";
-import { blurhash } from "@/utils/general.utils";
 import { Ionicons } from "@expo/vector-icons";
 import FullScreenLoading from "@/components/FullScreenLoading";
 import { useGroceries } from "@/context/GroceriesContext";
-import {
-  GroceryListType,
-  createGroceryList,
-} from "@/services/db/groceries.services";
 import GroceryListCard from "@/components/cards/groceries/GroceryListCard";
-import { Timestamp } from "firebase/firestore";
 import Fonts from "@/constants/Fonts";
 import StandardButton from "@/components/buttons/StandardButton";
+import { router } from "expo-router";
+import { useAuth } from "@/context/authContext";
+import RoundButton from "@/components/buttons/RoundButton";
+import { blurhash } from "@/utils/general.utils";
+import { Image } from "expo-image";
 
 const GroceriesScreen = () => {
-  const { user } = useContext<any>(AuthContext);
   const { isLoading, groceryLists } = useGroceries();
+  const { user } = useAuth();
 
   const sortedGroceryLists = useMemo(() => {
     return groceryLists.sort((a, b) => {
@@ -42,7 +37,7 @@ const GroceriesScreen = () => {
   const customHeaderChildren = () => {
     return (
       <>
-        {/* {user && (
+        {user && (
           <RoundButton
             handlePress={() => {
               router.push("/profile");
@@ -60,7 +55,7 @@ const GroceriesScreen = () => {
               <Ionicons name="person" size={hp(2.7)} color={Colors.white} />
             )}
           </RoundButton>
-        )} */}
+        )}
       </>
     );
   };

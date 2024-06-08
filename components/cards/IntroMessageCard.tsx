@@ -39,12 +39,13 @@ const IntroMessageCard = ({
   };
 
   return (
-    <LinearGradient
-      colors={[Colors.white, Colors.secondaryWhite]}
-      start={[0, 0]}
-      end={[1, 1]}
-      style={styles.container}
-    >
+    <View style={styles.container}>
+      <LinearGradient
+        style={styles.gradientContainer}
+        colors={[Colors.white, Colors.secondaryWhite, Colors.primarySkyBlue]}
+        start={[0, 0]}
+        end={[1, 1]}
+      />
       <View style={styles.introContainer}>
         <Image source={image} placeholder={blurhash} style={styles.image} />
         <View style={{ flex: 1 }}>
@@ -59,7 +60,9 @@ const IntroMessageCard = ({
           <TouchableOpacity
             key={index}
             style={styles.optionContainer}
-            onPress={() => handleSelectOption(option)}
+            onPress={() => {
+              disableSelectOption ? null : handleSelectOption(option);
+            }}
           >
             <LinearGradient
               colors={Colors.light.components.button.purple.background}
@@ -71,7 +74,9 @@ const IntroMessageCard = ({
                 disabled={disableSelectOption}
                 style={styles.touchable}
                 key={index}
-                onPress={() => handleSelectOption(option)}
+                onPress={() => {
+                  disableSelectOption ? null : handleSelectOption(option);
+                }}
               >
                 <Ionicons
                   name="checkmark"
@@ -84,7 +89,7 @@ const IntroMessageCard = ({
           </TouchableOpacity>
         ))}
       </View>
-    </LinearGradient>
+    </View>
   );
 };
 
@@ -92,16 +97,28 @@ export default IntroMessageCard;
 
 const styles = StyleSheet.create({
   container: {
+    borderTopColor: Colors.white,
+    borderTopWidth: 1,
+    borderLeftWidth: 1,
+    borderLeftColor: Colors.white,
     maxWidth: wp(80),
     elevation: 3,
     shadowColor: Colors.darkBlue,
-    backgroundColor: Colors.mediumPurple,
+    backgroundColor: Colors.white,
     paddingHorizontal: wp(4),
     paddingVertical: hp(2),
     alignItems: "flex-start",
     justifyContent: "flex-start",
-    borderRadius: hp(ComponentParams.button.height.small),
+    borderRadius: hp(ComponentParams.button.height.large / 2),
     alignSelf: "flex-start",
+  },
+  gradientContainer: {
+    borderRadius: hp(ComponentParams.button.height.large / 2),
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
   },
   introContainer: {
     flexDirection: "row",

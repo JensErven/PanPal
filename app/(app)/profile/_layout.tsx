@@ -5,7 +5,7 @@ const _layout = () => {
   return (
     <Stack screenOptions={{ headerShown: true }}>
       <Stack.Screen
-        name="tastePreferences"
+        name="taste-preferences"
         options={{
           headerShown: false,
         }}

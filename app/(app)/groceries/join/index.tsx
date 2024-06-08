@@ -1,13 +1,5 @@
-import {
-  View,
-  ToastAndroid,
-  StyleSheet,
-  TouchableOpacity,
-  TextInput,
-  Text,
-  Animated,
-} from "react-native";
-import React from "react";
+import { View, ToastAndroid, StyleSheet, TextInput } from "react-native";
+import React, { useState } from "react";
 import FullScreenLoading from "@/components/FullScreenLoading";
 import { LinearGradient } from "expo-linear-gradient";
 import Colors from "@/constants/Colors";
@@ -16,14 +8,8 @@ import CustomKeyBoardView from "@/components/CustomKeyBoardView";
 import CustomHeader from "@/components/navigation/CustomHeader";
 import RoundButton from "@/components/buttons/RoundButton";
 import { Ionicons } from "@expo/vector-icons";
-import {
-  GroceryListType,
-  createGroceryList,
-  joinGroceryList,
-  updateGroceryList,
-} from "@/services/db/groceries.services";
-import { Timestamp } from "firebase/firestore";
-import { AuthContext } from "@/context/authContext";
+import { joinGroceryList } from "@/services/db/groceries.services";
+import { useAuth } from "@/context/authContext";
 import { router } from "expo-router";
 import {
   widthPercentageToDP as wp,
@@ -32,20 +18,12 @@ import {
 import ComponentParams from "@/constants/ComponentParams";
 import StandardButton from "@/components/buttons/StandardButton";
 import Fonts from "@/constants/Fonts";
-import OptionTagButton from "@/components/buttons/OptionTagButton";
 
 const GroceryListAddScreen = () => {
-  const [isLoading, setIsLoading] = React.useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [groceryListSharedCode, setGroceryListSharedCode] =
-    React.useState<string>("");
-  const { user } = React.useContext<any>(AuthContext);
-
-  const handleNavigateToGroceryList = async (groceryListId: string) => {
-    router.push({
-      pathname: `/groceries/details/[id]`,
-      params: { id: groceryListId },
-    });
-  };
+    useState<string>("");
+  const { user } = useAuth();
 
   const handleJoinGroceryList = async (groceryListName: string) => {
     if (!user) return;

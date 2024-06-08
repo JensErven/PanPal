@@ -24,7 +24,7 @@ import * as ImagePicker from "expo-image-picker";
 import RoundButton from "./buttons/RoundButton";
 import { openaiServices } from "@/services/api/openai.services";
 import { RecipeType } from "@/models/RecipeType";
-import { AuthContext, UserCreditsType } from "@/context/authContext";
+import { AuthContext, UserCreditsType, useAuth } from "@/context/authContext";
 
 const RecipeImageContainer = ({
   allowedToEdit = false,
@@ -50,11 +50,7 @@ const RecipeImageContainer = ({
   };
   const [isGeneratingImage, setIsGeneratingImage] =
     React.useState<boolean>(false);
-  const {
-    credits,
-    substractCredits,
-  }: { credits: UserCreditsType; substractCredits: (amount: number) => void } =
-    React.useContext<any>(AuthContext);
+  const { credits, substractCredits } = useAuth();
 
   const { generateRecipeImage } = openaiServices;
 
@@ -79,11 +75,10 @@ const RecipeImageContainer = ({
 
   const handleGenerateImage = () => {
     if (!recipe) {
-      console.error("Recipe not found");
       return;
     }
     if (credits.credits < generateImageCreditCost) {
-      ToastAndroid.show("Insufficient Panpal Credits", ToastAndroid.SHORT);
+      ToastAndroid.show("Insufficient credits", ToastAndroid.SHORT);
       return;
     }
     setIsGeneratingImage(true);
@@ -92,10 +87,6 @@ const RecipeImageContainer = ({
         if (res) {
           handleNewImage(res);
           substractCredits(generateImageCreditCost);
-          ToastAndroid.show(
-            `${generateImageCreditCost} PanPal Credits deducted`,
-            ToastAndroid.SHORT
-          );
         }
         handleCloseModal();
         setIsGeneratingImage(false);

@@ -189,7 +189,9 @@ const styles = StyleSheet.create({
     flex: 1,
     gap: hp(1),
     flexDirection: "row",
-    paddingVertical: hp(2),
+    paddingTop: hp(2),
+    paddingBottom: hp(8),
+    paddingHorizontal: wp(4),
   },
   optionContainer: {
     flexDirection: "row",

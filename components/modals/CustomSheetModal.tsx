@@ -116,8 +116,6 @@ const styles = StyleSheet.create({
     borderBottomColor: Colors.secondaryWhite,
   },
   scrollViewContainer: {
-    paddingVertical: hp(2),
-    paddingHorizontal: wp(4),
     flex: 1,
     backgroundColor: "transparent",
   },

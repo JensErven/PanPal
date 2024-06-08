@@ -5,14 +5,12 @@ import {
   Alert,
   ToastAndroid,
   Share,
-  TouchableOpacity,
-  FlatList,
 } from "react-native";
-import React, { useEffect, useMemo } from "react";
+import React, { useMemo } from "react";
 import { router, useFocusEffect, useLocalSearchParams } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
 import Colors from "@/constants/Colors";
-import { AuthContext } from "@/context/authContext";
+import { useAuth } from "@/context/authContext";
 import RoundButton from "@/components/buttons/RoundButton";
 import { Ionicons } from "@expo/vector-icons";
 import {
@@ -37,19 +35,17 @@ import StandardButton from "@/components/buttons/StandardButton";
 import AddGroceryItemModal, {
   itemType,
 } from "@/components/cards/groceries/AddGroceryItemModal";
-import { ScrollView } from "react-native-gesture-handler";
-import { FlashList } from "@shopify/flash-list";
 import GroceryListItem from "@/components/cards/groceries/GroceryListItem";
 
 const GroceryListDetailsScreen = () => {
-  const { user } = React.useContext<any>(AuthContext);
+  const { user } = useAuth();
+  const { groceryLists } = useGroceries();
   const { id } = useLocalSearchParams();
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
   const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
   const [groceryList, setGroceryList] = React.useState<
     GroceryListType | undefined
   >(undefined);
-  const { groceryLists } = useGroceries();
 
   useFocusEffect(
     React.useCallback(() => {
@@ -278,11 +274,7 @@ const GroceryListDetailsScreen = () => {
     <>
       <LinearGradient
         style={styles.gradientBackground}
-        colors={[
-          Colors.light.navHeader[0],
-          Colors.light.navHeader[1],
-          Colors.light.navHeader[2],
-        ]}
+        colors={Colors.light.navHeader}
         start={[0, 0]}
         end={[1, 0]}
       >
@@ -308,7 +300,15 @@ const GroceryListDetailsScreen = () => {
           start={[0.5, 0]}
           end={[0.5, 1]}
         >
-          <View style={styles.addItemButtonContainer}>
+          <LinearGradient
+            style={styles.bottomButtonContainer}
+            colors={[
+              "transparent",
+              Colors.white,
+              Colors.secondaryWhite,
+              Colors.primarySkyBlue,
+            ]}
+          >
             <StandardButton
               clickHandler={handleOpenModal}
               height={ComponentParams.button.height.medium}
@@ -328,17 +328,7 @@ const GroceryListDetailsScreen = () => {
                 />
               }
             />
-          </View>
-          <LinearGradient
-            style={styles.bottomGradient}
-            colors={[
-              "transparent",
-              Colors.secondaryWhite,
-              Colors.primarySkyBlue,
-            ]}
-            start={[0.5, 0]}
-            end={[0.5, 1]}
-          />
+          </LinearGradient>
           {isLoading ? (
             <FullScreenLoading />
           ) : (
@@ -473,14 +463,17 @@ const styles = StyleSheet.create({
     borderRadius: hp(ComponentParams.button.height.small / 2),
   },
 
-  addItemButtonContainer: {
-    flexDirection: "column",
-    gap: hp(2),
-    position: "absolute",
-    bottom: hp(2),
-    zIndex: 100,
-    width: "100%",
+  bottomButtonContainer: {
+    backgroundColor: "transparent",
+    width: wp(100),
+    height: hp(14),
+    justifyContent: "flex-end",
+    zIndex: 1000,
     paddingHorizontal: wp(4),
+    paddingVertical: hp(2),
+    position: "absolute",
+    bottom: hp(0),
+    left: wp(0),
   },
   clearButton: {
     flexDirection: "row",

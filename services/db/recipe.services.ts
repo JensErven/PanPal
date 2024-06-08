@@ -38,7 +38,6 @@ const createRecipe = async (recipeData: RecipeType) => {
       id: docRef.id,
     };
   } catch (error) {
-    console.error("Error creating recipe:", error);
     return { success: false, message: "Failed to create recipe" };
   }
 };
@@ -74,7 +73,6 @@ const updateRecipe = async (
       recipeData,
     };
   } catch (error) {
-    console.error("Error updating recipe:", error);
     return { success: false, message: "Failed to update recipe" };
   }
 };
@@ -98,16 +96,13 @@ const uploadImageToFirebase = async (image: string) => {
         console.log("Upload is " + progress + "% done");
         switch (snapshot.state) {
           case "paused":
-            console.log("Upload is paused");
             break;
           case "running":
-            console.log("Upload is running");
             break;
         }
       },
       (error) => {
         // Handle unsuccessful uploads
-        console.error("Error uploading image:", error);
         throw error; // Re-throw the error to be caught by the caller
       }
     );
@@ -120,7 +115,6 @@ const uploadImageToFirebase = async (image: string) => {
     console.log("File available at", downloadURL);
     return downloadURL;
   } catch (error) {
-    console.error("Error uploading image:", error);
     throw error; // Re-throw the error to be caught by the caller
   }
 };
@@ -140,7 +134,6 @@ const getRecipesForUser = async (userId: string) => {
 
     return recipesWithId; // Return array of objects with doc ID and recipe data
   } catch (error) {
-    console.error("Error getting recipes:", error);
     throw error;
   }
 };
@@ -150,7 +143,6 @@ const deleteRecipe = async (recipeId: string) => {
     await deleteDoc(doc(db, collectionName, recipeId));
     return { success: true, message: "Recipe deleted successfully" };
   } catch (error) {
-    console.error("Error deleting recipe:", error);
     return { success: false, message: "Failed to delete recipe" };
   }
 };
@@ -174,7 +166,6 @@ const deleteImageFromFirebase = async (imageUrl: string) => {
       return { success: true, message: "Image deleted successfully" };
     })
     .catch((error) => {
-      console.error("Error deleting image:", error);
       return { success: false, message: "Failed to delete image" };
     });
 };
@@ -186,7 +177,6 @@ const deleteImage = async (imageUrl: string) => {
     await deleteObject(imageRef);
     return { success: true, message: "Image deleted successfully" };
   } catch (error) {
-    console.error("Error deleting image:", error);
     return { success: false, message: "Failed to delete image" };
   }
 };
@@ -204,13 +194,10 @@ const getRecipe = async (recipeId: string) => {
 
 const saveTipsToRecipe = async (recipeId: string, tips: string[]) => {
   try {
-    console.log("Saving tips to recipe:", recipeId, tips);
     const recipeRef = doc(db, collectionName, recipeId);
     await updateDoc(recipeRef, { tips });
-    console.log("Tips saved successfully");
     return { success: true, message: "Tips saved successfully" };
   } catch (error) {
-    console.error("Error saving tips:", error);
     return { success: false, message: "Failed to save tips" };
   }
 };

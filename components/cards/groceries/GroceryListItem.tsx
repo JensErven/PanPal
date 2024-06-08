@@ -30,6 +30,7 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 import RoundButton from "@/components/buttons/RoundButton";
+import { LinearGradient } from "expo-linear-gradient";
 
 interface GroceryListItemProps {
   item: itemType;
@@ -140,6 +141,12 @@ const GroceryListItem: React.FC<GroceryListItemProps> = ({
             )}
           </TouchableOpacity>
           <View style={styles.ingredientItem}>
+            <LinearGradient
+              style={styles.gradientContainer}
+              colors={[Colors.white, Colors.secondaryWhite]}
+              start={[0, 0]}
+              end={[1, 1]}
+            />
             <View
               style={{
                 height: hp(ComponentParams.button.height.medium),
@@ -193,6 +200,14 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginRight: wp(4),
   },
+  gradientContainer: {
+    borderRadius: hp(ComponentParams.button.height.medium / 2),
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+  },
   groceryItem: {
     flexDirection: "row",
     gap: wp(2),
@@ -216,13 +231,19 @@ const styles = StyleSheet.create({
     textAlignVertical: "center",
   },
   ingredientItem: {
-    elevation: 2,
+    marginHorizontal: wp(4),
+    borderTopColor: Colors.white,
+    borderTopWidth: 1,
+    borderLeftWidth: 1,
+    borderLeftColor: Colors.white,
+    backgroundColor: Colors.white,
+    alignItems: "center",
+    elevation: 10,
+    flex: 1,
     shadowColor: Colors.cardDropShadow,
     flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    flex: 1,
-    backgroundColor: Colors.white,
+    gap: wp(2),
+    height: hp(ComponentParams.button.height.medium),
     borderRadius: hp(ComponentParams.button.height.medium / 2),
   },
   checkItemButton: {

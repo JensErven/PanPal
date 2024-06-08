@@ -6,16 +6,14 @@ import {
 } from "react-native-responsive-screen";
 import Colors from "@/constants/Colors";
 import ComponentParams from "@/constants/ComponentParams";
-
 import { LinearGradient } from "expo-linear-gradient";
 import CustomKeyBoardView from "@/components/CustomKeyBoardView";
-
 import CustomHeader from "@/components/navigation/CustomHeader";
 import { StatusBar } from "expo-status-bar";
 import { RecipeType } from "@/models/RecipeType";
 import { Ionicons } from "@expo/vector-icons";
 import { router, useFocusEffect, useLocalSearchParams } from "expo-router";
-import { AuthContext } from "@/context/authContext";
+import { AuthContext, useAuth } from "@/context/authContext";
 import { recipeService } from "@/services/db/recipe.services";
 import { TextInput } from "react-native-gesture-handler";
 import Fonts from "@/constants/Fonts";
@@ -34,8 +32,8 @@ import EditRecipeServings from "@/components/edits/EditRecipeServings";
 import { RecipesContext } from "@/context/recipesContext";
 
 const EditCustomRecipeScreen = () => {
-  const { user } = useContext<any>(AuthContext);
-  const { recipeId } = useLocalSearchParams();
+  const { user } = useAuth();
+  const { id } = useLocalSearchParams();
   const { getRecipe, updateRecipe, deleteImageFromFirebase } = recipeService;
   const [recipe, setRecipe] = useState<RecipeType | undefined>(undefined);
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -44,9 +42,9 @@ const EditCustomRecipeScreen = () => {
 
   useFocusEffect(
     React.useCallback(() => {
-      if (!recipeId) return;
+      if (!id) return;
       setIsLoading(true);
-      findRecipeInContext(recipeId as string)
+      findRecipeInContext(id as string)
         .then((res) => {
           if (res) {
             console.log("Found recipe in context");
@@ -55,7 +53,7 @@ const EditCustomRecipeScreen = () => {
           }
         })
         .catch((err) => {
-          getRecipe(recipeId as string)
+          getRecipe(id as string)
             .then((res) => {
               if (res) {
                 console.log("Fetched recipe from db");
@@ -66,22 +64,24 @@ const EditCustomRecipeScreen = () => {
             .catch((err) => {
               setIsLoading(false);
               Alert.alert("Failed to fetch recipe", err.message);
+              router.back();
             });
         });
-    }, [recipeId])
+    }, [id])
   );
 
   const findRecipeInContext = async (recipeId: string) => {
     const recipe = recipes.find((recipe: RecipeType) => recipe.id === recipeId);
     if (recipe) {
-      return recipe.data;
+      const newRecipe = { ...recipe.data, id: recipe.id };
+      return newRecipe;
     }
   };
 
   const handleConfirmEditRecipe = () => {
     if (!recipe) return;
     setIsLoading(true);
-    updateRecipe(recipeId as string, recipe as RecipeType)
+    updateRecipe(id as string, recipe as RecipeType)
       .then((res) => {
         if (res.success) {
           router.back();
@@ -125,7 +125,7 @@ const EditCustomRecipeScreen = () => {
       await deleteImageFromFirebase(recipe.image as string).catch((err) => {
         Alert.alert("Failed to delete image", err.message);
       });
-      await updateRecipe(recipeId as string, updatedRecipe).then(
+      await updateRecipe(id as string, updatedRecipe).then(
         (res) => {
           if (res.success) {
             setRecipe(res.recipeData);

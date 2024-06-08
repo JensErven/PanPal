@@ -1,13 +1,5 @@
-import {
-  View,
-  ToastAndroid,
-  StyleSheet,
-  TouchableOpacity,
-  TextInput,
-  Text,
-  Animated,
-} from "react-native";
-import React from "react";
+import { View, ToastAndroid, StyleSheet, TextInput, Text } from "react-native";
+import React, { useState } from "react";
 import FullScreenLoading from "@/components/FullScreenLoading";
 import { LinearGradient } from "expo-linear-gradient";
 import Colors from "@/constants/Colors";
@@ -21,7 +13,7 @@ import {
   createGroceryList,
 } from "@/services/db/groceries.services";
 import { Timestamp } from "firebase/firestore";
-import { AuthContext } from "@/context/authContext";
+import { useAuth } from "@/context/authContext";
 import { router } from "expo-router";
 import {
   widthPercentageToDP as wp,
@@ -33,9 +25,9 @@ import Fonts from "@/constants/Fonts";
 import OptionTagButton from "@/components/buttons/OptionTagButton";
 
 const GroceryListAddScreen = () => {
-  const [isLoading, setIsLoading] = React.useState<boolean>(false);
-  const [groceryListName, setGroceryListName] = React.useState<string>("");
-  const { user } = React.useContext<any>(AuthContext);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [groceryListName, setGroceryListName] = useState<string>("");
+  const { user } = useAuth();
   const nameSuggestions = [
     "Weekly Groceries",
     "Monthly Groceries",
@@ -47,13 +39,6 @@ const GroceryListAddScreen = () => {
     "Dinner Ingredients",
     "Cooking Supplies",
   ];
-
-  // const handleNavigateToGroceryList = async (groceryListId: string) => {
-  //   router.push({
-  //     pathname: `/groceries/details/[id]`,
-  //     params: { id: groceryListId },
-  //   });
-  // };
 
   const handleAddGroceryList = async (groceryListName: string) => {
     if (!user) return;
@@ -78,7 +63,7 @@ const GroceryListAddScreen = () => {
       if (!res.groceryListData) return;
 
       setIsLoading(false);
-      // handleNavigateToGroceryList(res.groceryListData.id);
+
       router.back();
     });
   };

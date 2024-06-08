@@ -22,9 +22,11 @@ export default OthersContent;
 
 const styles = StyleSheet.create({
   container: {
+    flexDirection: "column",
     justifyContent: "center",
     alignItems: "flex-start",
-    gap: hp(2),
+    gap: hp(1),
+    width: "100%",
   },
   title: {
     fontFamily: Fonts.QuickSandBold.fontFamily,

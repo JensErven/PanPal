@@ -8,7 +8,7 @@ import {
   TouchableOpacity,
   Alert,
 } from "react-native";
-import React, { useContext } from "react";
+import React, { useState } from "react";
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -17,7 +17,7 @@ import { StatusBar } from "expo-status-bar";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import CustomKeyBoardView from "@/components/CustomKeyBoardView";
-import { AuthContext } from "@/context/authContext";
+import { useAuth } from "@/context/authContext";
 import { LinearGradient } from "expo-linear-gradient";
 import Colors from "@/constants/Colors";
 import ComponentParams from "@/constants/ComponentParams";
@@ -25,12 +25,11 @@ import Fonts from "@/constants/Fonts";
 import StandardButton from "@/components/buttons/StandardButton";
 
 const SignIn = () => {
-  const { login } = useContext<any>(AuthContext);
-
-  const [email, setEmail] = React.useState<string>("");
-  const [password, setPassword] = React.useState<string>("");
-  const [loading, setLoading] = React.useState<boolean>(false);
-  const [showpassword, setShowPassword] = React.useState<boolean>(false);
+  const { login } = useAuth();
+  const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+  const [loading, setLoading] = useState<boolean>(false);
+  const [showpassword, setShowPassword] = useState<boolean>(false);
 
   const handleSignIn = async () => {
     if (!email || !password) {

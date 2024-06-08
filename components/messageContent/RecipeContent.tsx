@@ -22,6 +22,7 @@ import { RecipeType } from "@/models/RecipeType";
 import { AuthContext } from "@/context/authContext";
 import { router } from "expo-router";
 import { RecipesContext } from "@/context/recipesContext";
+import SmallInfoTag from "../recipe-details/SmallInfoTag";
 
 const RecipeContent = ({ content }: { content: recipeExampleJsonType }) => {
   const { recipes } = useContext<any>(RecipesContext);
@@ -45,6 +46,7 @@ const RecipeContent = ({ content }: { content: recipeExampleJsonType }) => {
       servings: parseInt(recipe.servings), // Convert servings to number
       cuisineType: recipe.cuisineType,
       mealType: recipe.mealType.toLowerCase().trim(),
+      dietType: recipe.dietType,
       uuid: user.userId,
       isGenerated: true,
       createdAt: new Date().toISOString(),
@@ -85,35 +87,16 @@ const RecipeContent = ({ content }: { content: recipeExampleJsonType }) => {
       </Text>
 
       <Text style={styles.text}>{content.description}</Text>
-      <View style={styles.ingredientsContentContainer}>
+      <View style={styles.contentItemContainer}>
         <Text style={styles.subTitle}>Ingredients:</Text>
         <View style={styles.ingredientsList}>
           {content.ingredients.map((ingredient: any, index: number) => (
-            <View
-              key={index}
-              style={{
-                elevation: 2,
-                justifyContent: "center",
-                paddingHorizontal: wp(2),
-                flexDirection: "row",
-                height: hp(ComponentParams.button.height.small),
-                backgroundColor:
-                  Colors.light.components.button.white.background[1],
-                borderRadius: hp(ComponentParams.button.height.small),
-                shadowColor: Colors.darkBlue,
-                shadowOffset: {
-                  width: 0,
-                  height: 2,
-                },
-              }}
-            >
-              <Text style={styles.text}>{ingredient}</Text>
-            </View>
+            <SmallInfoTag key={index} text={ingredient} />
           ))}
         </View>
       </View>
 
-      <View style={styles.stepsContentContainer}>
+      <View style={styles.contentItemContainer}>
         <Text style={styles.subTitle}>Steps:</Text>
         <View style={styles.stepsList}>
           {content.steps.map((step: any, index: number) => (
@@ -128,20 +111,24 @@ const RecipeContent = ({ content }: { content: recipeExampleJsonType }) => {
           ))}
         </View>
       </View>
-
-      <View style={styles.typesItemsContainer}>
-        {content.mealType && (
-          <View>
-            <Text style={styles.subTitle}>Meal Type:</Text>
-            <Text style={styles.text}>{content.mealType}</Text>
-          </View>
-        )}
-        {content.cuisineType && (
-          <View>
-            <Text style={styles.subTitle}>Cuisine Type:</Text>
-            <Text style={styles.text}>{content.cuisineType}</Text>
-          </View>
-        )}
+      <View style={styles.contentItemContainer}>
+        <Text style={styles.subTitle}>Extra info:</Text>
+        <View style={styles.infoTagListContainer}>
+          {content.mealType && (
+            <SmallInfoTag
+              text={content.mealType}
+              icon={
+                <Ionicons
+                  name="restaurant"
+                  size={hp(2)}
+                  color={Colors.darkGrey}
+                />
+              }
+            />
+          )}
+          {content.cuisineType && <SmallInfoTag text={content.cuisineType} />}
+          {content.dietType && <SmallInfoTag text={content.dietType} />}
+        </View>
       </View>
       <View
         style={{
@@ -164,11 +151,7 @@ const RecipeContent = ({ content }: { content: recipeExampleJsonType }) => {
               <StandardButton
                 textValue="Go to Recipe"
                 height={ComponentParams.button.height.medium}
-                colors={[
-                  Colors.light.components.button.purple.background[0],
-                  Colors.light.components.button.purple.background[1],
-                  Colors.light.components.button.purple.background[2],
-                ]}
+                colors={Colors.light.components.button.purple.background}
                 borderColor={
                   Colors.light.components.button.purple.background[0]
                 }
@@ -196,7 +179,7 @@ const RecipeContent = ({ content }: { content: recipeExampleJsonType }) => {
               <Ionicons
                 name="bookmark"
                 size={hp(3.2)}
-                color={Colors.primarySkyBlue}
+                color={Colors.secondaryWhite}
               />
             </TouchableOpacity>
             <View style={{ flex: 1 }}>
@@ -206,11 +189,7 @@ const RecipeContent = ({ content }: { content: recipeExampleJsonType }) => {
                   isSaved ? "Saved" : isLoading ? "Saving..." : "Save Recipe"
                 }
                 height={ComponentParams.button.height.medium}
-                colors={[
-                  Colors.light.components.button.purple.background[0],
-                  Colors.light.components.button.purple.background[1],
-                  Colors.light.components.button.purple.background[2],
-                ]}
+                colors={Colors.light.components.button.purple.background}
                 borderColor={
                   Colors.light.components.button.purple.background[0]
                 }
@@ -232,10 +211,10 @@ export default RecipeContent;
 
 const styles = StyleSheet.create({
   container: {
+    flexDirection: "column",
     justifyContent: "center",
     alignItems: "flex-start",
     gap: hp(2),
-    display: "flex",
     width: "100%",
   },
   title: {
@@ -254,11 +233,22 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     justifyContent: "center",
   },
-  ingredientsList: {
+  contentItemContainer: {
+    flexDirection: "column",
+    justifyContent: "center",
     gap: hp(1),
+  },
+  infoTagListContainer: {
     flexDirection: "row",
-    flexWrap: "wrap",
     justifyContent: "flex-start",
+    flexWrap: "wrap",
+    gap: wp(2),
+  },
+  ingredientsList: {
+    flexDirection: "row",
+    justifyContent: "flex-start",
+    flexWrap: "wrap",
+    gap: wp(2),
   },
   stepsList: {
     flexDirection: "column",

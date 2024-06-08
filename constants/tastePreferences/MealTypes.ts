@@ -1,4 +1,4 @@
-const mealTypes = [
+const mealTypes: string[] = [
   "Breakfast",
   "Lunch",
   "Dinner",

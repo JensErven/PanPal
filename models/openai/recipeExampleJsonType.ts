@@ -9,6 +9,7 @@ export type recipeExampleJsonType = {
   cookTime: string;
   extraTime: string;
   cuisineType: string;
+  dietType: string;
   mealType: string;
   tips: string[];
 };

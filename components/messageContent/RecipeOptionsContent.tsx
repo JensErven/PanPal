@@ -29,7 +29,7 @@ const RecipeOptionsContent = ({
             key={index}
             style={styles.optionContainer}
             onPress={() => {
-              selectOption(option);
+              disableSelectContent ? null : selectOption(option);
             }}
           >
             <LinearGradient
@@ -42,7 +42,9 @@ const RecipeOptionsContent = ({
                 disabled={disableSelectContent}
                 style={styles.touchable}
                 key={index}
-                onPress={() => selectOption(option)}
+                onPress={() => {
+                  disableSelectContent ? null : selectOption(option);
+                }}
               >
                 <Ionicons
                   name="checkmark"
@@ -64,6 +66,7 @@ export default RecipeOptionsContent;
 
 const styles = StyleSheet.create({
   container: {
+    flexDirection: "column",
     justifyContent: "center",
     alignItems: "flex-start",
     gap: hp(2),
@@ -96,7 +99,6 @@ const styles = StyleSheet.create({
     justifyContent: "flex-start",
     alignItems: "flex-start",
     gap: wp(2),
-    marginRight: wp(4),
     width: "100%",
     flexWrap: "wrap",
   },

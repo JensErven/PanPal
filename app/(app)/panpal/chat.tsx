@@ -6,7 +6,7 @@ import {
   ScrollView,
   TouchableOpacity,
 } from "react-native";
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { LinearGradient } from "expo-linear-gradient";
 import CustomHeader from "@/components/navigation/CustomHeader";
 import Colors from "@/constants/Colors";
@@ -28,32 +28,38 @@ import IntroMessageCard from "@/components/cards/IntroMessageCard";
 import { cuisineTypes } from "@/constants/tastePreferences/CuisineTypes";
 import { mealTypes } from "@/constants/tastePreferences/MealTypes";
 import PopUp from "@/components/modals/PopUp";
-import { AuthContext, UserCreditsType } from "@/context/authContext";
+import { useAuth } from "@/context/authContext";
+import { useLocalSearchParams } from "expo-router";
+import CoinCount from "@/components/common/CoinCount";
+import RoundButton from "@/components/buttons/RoundButton";
 
 const PanPalChatScreen = () => {
-  const {
-    user,
-    credits,
-    substractCredits,
-  }: {
-    user: any;
-    credits: UserCreditsType;
-    substractCredits: (amount: number) => void;
-  } = React.useContext<any>(AuthContext);
-
-  const [messages, setMessages] = React.useState<Message[]>([]);
+  const { user, credits, substractCredits } = useAuth();
+  const { prompt } = useLocalSearchParams();
+  const [messages, setMessages] = useState<Message[]>([]);
   const [shouldShowCreditAlert, setShouldShowCreditAlert] =
     React.useState<boolean>(false);
   const [shouldShowCreditsInfoPopUp, setShouldShowCreditsInfoPopUp] =
     React.useState<boolean>(false);
-  const [randomIntro, setRandomIntro] = React.useState<{
+  const [randomIntro, setRandomIntro] = useState<{
     greeting: string;
     introText: string;
     cuisineType: string;
     mealType: string;
   }>({ greeting: "", introText: "", cuisineType: "", mealType: "" });
-  const [isLoading, setIsLoading] = React.useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const scrollViewRef = useRef<ScrollView>(null);
+
+  useEffect(() => {
+    console.log("Prompt:", prompt);
+    if (typeof prompt === "string") {
+      const message: Message = {
+        role: "user",
+        content: prompt,
+      };
+      handleSendMessage(message);
+    }
+  }, [prompt]);
 
   const handleSendMessage = async (message: Message) => {
     if (credits.credits === 0) {
@@ -161,11 +167,7 @@ const PanPalChatScreen = () => {
 
       <LinearGradient
         style={styles.gradientBackground}
-        colors={[
-          Colors.light.navHeader[0],
-          Colors.light.navHeader[1],
-          Colors.light.navHeader[2],
-        ]}
+        colors={Colors.light.navHeader}
         start={[0, 0]}
         end={[1, 0]}
       >
@@ -175,26 +177,18 @@ const PanPalChatScreen = () => {
           headerTitle={"PanPal Chat"}
           hasGoBack={true}
           children={
-            <View style={styles.panpalCreditsContainer}>
-              <TouchableOpacity
-                style={styles.helpButton}
-                onPress={() => setShouldShowCreditsInfoPopUp(true)}
-              >
-                <Ionicons name="help" size={hp(2.7)} color={Colors.white} />
-              </TouchableOpacity>
-              <Text style={styles.panpalCreditsText}>{credits.credits}</Text>
-              <LinearGradient
-                style={styles.panpalCreditsButtonContainer}
-                colors={[
-                  Colors.light.components.button.gold.background[0],
-                  Colors.light.components.button.gold.background[1],
-                ]}
-                start={[0.5, 0]}
-                end={[0.5, 1]}
-              >
-                <Text style={styles.panpalCreditsButtonText}>pp</Text>
-              </LinearGradient>
-            </View>
+            <>
+              <RoundButton
+                handlePress={() => setShouldShowCreditsInfoPopUp(true)}
+                height={ComponentParams.button.height.medium}
+                transparent={true}
+                children={
+                  <Ionicons name="help" size={hp(2.7)} color={Colors.white} />
+                }
+              />
+
+              <CoinCount count={credits.credits} isTransparent={false} />
+            </>
           }
         />
         <LinearGradient
@@ -207,21 +201,24 @@ const PanPalChatScreen = () => {
             contentContainerStyle={styles.content}
             ref={scrollViewRef}
           >
-            <IntroMessageCard
-              disableSelectOption={isLoading}
-              image={panPalIcon}
-              title={randomIntro.greeting}
-              text={randomIntro.introText}
-              options={[
-                "Get some suggestions",
-                "Get a random cooking tip",
-                `Try a "${randomIntro.cuisineType}" recipe`,
-                `Give me a "${randomIntro.mealType}" suggestion`,
-              ]}
-              key={1000}
-              index={1000}
-              selectOption={handleSendMessage}
-            />
+            {!prompt && (
+              <IntroMessageCard
+                disableSelectOption={isLoading}
+                image={panPalIcon}
+                title={randomIntro.greeting}
+                text={randomIntro.introText}
+                options={[
+                  "Get some suggestions",
+                  "Get a random cooking tip",
+                  `Try a "${randomIntro.cuisineType}" recipe`,
+                  `Give me a "${randomIntro.mealType}" suggestion`,
+                ]}
+                key={1000}
+                index={1000}
+                selectOption={handleSendMessage}
+              />
+            )}
+
             {messages.map((message, index) => (
               <MessageCard
                 disableSelectOption={isLoading}
@@ -231,9 +228,6 @@ const PanPalChatScreen = () => {
                 selectRecipeOption={handleSendMessage}
               />
             ))}
-            {isLoading && (
-              <ActivityIndicator size={hp(5.4)} color={Colors.primarySkyBlue} />
-            )}
           </ScrollView>
         </LinearGradient>
         <ChatInputBar
@@ -289,47 +283,17 @@ const styles = StyleSheet.create({
     gap: hp(1),
     marginTop: hp(4),
   },
-  panpalCreditsButtonContainer: {
-    backgroundColor: Colors.light.components.button.gold.background[0], // Set the background color to represent a coin
-    borderRadius: hp(ComponentParams.button.height.small / 2), // Rounded border
-    width: hp(ComponentParams.button.height.small),
-    height: hp(ComponentParams.button.height.small),
-    justifyContent: "center",
-    alignItems: "center",
-    borderWidth: 2, // Border width
-    borderColor: Colors.light.components.button.gold.border, // Border color
-  },
-  panpalCreditsText: {
-    fontFamily: Fonts.text_1.fontFamily,
-    fontSize: Fonts.text_1.fontSize,
-    lineHeight: Fonts.text_1.lineHeight,
-    color: Colors.white,
-  },
-  panpalCreditsButtonText: {
-    textAlign: "center",
-    textTransform: "uppercase",
-    fontFamily: Fonts.text_1.fontFamily,
-    fontSize: Fonts.text_3.fontSize,
-    lineHeight: Fonts.text_3.lineHeight,
-    color: Colors.darkGold,
-  },
   panpalCreditsContainer: {
+    position: "absolute",
+    top: hp(1),
+    right: wp(2),
     flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
-    gap: wp(1),
-    backgroundColor: "rgba(0, 0, 0, 0.2)",
-    height: hp(ComponentParams.button.height.medium),
-    paddingHorizontal: wp(2),
-    borderRadius: hp(ComponentParams.button.height.medium / 2),
   },
   helpButton: {
     height: hp(ComponentParams.button.height.small),
     width: hp(ComponentParams.button.height.small),
-    aspectRatio: 1,
     justifyContent: "center",
     alignItems: "center",
     borderRadius: hp(ComponentParams.button.height.small / 2),
-    backgroundColor: "rgba(0, 0, 0, 0.2)",
   },
 });

@@ -38,28 +38,34 @@ const MessageCard = ({
       {message.role === "system" ? (
         <Text style={{ textAlign: "center" }}>{message.content}</Text>
       ) : message.role === "user" ? (
-        <LinearGradient
-          colors={[
-            Colors.light.components.button.purple.background[1],
-            Colors.light.components.button.purple.background[0],
-          ]}
-          start={[0.5, 0]}
-          end={[0.5, 1]}
-          style={styles.userMessageContainer}
-        >
+        <View style={[styles.container, styles.userMessageContainer]}>
+          <LinearGradient
+            style={styles.gradientContainer}
+            colors={[
+              Colors.light.components.button.purple.background[0],
+              Colors.light.components.button.purple.background[1],
+            ]}
+            start={[0.5, 0]}
+            end={[0.5, 1]}
+          />
           <View style={styles.messageContent}>
             <Text style={[{ color: Colors.white }, styles.messageText]}>
               {message.content}
             </Text>
           </View>
-        </LinearGradient>
+        </View>
       ) : (
-        <LinearGradient
-          colors={[Colors.white, Colors.secondaryWhite]}
-          start={[0, 0]}
-          end={[1, 1]}
-          style={styles.assistantMessageContainer}
-        >
+        <View style={[styles.container, styles.assistantMessageContainer]}>
+          <LinearGradient
+            colors={[
+              Colors.white,
+              Colors.secondaryWhite,
+              Colors.primarySkyBlue,
+            ]}
+            start={[0, 0]}
+            end={[1, 1]}
+            style={styles.gradientContainer}
+          />
           <View style={styles.messageContent}>
             {renderContent(
               message.content,
@@ -67,7 +73,7 @@ const MessageCard = ({
               disableSelectOption
             )}
           </View>
-        </LinearGradient>
+        </View>
       )}
     </View>
   );
@@ -114,36 +120,48 @@ const JsonViewer = ({ content }: { content: any }) => {
 
 const styles = StyleSheet.create({
   userMessageContainer: {
-    maxWidth: wp(80),
-    elevation: 3,
-    shadowColor: Colors.darkGrey,
-    backgroundColor: Colors.mediumPurple,
-    paddingHorizontal: wp(4),
-    paddingVertical: hp(2),
-    alignItems: "center",
-    justifyContent: "center",
-    borderRadius: hp(ComponentParams.button.height.small),
+    backgroundColor: Colors.darkBlue,
+    borderTopColor: Colors.darkBlue,
+    borderBottomWidth: 2,
+    borderRightWidth: 1,
+    borderRightColor: Colors.darkBlue,
+    borderLeftColor: Colors.darkBlue,
+    borderLeftWidth: 1,
     alignSelf: "flex-end",
   },
   assistantMessageContainer: {
+    backgroundColor: Colors.white,
+    borderTopColor: Colors.white,
+    borderTopWidth: 1,
+    borderLeftWidth: 1,
+    borderLeftColor: Colors.white,
+    alignSelf: "flex-start",
+  },
+  container: {
     maxWidth: wp(80),
-    width: wp(80),
-    elevation: 3,
-    shadowColor: Colors.darkGrey,
-    backgroundColor: Colors.mediumPurple,
-    paddingHorizontal: wp(4),
-    paddingVertical: hp(2),
+    elevation: 10,
+    shadowColor: Colors.cardDropShadow,
+    minHeight: hp(ComponentParams.button.height.large),
     alignItems: "center",
     justifyContent: "center",
-    borderRadius: hp(ComponentParams.button.height.small),
-    alignSelf: "flex-start",
+    borderRadius: hp(ComponentParams.button.height.large / 2),
     display: "flex",
   },
   messageContent: {
+    paddingHorizontal: wp(4),
+    paddingVertical: hp(2),
     width: "100%",
     justifyContent: "center",
     alignItems: "center",
     flexWrap: "wrap",
+  },
+  gradientContainer: {
+    borderRadius: hp(ComponentParams.button.height.large / 2),
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
   },
   messageText: {
     color: Colors.white,

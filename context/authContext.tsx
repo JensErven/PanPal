@@ -18,14 +18,47 @@ import {
 } from "firebase/firestore";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { preferenceType } from "@/models/PreferenceType";
-import { Alert } from "react-native";
+import { Alert, ToastAndroid } from "react-native";
+import { recipeSuggestionService } from "@/services/async-storage/recipeSuggestion.services";
+import { TastePreferencesType } from "@/models/TastePreferencesType";
+import { createTastePreferences } from "@/services/db/tastePreferences.services";
 
-export const AuthContext = createContext(null);
-
-export type TastePreferenceType = {
-  cuisineTypes: string[];
-  allergyTypes: string[];
+type AuthContextType = {
+  user: any;
+  handleSendPasswordResetEmail: (email: string) => Promise<any>;
+  setUser: (user: any) => void;
+  isAuthenticated: boolean | undefined;
+  setIsAuthenticated: (value: boolean) => void;
+  login: (email: string, password: string) => Promise<any>;
+  logout: () => Promise<any>;
+  register: (email: string, password: string) => Promise<any>;
+  substractCredits: (amount: number) => Promise<void>;
+  storeUserTastePreferencesToFirebase: (userId: string) => Promise<void>;
+  credits: UserCreditsType;
+  tastePreferences: TastePreferencesType;
 };
+
+const defaultValue: AuthContextType = {
+  user: null,
+  handleSendPasswordResetEmail: async () => {},
+  setUser: (user: any) => {},
+  isAuthenticated: undefined,
+  setIsAuthenticated: (value: boolean) => {},
+  login: async (email: string, password: string) => {},
+  logout: async () => {},
+  register: async (email: string, password: string) => {},
+  substractCredits: async (amount: number) => {},
+  storeUserTastePreferencesToFirebase: async (userId: string) => {},
+  credits: {} as UserCreditsType,
+  tastePreferences: {
+    cuisineTypes: [],
+    allergyTypes: [],
+    dislikedIngredients: [],
+    dietTypes: [],
+  },
+};
+
+export const AuthContext = createContext<AuthContextType>(defaultValue);
 
 export type UserCreditsType = {
   credits: number;
@@ -40,9 +73,13 @@ export const AuthContextProvider = ({ children }: { children: any }) => {
   const [credits, setCredits] = useState<UserCreditsType>(
     {} as UserCreditsType
   );
-  const [tastePreferences, setTastePreferences] = useState<TastePreferenceType>(
-    { cuisineTypes: [], allergyTypes: [] }
-  );
+  const [tastePreferences, setTastePreferences] =
+    useState<TastePreferencesType>({
+      cuisineTypes: [],
+      allergyTypes: [],
+      dislikedIngredients: [],
+      dietTypes: [],
+    });
   const unsubscribeFunctions = useRef<(() => void)[]>([]); // Use useRef instead of useState
 
   useEffect(() => {
@@ -52,17 +89,30 @@ export const AuthContextProvider = ({ children }: { children: any }) => {
     };
 
     const handleAuthStateChanged = (user: any) => {
+      unsubscribeAll(); // Always unsubscribe before setting up new subscriptions
       if (user && user.uid && user.emailVerified) {
         setIsAuthenticated(true);
         updateUserData(user.uid);
-        subscribeToUserTastePreferencesDocChanges(user.uid);
+        const unsubscribeTastePreferences =
+          subscribeToUserTastePreferencesDocChanges(user.uid);
         const unsubscribeCredits = subscribeToCreditsDocChanges(user.uid);
         const unsubscribeUser = subscribeToUserDocChanges(user.uid);
-        unsubscribeFunctions.current.push(unsubscribeCredits, unsubscribeUser);
+        unsubscribeFunctions.current.push(
+          unsubscribeCredits,
+          unsubscribeUser,
+          unsubscribeTastePreferences
+        );
       } else {
         setIsAuthenticated(false);
         setUser(null);
         setCredits({} as UserCreditsType);
+        setTastePreferences({
+          cuisineTypes: [],
+          allergyTypes: [],
+          dislikedIngredients: [],
+          dietTypes: [],
+        });
+        recipeSuggestionService.clearSuggestedRecipes();
       }
     };
 
@@ -87,68 +137,69 @@ export const AuthContextProvider = ({ children }: { children: any }) => {
    * @returns A function to unsubscribe from the snapshot listener.
    */
   const subscribeToCreditsDocChanges = (userId: string) => {
+    console.log("Subscribing to credits doc changes for user: ", userId);
     const creditsDocRef = doc(db, "credits", userId);
-    const unsubscribe = onSnapshot(creditsDocRef, async (doc) => {
-      if (doc.exists()) {
-        console.log("Credits doc exists");
-        let data = doc.data();
-        const today = new Date();
-        const todayMidnight = new Date(
-          today.getFullYear(),
-          today.getMonth(),
-          today.getDate(),
-          0,
-          0,
-          0,
-          0
-        );
-        const lastResetDay = data.lastResetDay.toDate();
-        const lastResetDayMidnight = new Date(
-          lastResetDay.getFullYear(),
-          lastResetDay.getMonth(),
-          lastResetDay.getDate(),
-          0,
-          0,
-          0,
-          0
-        );
-        console.log("lastResetDayMidnight", lastResetDayMidnight);
-        console.log("todayMidnight", todayMidnight);
-        if (lastResetDayMidnight.getTime() !== todayMidnight.getTime()) {
-          const newCreditsData = await resetCredits(50, userId);
-          if (newCreditsData) {
-            setCredits(newCreditsData);
+    const unsubscribe = onSnapshot(
+      creditsDocRef,
+      async (doc) => {
+        console.log("Credits doc changed:", doc.data());
+        if (doc.exists()) {
+          console.log("Credits doc exists");
+          let data = doc.data();
+          const today = new Date();
+          const todayMidnight = new Date(
+            today.getFullYear(),
+            today.getMonth(),
+            today.getDate(),
+            0,
+            0,
+            0,
+            0
+          );
+          const lastResetDay = data.lastResetDay.toDate();
+          const lastResetDayMidnight = new Date(
+            lastResetDay.getFullYear(),
+            lastResetDay.getMonth(),
+            lastResetDay.getDate(),
+            0,
+            0,
+            0,
+            0
+          );
+
+          if (lastResetDayMidnight.getTime() !== todayMidnight.getTime()) {
+            console.log("Resetting credits to 50");
+            const newCreditsData = await resetCredits(50, userId);
+            if (newCreditsData) {
+              setCredits(newCreditsData);
+            }
+          } else {
+            setCredits({
+              credits: data.credits,
+              lastResetDay: data.lastResetDay,
+            });
           }
         } else {
-          setCredits({
-            credits: data.credits,
-            lastResetDay: data.lastResetDay,
+          console.log("Credits doc does not exist");
+          setCredits({ credits: 50, lastResetDay: Timestamp.now() });
+          await setDoc(creditsDocRef, {
+            credits: 50,
+            lastResetDay: Timestamp.now(),
           });
         }
-      } else {
-        console.log("Credits doc does not exist");
-        setCredits({ credits: 50, lastResetDay: Timestamp.now() });
-        await setDoc(creditsDocRef, {
-          credits: 50,
-          lastResetDay: Timestamp.now(),
-        });
+      },
+      (error) => {
+        console.error("Error subscribing to credits doc changes: ", error);
       }
-    });
+    );
     return unsubscribe;
   };
-
-  useEffect(() => {
-    console.log("User", user);
-    console.log("Credits", credits);
-    console.log("TastePreferences", tastePreferences);
-  }, [user, credits, tastePreferences]);
 
   const resetCredits = async (amount: number, userId: string) => {
     const newCredits = amount;
     const newLastResetDay = Timestamp.now();
 
     if (userId) {
-      console.log("Resetting credits to 50");
       const creditsDocRef = doc(db, "credits", userId);
       await updateDoc(creditsDocRef, {
         credits: newCredits,
@@ -167,12 +218,10 @@ export const AuthContextProvider = ({ children }: { children: any }) => {
       if (user?.userId) {
         const creditsDocRef = doc(db, "credits", user.userId);
         await updateDoc(creditsDocRef, { credits: newCredits });
+        ToastAndroid.show("Used " + amount + " credits", ToastAndroid.SHORT);
       }
     } else {
-      Alert.alert(
-        "Insufficient credits",
-        "You do not have enough credits to perform this action."
-      );
+      ToastAndroid.show("Insufficient credits", ToastAndroid.SHORT);
     }
   };
 
@@ -198,11 +247,28 @@ export const AuthContextProvider = ({ children }: { children: any }) => {
     const userDocRef = doc(db, "tastePreferences", userId);
     const unsubscribe = onSnapshot(userDocRef, (doc) => {
       if (doc.exists()) {
-        const data = doc.data() as TastePreferenceType;
-        setTastePreferences({
-          cuisineTypes: data.cuisineTypes || [],
-          allergyTypes: data.allergyTypes || [],
-        });
+        const data = doc.data() as TastePreferencesType;
+        setTastePreferences(data);
+      } else {
+        createTastePreferences(userId, {
+          cuisineTypes: [],
+          allergyTypes: [],
+          dislikedIngredients: [],
+          dietTypes: [],
+        })
+          .then((res) => {
+            if (res.success) {
+              setTastePreferences({
+                cuisineTypes: [],
+                allergyTypes: [],
+                dislikedIngredients: [],
+                dietTypes: [],
+              });
+            }
+          })
+          .catch((error) => {
+            console.error("Error creating taste preferences:", error);
+          });
       }
     });
     return unsubscribe;
@@ -316,12 +382,9 @@ export const AuthContextProvider = ({ children }: { children: any }) => {
   };
 
   const storeUserTastePreferencesToFirebase = async (userId: string) => {
-    console.log("Storing user taste preferences in Firebase.");
     try {
       const preferences = await AsyncStorage.getItem("tastePreferences");
-      console.log("preferences", preferences);
       if (!preferences) {
-        console.log("No preferences found in AsyncStorage.");
         return;
       }
       const parsedPreferences = JSON.parse(preferences);
@@ -335,9 +398,11 @@ export const AuthContextProvider = ({ children }: { children: any }) => {
         } as preferenceType;
         await setDoc(docRef, newDoc);
       });
-      console.log("User taste preferences stored in Firebase");
     } catch (error) {
-      console.error("Error storing user taste preferences:", error);
+      console.error(
+        "Error storing user taste preferences to Firebase: ",
+        error
+      );
     }
   };
 

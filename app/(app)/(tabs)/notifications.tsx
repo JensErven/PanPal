@@ -13,8 +13,42 @@ import CustomKeyBoardView from "@/components/CustomKeyBoardView";
 import CustomHeader from "@/components/navigation/CustomHeader";
 import { StatusBar } from "expo-status-bar";
 import UnderDevelopmentCard from "@/components/cards/UnderDevelopmentCard";
+import RoundButton from "@/components/buttons/RoundButton";
+import { useAuth } from "@/context/authContext";
+import { router } from "expo-router";
+import { Image } from "expo-image";
+import { blurhash } from "@/utils/general.utils";
+import { Ionicons } from "@expo/vector-icons";
 
 const NotificationsScreen = () => {
+  const { user } = useAuth();
+
+  const customHeaderChildren = () => {
+    return (
+      <>
+        {user && (
+          <RoundButton
+            handlePress={() => {
+              router.push("/profile");
+            }}
+          >
+            {user.profileUrl ? (
+              <Image
+                style={styles.profileImage}
+                source={user.profileUrl ? user.profileUrl : blurhash}
+                placeholder={blurhash}
+                contentFit="cover"
+                transition={1000}
+              />
+            ) : (
+              <Ionicons name="person" size={hp(2.7)} color={Colors.white} />
+            )}
+          </RoundButton>
+        )}
+      </>
+    );
+  };
+
   return (
     <LinearGradient
       style={styles.gradientBackground}
@@ -30,6 +64,7 @@ const NotificationsScreen = () => {
         isTransparent={true}
         headerTitle={"Notifications"}
         hasGoBack={false}
+        children={customHeaderChildren()}
       />
 
       <CustomKeyBoardView>
@@ -69,5 +104,11 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: hp(ComponentParams.button.height.medium),
     flex: 1,
     gap: hp(4),
+  },
+  profileImage: {
+    aspectRatio: 1,
+    width: "100%",
+    height: "100%",
+    borderRadius: hp(ComponentParams.button.height.medium / 2),
   },
 });
