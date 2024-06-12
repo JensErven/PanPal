@@ -53,7 +53,6 @@ const GroceryListDetailsScreen = () => {
       setIsLoading(true);
       findGroceryListInContext(id as string)
         .then((res) => {
-          console.log("Found GroceryList in Context: ", res);
           if (res && !res.uuids.includes(user.userId)) {
             router.back();
           }
@@ -141,7 +140,6 @@ const GroceryListDetailsScreen = () => {
   };
 
   const handleCloseModal = (selectedItems: itemType[]) => {
-    console.log("Selected Items: ", selectedItems);
     if (!selectedItems) return;
     if (!groceryList) return;
     if (!groceryList.uuids.includes(user.userId)) return;

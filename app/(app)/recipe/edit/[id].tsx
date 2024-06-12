@@ -47,7 +47,6 @@ const EditCustomRecipeScreen = () => {
       findRecipeInContext(id as string)
         .then((res) => {
           if (res) {
-            console.log("Found recipe in context");
             setRecipe(res);
             setIsLoading(false);
           }
@@ -56,7 +55,6 @@ const EditCustomRecipeScreen = () => {
           getRecipe(id as string)
             .then((res) => {
               if (res) {
-                console.log("Fetched recipe from db");
                 setRecipe(res);
                 setIsLoading(false);
               }
@@ -157,7 +155,7 @@ const EditCustomRecipeScreen = () => {
       <CustomKeyBoardView>
         <LinearGradient
           style={styles.container}
-          colors={[Colors.white, Colors.white]}
+          colors={[Colors.white, "#DDEBF3"]}
           start={[0.5, 0]}
           end={[0.5, 1]}
         >

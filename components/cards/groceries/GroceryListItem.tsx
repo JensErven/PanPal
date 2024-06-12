@@ -187,7 +187,7 @@ export default GroceryListItem;
 const styles = StyleSheet.create({
   container: {
     marginVertical: hp(1),
-    paddingHorizontal: wp(4),
+    paddingLeft: wp(4),
     width: "100%",
     alignItems: "center",
   },

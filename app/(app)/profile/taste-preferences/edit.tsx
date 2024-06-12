@@ -161,10 +161,6 @@ const EditTastePreferencesScreen = () => {
     return selectedPreferences?.includes(type);
   };
 
-  useEffect(() => {
-    console.log(selectedPreferences);
-  }, [selectedPreferences]);
-
   return (
     <LinearGradient
       style={styles.gradientBackground}

@@ -17,6 +17,7 @@ import { RecipeType } from "@/models/RecipeType";
 import { Ionicons } from "@expo/vector-icons";
 import Fonts from "@/constants/Fonts";
 import RoundButton from "@/components/buttons/RoundButton";
+import { LinearGradient } from "expo-linear-gradient";
 
 const EditRecipeStepList = ({
   recipe,
@@ -51,19 +52,26 @@ const EditRecipeStepList = ({
           gap: wp(2),
         }}
       >
-        <TextInput
+        <LinearGradient
+          colors={[Colors.primarySkyBlue, Colors.secondaryWhite]}
           style={styles.contentItemInput}
-          value={stepsTextInput}
-          placeholder="add steps"
-          placeholderTextColor={
-            Colors.light.components.inputField.placeholderTextColor
-          }
-          onChangeText={(text: string) => {
-            setStepsTextInput(text);
-          }}
-          onSubmitEditing={handleAddStep}
-          multiline={true}
-        />
+          start={[0.5, 0]}
+          end={[0.5, 1]}
+        >
+          <TextInput
+            style={styles.textInput}
+            value={stepsTextInput}
+            placeholder="add steps"
+            placeholderTextColor={
+              Colors.light.components.inputField.placeholderTextColor
+            }
+            onChangeText={(text: string) => {
+              setStepsTextInput(text);
+            }}
+            onSubmitEditing={handleAddStep}
+            multiline={true}
+          />
+        </LinearGradient>
         <RoundButton
           handlePress={handleAddStep}
           transparent={false}
@@ -97,6 +105,12 @@ const EditRecipeStepList = ({
         <View style={styles.stepItemList}>
           {recipe?.steps.map((step, index) => (
             <View key={index} style={styles.listItem}>
+              <LinearGradient
+                colors={[Colors.white, Colors.secondaryWhite]}
+                style={styles.listItemGradientContainer}
+                start={[0, 0]}
+                end={[1, 1]}
+              />
               <View
                 style={{
                   width: "100%",
@@ -106,6 +120,12 @@ const EditRecipeStepList = ({
                 }}
               >
                 <View style={styles.stepNumber}>
+                  <LinearGradient
+                    style={styles.stepNumberGradientContainer}
+                    colors={[Colors.white, Colors.secondaryWhite]}
+                    start={[0, 0]}
+                    end={[1, 1]}
+                  />
                   <Text style={styles.stepNumberText}>{index + 1}</Text>
                 </View>
                 <View style={{ flexDirection: "row", gap: wp(2) }}>
@@ -121,7 +141,7 @@ const EditRecipeStepList = ({
                       });
                     }}
                     transparent={false}
-                    backgroundColor={Colors.secondaryWhite}
+                    backgroundColor={"transparent"}
                   >
                     <Ionicons name="trash" size={hp(2.7)} color={"#C70000"} />
                   </RoundButton>
@@ -185,10 +205,39 @@ export default EditRecipeStepList;
 const styles = StyleSheet.create({
   contentItemInput: {
     flex: 1,
-    minHeight: hp(ComponentParams.button.height.medium),
-    paddingVertical: hp(1),
     borderRadius: hp(ComponentParams.button.height.medium / 2),
     backgroundColor: Colors.secondaryWhite,
+    fontFamily: Fonts.text_2.fontFamily,
+    fontSize: Fonts.text_2.fontSize,
+    color: Colors.darkGrey,
+    lineHeight: Fonts.text_2.lineHeight,
+    borderBottomColor: Colors.white,
+    borderBottomWidth: 1,
+    borderRightColor: Colors.white,
+    borderRightWidth: 1,
+  },
+  stepNumberGradientContainer: {
+    borderRadius: hp(ComponentParams.button.height.medium / 2),
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+  },
+  listItemGradientContainer: {
+    borderRadius: hp(ComponentParams.button.height.medium / 2),
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+  },
+  textInput: {
+    width: "100%",
+    minHeight: hp(ComponentParams.button.height.medium),
+    borderRadius: hp(ComponentParams.button.height.medium / 2),
+
+    paddingVertical: hp(1),
     paddingHorizontal: wp(4),
     fontFamily: Fonts.text_2.fontFamily,
     fontSize: Fonts.text_2.fontSize,
@@ -239,17 +288,24 @@ const styles = StyleSheet.create({
     textDecorationLine: "underline",
   },
   listItem: {
-    flexDirection: "column",
-    justifyContent: "space-between",
-    alignItems: "flex-start",
-    gap: wp(2),
-    borderColor: Colors.primarySkyBlue,
-    borderWidth: 1,
-    padding: wp(1),
-    borderRadius: hp(ComponentParams.button.height.large / 2),
+    flex: 1,
+    borderRadius: hp(ComponentParams.button.height.medium / 2),
+    backgroundColor: Colors.white,
+    fontFamily: Fonts.text_2.fontFamily,
+    fontSize: Fonts.text_2.fontSize,
+    color: Colors.darkGrey,
+    lineHeight: Fonts.text_2.lineHeight,
+    borderTopColor: Colors.white,
+    borderTopWidth: 1,
+    borderLeftWidth: 1,
+    borderLeftColor: Colors.white,
+    borderRightColor: Colors.white,
+    borderRightWidth: 0.25,
+    elevation: 10,
+    gap: hp(1),
+    shadowColor: Colors.darkBlue,
   },
   stepNumber: {
-    backgroundColor: Colors.primarySkyBlue,
     borderRadius: hp(ComponentParams.button.height.medium / 2),
     justifyContent: "center",
     alignItems: "center",
@@ -258,9 +314,9 @@ const styles = StyleSheet.create({
     height: hp(ComponentParams.button.height.medium),
   },
   stepNumberText: {
-    color: Colors.darkGrey,
+    fontFamily: Fonts.text_1.fontFamily,
     fontSize: Fonts.text_2.fontSize,
-    fontFamily: Fonts.text_2.fontFamily,
+    color: Colors.darkGrey,
     lineHeight: Fonts.text_2.lineHeight,
   },
   stepItemList: {

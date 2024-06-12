@@ -1,72 +1,94 @@
-import { View, Text, Alert } from "react-native";
+import { View, StyleSheet, Button } from "react-native";
 import React, { useEffect, useState } from "react";
-import { useLocalSearchParams } from "expo-router";
-import Voice from "@react-native-voice/voice";
-
+import { Audio } from "expo-av";
+import { openaiServices } from "@/services/api/openai.services";
+import * as FileSystem from "expo-file-system";
 const VoiceAssistantScreen = () => {
-  const [started, setStarted] = useState(false);
-  const [results, setResults] = useState([]);
-  const { id } = useLocalSearchParams();
+  const [recording, setRecording] = useState<Audio.Recording | undefined>();
+  const [savedRecordings, setSavedRecordings] = useState<string[]>([]);
+  const [sound, setSound] = useState<Audio.Sound | null>(null);
+  const { transcribeAudio } = openaiServices;
+  const [transcriptions, setTranscriptions] = useState<string[]>([]);
+  const [permissionResponse, requestPermission] = Audio.usePermissions();
 
-  useEffect(() => {
-    Voice.onSpeechStart = onSpeechStartHandler;
-    Voice.onSpeechEnd = onSpeechEndHandler;
-    Voice.onSpeechResults = onSpeechResultsHandler;
-    Voice.onSpeechError = onSpeechErrorHandler;
-
-    startListening();
-
-    return () => {
-      Voice.destroy().then(Voice.removeAllListeners);
-    };
-  }, []);
-
-  const startListening = async () => {
+  async function startRecording() {
     try {
-      await Voice.start("en-US");
-      setStarted(true);
+      if (permissionResponse?.status !== "granted") {
+        await requestPermission();
+      }
+      await Audio.setAudioModeAsync({
+        allowsRecordingIOS: true,
+        playsInSilentModeIOS: true,
+        staysActiveInBackground: true,
+      });
+
+      const { recording } = await Audio.Recording.createAsync(
+        Audio.RecordingOptionsPresets.HIGH_QUALITY
+      );
+      setRecording(recording);
+    } catch (err) {
+      console.error("Failed to start recording", err);
+    }
+  }
+
+  async function playSound(uri: string) {
+    const { sound } = await Audio.Sound.createAsync({ uri });
+    setSound(sound);
+    try {
+      await sound.playAsync();
     } catch (error) {
-      console.error("Error starting Voice: ", error);
+      console.log("Error playing sound: ", error);
     }
-  };
+  }
 
-  const onSpeechStartHandler = (e: any) => {
-    console.log("Speech started: ", e);
-  };
+  async function stopRecording() {
+    await recording?.stopAndUnloadAsync();
+    const uri = recording?.getURI();
 
-  const onSpeechEndHandler = (e: any) => {
-    console.log("Speech ended: ", e);
-    startListening(); // Restart listening to ensure continuous listening
-  };
+    if (uri) {
+      // Move file to a new URI with a .mp3 extension
+      const newUri = uri.replace(/(\.[\w\d_-]+)$/i, ".mp3");
+      await FileSystem.moveAsync({ from: uri, to: newUri });
+      setSavedRecordings([...savedRecordings, newUri]);
 
-  const onSpeechResultsHandler = (e: any) => {
-    const spokenWords = e.value;
-    setResults(spokenWords);
-    console.log("Speech results: ", spokenWords);
-
-    // Check for specific keywords
-    if (spokenWords.includes("previous")) {
-      console.log("Successful recognition: 'previous'");
-    } else if (spokenWords.includes("next")) {
-      console.log("Successful recognition: 'next'");
-    } else if (spokenWords.includes("stop")) {
-      console.log("Successful recognition: 'stop'");
+      // Transcribe audio
+      const transcription = await transcribeAudio(newUri);
+      setTranscriptions([...transcriptions, transcription]);
     }
-  };
-
-  const onSpeechErrorHandler = (e: any) => {
-    console.error("Speech error: ", e);
-    startListening(); // Restart listening in case of an error
-  };
+    setRecording(undefined);
+  }
 
   return (
-    <View>
-      <Text>{id}</Text>
-      {results.map((result, index) => (
-        <Text key={index}>{result}</Text>
+    <View style={styles.container}>
+      <Button
+        title={recording ? "Stop Recording" : "Start Recording"}
+        onPress={recording ? stopRecording : startRecording}
+      />
+      {savedRecordings.map((uri, index) => (
+        <Button
+          key={index}
+          title={`Play Recording ${index + 1}`}
+          onPress={() => playSound(uri)}
+        />
       ))}
     </View>
   );
 };
-
 export default VoiceAssistantScreen;
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  startRecognizingButton: {
+    backgroundColor: "blue",
+    padding: 10,
+    borderRadius: 5,
+    marginTop: 10,
+  },
+  buttonText: {
+    color: "white",
+  },
+});

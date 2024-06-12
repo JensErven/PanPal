@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useRef, useState } from "react";
 import { auth, db } from "../firebaseConfig";
 import {
+  User,
   createUserWithEmailAndPassword,
   onAuthStateChanged,
   sendEmailVerification,
@@ -88,21 +89,26 @@ export const AuthContextProvider = ({ children }: { children: any }) => {
       unsubscribeFunctions.current.length = 0; // Clear the array
     };
 
-    const handleAuthStateChanged = (user: any) => {
+    const handleAuthStateChanged = async (user: any) => {
       unsubscribeAll(); // Always unsubscribe before setting up new subscriptions
       if (user && user.uid && user.emailVerified) {
+        console.log("User is authenticated");
         setIsAuthenticated(true);
         updateUserData(user.uid);
+        // Subscribe to taste preferences
         const unsubscribeTastePreferences =
           subscribeToUserTastePreferencesDocChanges(user.uid);
+        unsubscribeFunctions.current.push(unsubscribeTastePreferences);
+
+        // Subscribe to credits
         const unsubscribeCredits = subscribeToCreditsDocChanges(user.uid);
+        unsubscribeFunctions.current.push(unsubscribeCredits);
+
+        // Subscribe to user document changes
         const unsubscribeUser = subscribeToUserDocChanges(user.uid);
-        unsubscribeFunctions.current.push(
-          unsubscribeCredits,
-          unsubscribeUser,
-          unsubscribeTastePreferences
-        );
+        unsubscribeFunctions.current.push(unsubscribeUser);
       } else {
+        console.log("User is not authenticated");
         setIsAuthenticated(false);
         setUser(null);
         setCredits({} as UserCreditsType);
@@ -125,7 +131,7 @@ export const AuthContextProvider = ({ children }: { children: any }) => {
       unsubscribeAll(); // Unsubscribe from all listeners
       unsubscribeAuthStateChanged(); // Unsubscribe from onAuthStateChanged
     };
-  }, []);
+  }, []); // Empty dependency array to run only on mount and unmount
 
   /**
    * Subscribes to changes in the credits document for a specific user.
@@ -137,14 +143,11 @@ export const AuthContextProvider = ({ children }: { children: any }) => {
    * @returns A function to unsubscribe from the snapshot listener.
    */
   const subscribeToCreditsDocChanges = (userId: string) => {
-    console.log("Subscribing to credits doc changes for user: ", userId);
     const creditsDocRef = doc(db, "credits", userId);
     const unsubscribe = onSnapshot(
       creditsDocRef,
       async (doc) => {
-        console.log("Credits doc changed:", doc.data());
         if (doc.exists()) {
-          console.log("Credits doc exists");
           let data = doc.data();
           const today = new Date();
           const todayMidnight = new Date(
@@ -168,7 +171,6 @@ export const AuthContextProvider = ({ children }: { children: any }) => {
           );
 
           if (lastResetDayMidnight.getTime() !== todayMidnight.getTime()) {
-            console.log("Resetting credits to 50");
             const newCreditsData = await resetCredits(50, userId);
             if (newCreditsData) {
               setCredits(newCreditsData);
@@ -180,12 +182,11 @@ export const AuthContextProvider = ({ children }: { children: any }) => {
             });
           }
         } else {
-          console.log("Credits doc does not exist");
-          setCredits({ credits: 50, lastResetDay: Timestamp.now() });
           await setDoc(creditsDocRef, {
             credits: 50,
             lastResetDay: Timestamp.now(),
           });
+          setCredits({ credits: 50, lastResetDay: Timestamp.now() });
         }
       },
       (error) => {
@@ -247,9 +248,17 @@ export const AuthContextProvider = ({ children }: { children: any }) => {
     const userDocRef = doc(db, "tastePreferences", userId);
     const unsubscribe = onSnapshot(userDocRef, (doc) => {
       if (doc.exists()) {
+        console.log("Taste preferences doc exists");
         const data = doc.data() as TastePreferencesType;
-        setTastePreferences(data);
+        setTastePreferences((prevPreferences) => ({
+          ...prevPreferences,
+          cuisineTypes: data.cuisineTypes,
+          allergyTypes: data.allergyTypes,
+          dislikedIngredients: data.dislikedIngredients,
+          dietTypes: data.dietTypes,
+        }));
       } else {
+        console.log("Taste preferences doc does not exist");
         createTastePreferences(userId, {
           cuisineTypes: [],
           allergyTypes: [],
@@ -258,6 +267,7 @@ export const AuthContextProvider = ({ children }: { children: any }) => {
         })
           .then((res) => {
             if (res.success) {
+              console.log("Taste preferences created successfully");
               setTastePreferences({
                 cuisineTypes: [],
                 allergyTypes: [],
@@ -312,6 +322,27 @@ export const AuthContextProvider = ({ children }: { children: any }) => {
         );
         return { success: false, msg: "Email not verified" };
       }
+      updateUserData(response?.user?.uid);
+      // fetch user taste preferences from firebase and store in async storage
+      const tastePreferencesDocRef = doc(
+        db,
+        "tastePreferences",
+        response.user.uid
+      );
+      const tastePreferencesDoc = await getDoc(tastePreferencesDocRef);
+      if (tastePreferencesDoc.exists()) {
+        const data = tastePreferencesDoc.data() as TastePreferencesType;
+        await AsyncStorage.setItem("tastePreferences", JSON.stringify(data));
+        setTastePreferences(data);
+      }
+      // fetch user credits from firebase and store in async storage
+      const creditsDocRef = doc(db, "credits", response.user.uid);
+      const creditsDoc = await getDoc(creditsDocRef);
+      if (creditsDoc.exists()) {
+        const data = creditsDoc.data() as UserCreditsType;
+        setCredits(data);
+      }
+
       return { success: true, data: response.user };
     } catch (error: any) {
       let msg = error.message;
@@ -350,24 +381,42 @@ export const AuthContextProvider = ({ children }: { children: any }) => {
         password
       );
       await sendEmailVerification(response.user);
+
       Alert.alert(
         "Verification email sent",
         "Please verify your email before signing in."
       );
+
       const username = email.split("@")[0].replace(/\./g, " ");
 
-      await setDoc(doc(db, "users", response?.user?.uid), {
-        email,
-        username,
-        bio: "",
-        profileUrl: "",
-      });
-      await setDoc(doc(db, "credits", response?.user?.uid), {
-        credits: 50,
-        lastResetDay: Timestamp.now(),
-      });
+      // Check if response.user.uid exists before setting user document
+      if (response.user && response.user.uid) {
+        // Set user document
+        await setDoc(doc(db, "users", response.user.uid), {
+          email,
+          username,
+          bio: "",
+          profileUrl: "",
+        });
 
-      return { success: true, data: response.user };
+        // Set credits document
+        await setDoc(doc(db, "credits", response.user.uid), {
+          credits: 50,
+          lastResetDay: Timestamp.now(),
+        });
+
+        await setDoc(doc(db, "tastePreferences", response.user.uid), {
+          cuisineTypes: [],
+          allergyTypes: [],
+          dislikedIngredients: [],
+          dietTypes: [],
+        });
+
+        // Update user data and await it to ensure it completes
+        await updateUserData(response.user.uid);
+      }
+
+      return { success: true, data: response.user as User };
     } catch (error: any) {
       let msg = error.message;
       if (msg.includes("auth/email-already-in-use")) {

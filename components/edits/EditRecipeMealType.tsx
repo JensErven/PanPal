@@ -20,6 +20,7 @@ import { mealTypes as meals } from "@/constants/tastePreferences/MealTypes";
 import CustomSheetModal from "../modals/CustomSheetModal";
 import StandardButton from "../buttons/StandardButton";
 import OptionTagButton from "../buttons/OptionTagButton";
+import { LinearGradient } from "expo-linear-gradient";
 
 const EditRecipeMealType = ({
   recipe = {} as RecipeType,
@@ -122,7 +123,13 @@ const EditRecipeMealType = ({
           onPress={handleOpenModal}
           style={styles.contentItemButton}
         >
-          <Text style={styles.text}>
+          <LinearGradient
+            colors={[Colors.white, Colors.secondaryWhite]}
+            style={styles.gradientContainer}
+            start={[0, 0]}
+            end={[1, 1]}
+          />
+          <Text style={styles.text} ellipsizeMode="tail" numberOfLines={1}>
             {recipe?.mealType ? recipe.mealType : "Select"}
           </Text>
           <Ionicons name="chevron-down" size={24} color={Colors.darkGrey} />
@@ -141,6 +148,14 @@ const styles = StyleSheet.create({
     fontSize: Fonts.text_2.fontSize,
     color: Colors.darkGrey,
     lineHeight: Fonts.text_2.lineHeight,
+  },
+  gradientContainer: {
+    borderRadius: hp(ComponentParams.button.height.medium / 2),
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
   },
   contentItemInputContainer: {
     flexDirection: "row",
@@ -168,14 +183,23 @@ const styles = StyleSheet.create({
     lineHeight: Fonts.heading_3.lineHeight,
   },
   contentItemButton: {
+    maxWidth: wp(50),
+    borderTopColor: Colors.white,
+    borderTopWidth: 1,
+    borderLeftWidth: 1,
+    borderLeftColor: Colors.white,
+    borderRightColor: Colors.white,
+    borderRightWidth: 0.25,
     flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    backgroundColor: Colors.secondaryWhite,
-    height: hp(ComponentParams.button.height.medium),
-    borderRadius: hp(ComponentParams.button.height.medium / 2),
-    paddingHorizontal: wp(4),
     gap: wp(2),
+    paddingHorizontal: wp(4),
+    minHeight: hp(ComponentParams.button.height.medium),
+    borderRadius: hp(ComponentParams.button.height.medium / 2),
+    alignItems: "center",
+    justifyContent: "center",
+    elevation: 10,
+    shadowColor: Colors.darkBlue,
+    backgroundColor: Colors.white,
   },
   modalTitle: {
     marginBottom: hp(1),

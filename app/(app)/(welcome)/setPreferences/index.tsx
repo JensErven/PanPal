@@ -100,8 +100,6 @@ const setPreferencesStep1 = () => {
         "userTastePreferences",
         JSON.stringify(updatedPreferences)
       );
-
-      // console.log("Preferences:", updatedPreferences);
     } catch (error) {
       console.error("Error saving preferences:", error);
     }

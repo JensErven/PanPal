@@ -55,7 +55,6 @@ const DetailsRecipe = () => {
       findRecipeInContext(id as string)
         .then((res) => {
           if (res) {
-            console.log("Found recipe in context");
             setRecipe(res);
             setIsLoading(false);
           }
@@ -64,7 +63,6 @@ const DetailsRecipe = () => {
           getRecipe(id as string)
             .then((res) => {
               if (res) {
-                console.log("Fetched recipe from db");
                 setRecipe(res);
                 setIsLoading(false);
               }
@@ -225,43 +223,43 @@ const DetailsRecipe = () => {
     }
   }, [selectedTab, recipe, selectedSteps, progress, selectedSteps]);
 
-  const RecipeDetailsModalFooterChildren = useMemo(() => {
-    if (!recipe) return;
-    switch (selectedTab) {
-      case 0:
-        return (
-          <StandardButton
-            textValue="Add to Shopping List"
-            clickHandler={() => console.log("Add to Shopping List")}
-            colors={Colors.light.components.button.purple.background}
-            textColor={Colors.white}
-            height={ComponentParams.button.height.medium}
-          />
-        );
-      case 1:
-        return (
-          <StandardButton
-            iconRight={
-              <Ionicons
-                name="play"
-                size={hp(2.7)}
-                color={Colors.white}
-                style={{ marginRight: wp(4) }}
-              />
-            }
-            textValue="Start Cooking Assistance"
-            clickHandler={() => {
-              recipe.id && handleNavigateToVoiceAssistant(recipe.id);
-            }}
-            colors={Colors.light.components.button.purple.background}
-            textColor={Colors.white}
-            height={ComponentParams.button.height.medium}
-          />
-        );
-      default:
-        return null;
-    }
-  }, [selectedTab, recipe]);
+  // const RecipeDetailsModalFooterChildren = useMemo(() => {
+  //   if (!recipe) return;
+  //   switch (selectedTab) {
+  //     case 0:
+  //       return (
+  //         <StandardButton
+  //           textValue="Add to Shopping List"
+  //           clickHandler={() => console.log("Add to Shopping List")}
+  //           colors={Colors.light.components.button.purple.background}
+  //           textColor={Colors.white}
+  //           height={ComponentParams.button.height.medium}
+  //         />
+  //       );
+  //     case 1:
+  //       return (
+  //         <StandardButton
+  //           iconRight={
+  //             <Ionicons
+  //               name="play"
+  //               size={hp(2.7)}
+  //               color={Colors.white}
+  //               style={{ marginRight: wp(4) }}
+  //             />
+  //           }
+  //           textValue="Start Cooking Assistance"
+  //           clickHandler={() => {
+  //             recipe.id && handleNavigateToVoiceAssistant(recipe.id);
+  //           }}
+  //           colors={Colors.light.components.button.purple.background}
+  //           textColor={Colors.white}
+  //           height={ComponentParams.button.height.medium}
+  //         />
+  //       );
+  //     default:
+  //       return null;
+  //   }
+  // }, [selectedTab, recipe]);
 
   const RecipeDetailsModalHeaderChildren = useMemo(() => {
     if (!recipe) return;
@@ -389,7 +387,7 @@ const DetailsRecipe = () => {
         snapPoints={[hp(12), hp(100)]}
         modalRef={recipesDetailsTabBarSheetModal}
         scrollViewChildren={RecipeDetailsModalContentChildren}
-        footerChildren={RecipeDetailsModalFooterChildren}
+        // footerChildren={RecipeDetailsModalFooterChildren}
       />
 
       <LinearGradient

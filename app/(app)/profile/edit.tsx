@@ -34,7 +34,7 @@ const editProfileScreen = () => {
   const [profileUrl, setProfileUrl] = useState<string>(user.profileUrl || "");
 
   const handleSubmitEditProfile = async () => {
-    if (username.trim() === "" || bio.trim() === "") {
+    if (username.trim() === "") {
       Alert.alert("Edit Profile", "Please fill all the fields");
       return;
     }
@@ -44,7 +44,7 @@ const editProfileScreen = () => {
       email: user.email,
       username: username.trim(),
       profileUrl: profileUrl.trim(),
-      bio: bio.trim(),
+      bio: bio.trim() ? bio.trim() : "",
     };
 
     const response = await userService.updateUser(user, updatedUserData);

@@ -72,7 +72,6 @@ const AddGroceryItemModal = ({
   }, [groceryList]);
 
   const handleSheetChanges = (index: number) => {
-    console.log("Sheet Changes", index);
     if (index === -1) {
       closeModal ? closeModal(selectedItems) : () => {};
     }

@@ -161,16 +161,38 @@ const GroceryListCard = ({ groceryList }: { groceryList: GroceryListType }) => {
             <Text style={styles.title} numberOfLines={2} ellipsizeMode="tail">
               {groceryList.name}
             </Text>
-            <TouchableOpacity
-              style={{ padding: wp(2), alignSelf: "flex-start" }}
-              onPress={() => groceryListSettingsModal.current?.present()}
-            >
-              <Ionicons
-                name="ellipsis-vertical"
-                size={hp(2.5)}
-                color={Colors.darkGrey}
-              />
-            </TouchableOpacity>
+            <View style={styles.groceryListCardIconsContainer}>
+              {groceryList.uuids.length > 0 && (
+                <View style={styles.peoplesCounterContainer}>
+                  <Text
+                    style={[
+                      styles.subTitle,
+                      {
+                        marginBottom: hp(0.5),
+                      },
+                    ]}
+                  >
+                    {groceryList.uuids.length}
+                  </Text>
+                  <Ionicons
+                    name="people"
+                    size={hp(2.5)}
+                    color={Colors.darkGrey}
+                  />
+                </View>
+              )}
+
+              <TouchableOpacity
+                style={{ padding: wp(2), alignSelf: "flex-start" }}
+                onPress={() => groceryListSettingsModal.current?.present()}
+              >
+                <Ionicons
+                  name="ellipsis-vertical"
+                  size={hp(2.5)}
+                  color={Colors.darkGrey}
+                />
+              </TouchableOpacity>
+            </View>
           </View>
           <View style={styles.lowerContentContainer}>
             <View style={{ flex: 1 }}>
@@ -215,6 +237,18 @@ const styles = StyleSheet.create({
     borderRadius: hp(ComponentParams.button.height.large / 2),
     overflow: "visible",
   },
+  peoplesCounterContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    gap: wp(0.5),
+  },
+  groceryListCardIconsContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    gap: hp(1),
+  },
   gradientContainer: {
     borderRadius: hp(ComponentParams.button.height.large / 2),
     position: "absolute",
@@ -228,7 +262,6 @@ const styles = StyleSheet.create({
     gap: hp(2),
   },
   headerContainer: {
-    flex: 1,
     width: "100%",
     display: "flex",
     flexDirection: "row",
