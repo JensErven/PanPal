@@ -1,5 +1,11 @@
-import { View, Text, StyleSheet, ActivityIndicator } from "react-native";
-import React from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  ActivityIndicator,
+  TouchableOpacity,
+} from "react-native";
+import React, { useEffect, useMemo } from "react";
 import { RecipeType } from "@/models/RecipeType";
 import { Ionicons } from "@expo/vector-icons";
 import Colors from "@/constants/Colors";
@@ -12,12 +18,14 @@ import {
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
 import RoundButton from "../buttons/RoundButton";
+import { useRecipes } from "@/context/recipesContext";
 
 interface RecipeSuggestionCardProps {
   username: string;
   recipe: RecipeType | null;
-  saveRecipe?: () => void;
+  saveRecipe?: (recipe: RecipeType) => void;
   loading?: boolean;
+  handleClick?: (recipe: RecipeType) => void;
 }
 
 const RecipeSuggestionCard: React.FC<RecipeSuggestionCardProps> = ({
@@ -25,11 +33,16 @@ const RecipeSuggestionCard: React.FC<RecipeSuggestionCardProps> = ({
   username,
   saveRecipe,
   loading,
+  handleClick,
 }) => {
   return (
     <>
       {recipe && (
-        <View style={[styles.container]}>
+        <TouchableOpacity
+          style={[styles.container]}
+          activeOpacity={1}
+          onPress={() => handleClick && handleClick(recipe)}
+        >
           <LinearGradient
             style={styles.gradientContainer}
             colors={[
@@ -42,22 +55,21 @@ const RecipeSuggestionCard: React.FC<RecipeSuggestionCardProps> = ({
           />
           <View style={styles.saveButtonContainer}>
             <RoundButton
-              handlePress={() => saveRecipe && saveRecipe()}
+              handlePress={() => saveRecipe && saveRecipe(recipe)}
               transparent={false}
               backgroundColor={Colors.secondaryWhite}
               height={ComponentParams.button.height.medium}
-              children={
-                loading ? (
-                  <ActivityIndicator size="small" color={Colors.mediumPurple} />
-                ) : (
-                  <Ionicons
-                    name="bookmark"
-                    size={hp(2.7)}
-                    color={Colors.primarySkyBlue}
-                  />
-                )
-              }
-            />
+            >
+              {loading ? (
+                <ActivityIndicator size="small" color={Colors.mediumPurple} />
+              ) : (
+                <Ionicons
+                  name="bookmark"
+                  size={hp(2.7)}
+                  color={Colors.primarySkyBlue}
+                />
+              )}
+            </RoundButton>
           </View>
           <View style={[{}, styles.isGeneratedIconContainer]}>
             <Ionicons
@@ -109,7 +121,7 @@ const RecipeSuggestionCard: React.FC<RecipeSuggestionCardProps> = ({
               />
             )}
           </View>
-        </View>
+        </TouchableOpacity>
       )}
     </>
   );

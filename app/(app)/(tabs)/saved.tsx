@@ -194,9 +194,6 @@ const Saved = () => {
     setToShowRecipesType("All");
   };
 
-  useEffect(() => {
-    console.log("viewableItems", viewableItems.value);
-  }, [viewableItems]);
   return (
     <LinearGradient
       style={styles.gradientBackground}

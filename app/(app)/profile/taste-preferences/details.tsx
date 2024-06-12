@@ -34,10 +34,8 @@ const TastePreferencesScreen = () => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    console.log(user.userId);
     if (tastePreferences) {
       setIsLoading(false);
-      console.log(tastePreferences.cuisineTypes);
     }
   }, []);
 

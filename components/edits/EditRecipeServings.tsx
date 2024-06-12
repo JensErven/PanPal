@@ -8,6 +8,7 @@ import {
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
 import ComponentParams from "@/constants/ComponentParams";
+import { LinearGradient } from "expo-linear-gradient";
 
 const EditRecipeServings = ({
   recipe = {} as RecipeType,
@@ -39,23 +40,16 @@ const EditRecipeServings = ({
       >
         <Text style={styles.contentItemTitle}>{title}</Text>
         <View style={styles.contentItemRight}>
-          <View
-            style={{
-              backgroundColor: Colors.secondaryWhite,
-              borderRadius: hp(ComponentParams.button.height.medium / 2),
-              height: hp(ComponentParams.button.height.medium),
-              paddingVertical: hp(1),
-              paddingHorizontal: wp(2),
-              flexDirection: "row",
-              justifyContent: "center",
-              alignItems: "center",
-              gap: wp(2),
-            }}
+          <LinearGradient
+            colors={[Colors.primarySkyBlue, Colors.secondaryWhite]}
+            style={styles.contentItemInput}
+            start={[0.5, 0]}
+            end={[0.5, 1]}
           >
             <TextInput
               maxLength={2}
               keyboardType="numeric"
-              style={styles.contentItemInput}
+              style={styles.textInput}
               value={servingsInput}
               placeholder="ex. 4"
               onChangeText={handleServingsChange}
@@ -63,8 +57,16 @@ const EditRecipeServings = ({
                 Colors.light.components.inputField.placeholderTextColor
               }
             />
+          </LinearGradient>
+
+          <LinearGradient
+            colors={[Colors.white, Colors.secondaryWhite]}
+            style={styles.gradientContainer}
+            start={[0, 0]}
+            end={[1, 1]}
+          >
             <Text style={styles.unitText}>Servings</Text>
-          </View>
+          </LinearGradient>
         </View>
       </View>
     </View>
@@ -75,13 +77,42 @@ export default EditRecipeServings;
 
 const styles = StyleSheet.create({
   contentItemInput: {
-    justifyContent: "center",
-    alignItems: "center",
-    paddingHorizontal: wp(2),
-    height: hp(ComponentParams.button.height.medium),
-    borderRightColor: Colors.primarySkyBlue,
+    borderTopLeftRadius: hp(ComponentParams.button.height.medium / 2),
+    borderBottomLeftRadius: hp(ComponentParams.button.height.medium / 2),
+    backgroundColor: Colors.secondaryWhite,
+    paddingHorizontal: wp(4),
+    fontFamily: Fonts.text_2.fontFamily,
+    fontSize: Fonts.text_2.fontSize,
+    color: Colors.darkGrey,
+    lineHeight: Fonts.text_2.lineHeight,
+    borderBottomColor: Colors.white,
+    borderBottomWidth: 1,
+    borderRightColor: Colors.white,
     borderRightWidth: 1,
-    textAlign: "center",
+    borderLeftWidth: 0.15,
+    borderLeftColor: Colors.white,
+  },
+  gradientContainer: {
+    borderTopColor: Colors.white,
+    borderTopWidth: 1,
+    borderLeftWidth: 1,
+    borderLeftColor: Colors.white,
+    borderRightColor: Colors.white,
+    borderRightWidth: 0.25,
+    flexDirection: "row",
+    paddingHorizontal: wp(4),
+    minHeight: hp(ComponentParams.button.height.medium),
+    borderTopRightRadius: hp(ComponentParams.button.height.medium / 2),
+    borderBottomRightRadius: hp(ComponentParams.button.height.medium / 2),
+    alignItems: "center",
+    justifyContent: "center",
+    elevation: 10,
+    shadowColor: Colors.darkBlue,
+    backgroundColor: Colors.white,
+  },
+  textInput: {
+    minHeight: hp(ComponentParams.button.height.medium),
+    flex: 1,
     fontFamily: Fonts.text_2.fontFamily,
     fontSize: Fonts.text_2.fontSize,
     color: Colors.darkGrey,
@@ -103,13 +134,11 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    gap: wp(2),
   },
   unitText: {
     fontFamily: Fonts.text_1.fontFamily,
     fontSize: Fonts.text_2.fontSize,
     color: Colors.darkGrey,
     lineHeight: Fonts.text_2.lineHeight,
-    marginRight: wp(2),
   },
 });

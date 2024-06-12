@@ -73,7 +73,7 @@ const GroceryListAddScreen = () => {
       <RoundButton
         handlePress={() => handleAddGroceryList(groceryListName.trim())}
       >
-        <Ionicons name="save" size={hp(2.7)} color={Colors.white} />
+        <Ionicons name="checkmark" size={hp(2.7)} color={Colors.white} />
       </RoundButton>
     );
   };
@@ -112,42 +112,47 @@ const GroceryListAddScreen = () => {
           <CustomKeyBoardView>
             <View style={styles.content}>
               <View style={{ flexDirection: "column", gap: hp(2) }}>
-                <View style={styles.contentItem}>
-                  <View style={styles.contentItemInputContainer}>
-                    <Ionicons
-                      name="pencil"
-                      size={hp(2.7)}
-                      color={
-                        Colors.light.components.inputField.placeholderTextColor
-                      }
-                    />
-                    <TextInput
-                      value={groceryListName}
-                      onChangeText={setGroceryListName}
-                      style={styles.contentItemInput}
-                      placeholder="Grocery list name"
-                      placeholderTextColor={
-                        Colors.light.components.inputField.placeholderTextColor
-                      }
-                    />
-                    {groceryListName.length > 0 && (
-                      <View style={styles.clearButton}>
-                        <RoundButton
-                          height={ComponentParams.button.height.small}
-                          transparent={false}
-                          backgroundColor={Colors.primarySkyBlue}
-                          handlePress={() => setGroceryListName("")}
-                        >
-                          <Ionicons
-                            name="close"
-                            size={hp(2.7)}
-                            color={Colors.darkGrey}
-                          />
-                        </RoundButton>
-                      </View>
-                    )}
-                  </View>
+                <View style={styles.contentItemInputContainer}>
+                  <LinearGradient
+                    colors={[Colors.primarySkyBlue, Colors.secondaryWhite]}
+                    style={styles.gardientContainer}
+                    start={[0.5, 0]}
+                    end={[0.5, 1]}
+                  />
+                  <Ionicons
+                    name="pencil"
+                    size={hp(2.7)}
+                    color={
+                      Colors.light.components.inputField.placeholderTextColor
+                    }
+                  />
+                  <TextInput
+                    value={groceryListName}
+                    onChangeText={setGroceryListName}
+                    style={styles.contentItemInput}
+                    placeholder="Grocery list name"
+                    placeholderTextColor={
+                      Colors.light.components.inputField.placeholderTextColor
+                    }
+                  />
+                  {groceryListName.length > 0 && (
+                    <View style={styles.clearButton}>
+                      <RoundButton
+                        height={ComponentParams.button.height.small}
+                        transparent={false}
+                        backgroundColor={Colors.primarySkyBlue}
+                        handlePress={() => setGroceryListName("")}
+                      >
+                        <Ionicons
+                          name="close"
+                          size={hp(2.7)}
+                          color={Colors.darkGrey}
+                        />
+                      </RoundButton>
+                    </View>
+                  )}
                 </View>
+
                 <View style={styles.contentItem}>
                   <Text style={styles.inputLabel}>Suggestions</Text>
                   <View style={styles.suggestionsListContainer}>
@@ -173,7 +178,7 @@ const GroceryListAddScreen = () => {
                     transparent={true}
                     children={
                       <Ionicons
-                        name="save"
+                        name="checkmark"
                         size={hp(2.7)}
                         color={Colors.white}
                       />
@@ -209,6 +214,14 @@ const styles = StyleSheet.create({
     borderTopColor: Colors.darkBlue,
     borderTopWidth: wp(1),
   },
+  gardientContainer: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    borderRadius: hp(ComponentParams.button.height.large / 2),
+  },
   content: {
     flexDirection: "column",
     justifyContent: "space-between",
@@ -227,15 +240,22 @@ const styles = StyleSheet.create({
     lineHeight: Fonts.text_2.lineHeight,
   },
   contentItemInputContainer: {
-    backgroundColor: Colors.secondaryWhite,
-    flexDirection: "row",
-    justifyContent: "flex-start",
-    alignItems: "center",
-    height: hp(ComponentParams.button.height.large),
-    borderRadius: hp(ComponentParams.button.height.large),
-    paddingRight: wp(1),
-    paddingLeft: wp(4),
     gap: wp(2),
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingLeft: wp(4),
+    flex: 1,
+    borderRadius: hp(ComponentParams.button.height.large / 2),
+    backgroundColor: Colors.secondaryWhite,
+    fontFamily: Fonts.text_2.fontFamily,
+    fontSize: Fonts.text_2.fontSize,
+    color: Colors.darkGrey,
+    lineHeight: Fonts.text_2.lineHeight,
+    borderBottomColor: Colors.white,
+    borderBottomWidth: 1,
+    borderRightColor: Colors.white,
+    borderRightWidth: 1,
   },
   clearButton: {
     marginRight: wp(2),

@@ -7,6 +7,7 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
+import { LinearGradient } from "expo-linear-gradient";
 
 const EditProfileBio = ({
   bio,
@@ -32,19 +33,26 @@ const EditProfileBio = ({
           {bio.length || 0}/{maxCharAmount}
         </Text>
       </View>
-
-      <TextInput
-        multiline={true}
-        numberOfLines={8}
-        maxLength={maxCharAmount}
+      <LinearGradient
+        colors={[Colors.primarySkyBlue, Colors.secondaryWhite]}
         style={styles.contentItemInput}
-        value={bio}
-        placeholder="tell us about yourself"
-        placeholderTextColor={"#A0B7D6"}
-        onChangeText={(text: string) => {
-          if (bio !== undefined) setBio(text);
-        }}
-      />
+        start={[0.5, 0]}
+        end={[0.5, 1]}
+      >
+        <TextInput
+          maxLength={maxCharAmount}
+          multiline={true}
+          style={styles.textInput}
+          value={bio}
+          placeholder="tell us about yourself"
+          placeholderTextColor={
+            Colors.light.components.inputField.placeholderTextColor
+          }
+          onChangeText={(text: string) => {
+            setBio(text);
+          }}
+        />
+      </LinearGradient>
     </View>
   );
 };
@@ -54,12 +62,24 @@ export default EditProfileBio;
 const styles = StyleSheet.create({
   contentItemInput: {
     flex: 1,
-    textAlignVertical: "top",
-    minHeight: hp(ComponentParams.button.height.medium),
     borderRadius: hp(ComponentParams.button.height.medium / 2),
     backgroundColor: Colors.secondaryWhite,
-    paddingHorizontal: wp(4),
+    fontFamily: Fonts.text_2.fontFamily,
+    fontSize: Fonts.text_2.fontSize,
+    color: Colors.darkGrey,
+    lineHeight: Fonts.text_2.lineHeight,
+    borderBottomColor: Colors.white,
+    borderBottomWidth: 1,
+    borderRightColor: Colors.white,
+    borderRightWidth: 1,
+  },
+  textInput: {
+    width: "100%",
+    minHeight: hp(ComponentParams.button.height.medium),
+    borderRadius: hp(ComponentParams.button.height.medium / 2),
+
     paddingVertical: hp(1),
+    paddingHorizontal: wp(4),
     fontFamily: Fonts.text_2.fontFamily,
     fontSize: Fonts.text_2.fontSize,
     color: Colors.darkGrey,

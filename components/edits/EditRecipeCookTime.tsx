@@ -8,6 +8,7 @@ import Colors from "@/constants/Colors";
 import ComponentParams from "@/constants/ComponentParams";
 import { RecipeType } from "@/models/RecipeType";
 import Fonts from "@/constants/Fonts";
+import { LinearGradient } from "expo-linear-gradient";
 
 const EditRecipeCookTime = ({
   recipe,
@@ -61,17 +62,17 @@ const EditRecipeCookTime = ({
       >
         <Text style={styles.contentItemTitle}>{title}</Text>
         <View style={styles.contentItemRight}>
+          <LinearGradient
+            colors={[Colors.primarySkyBlue, Colors.secondaryWhite]}
+            style={styles.gradientContainer}
+            start={[0.5, 0]}
+            end={[0.5, 1]}
+          />
           <View
             style={{
-              backgroundColor: Colors.secondaryWhite,
-              borderRadius: hp(ComponentParams.button.height.medium / 2),
-              height: hp(ComponentParams.button.height.medium),
-              paddingVertical: hp(1),
-              paddingHorizontal: wp(2),
               flexDirection: "row",
               justifyContent: "center",
               alignItems: "center",
-              gap: wp(2),
             }}
           >
             <TextInput
@@ -88,19 +89,13 @@ const EditRecipeCookTime = ({
             />
             <Text style={styles.unitText}>h</Text>
           </View>
+          <View style={styles.verticalLine}></View>
 
-          <Text style={styles.text}>:</Text>
           <View
             style={{
-              backgroundColor: Colors.secondaryWhite,
-              borderRadius: hp(ComponentParams.button.height.medium / 2),
-              height: hp(ComponentParams.button.height.medium),
-              paddingVertical: hp(1),
-              paddingHorizontal: wp(2),
               flexDirection: "row",
               justifyContent: "center",
               alignItems: "center",
-              gap: wp(2),
             }}
           >
             <TextInput
@@ -127,17 +122,20 @@ export default EditRecipeCookTime;
 
 const styles = StyleSheet.create({
   contentItemInput: {
-    justifyContent: "center",
-    alignItems: "center",
-    paddingHorizontal: wp(2),
     height: hp(ComponentParams.button.height.medium),
-    borderRightColor: Colors.primarySkyBlue,
-    borderRightWidth: 1,
-    textAlign: "center",
+    borderRadius: hp(ComponentParams.button.height.medium / 2),
     fontFamily: Fonts.text_2.fontFamily,
     fontSize: Fonts.text_2.fontSize,
     color: Colors.darkGrey,
     lineHeight: Fonts.text_2.lineHeight,
+  },
+  gradientContainer: {
+    borderRadius: hp(ComponentParams.button.height.medium / 2),
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
   },
   text: {
     fontFamily: Fonts.text_2.fontFamily,
@@ -151,17 +149,32 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.heading_3.fontFamily,
     lineHeight: Fonts.heading_3.lineHeight,
   },
+  verticalLine: {
+    height: hp(ComponentParams.button.height.medium),
+    width: wp(1),
+    backgroundColor: Colors.secondaryWhite,
+  },
   contentItemRight: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
     gap: wp(2),
+    paddingHorizontal: wp(4),
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    borderRadius: hp(ComponentParams.button.height.medium / 2),
+    backgroundColor: Colors.secondaryWhite,
+    fontFamily: Fonts.text_2.fontFamily,
+    fontSize: Fonts.text_2.fontSize,
+    color: Colors.darkGrey,
+    lineHeight: Fonts.text_2.lineHeight,
+    borderBottomColor: Colors.white,
+    borderBottomWidth: 1,
+    borderRightColor: Colors.white,
+    borderRightWidth: 1,
   },
   unitText: {
     fontFamily: Fonts.text_1.fontFamily,
     fontSize: Fonts.text_2.fontSize,
     color: Colors.darkGrey,
     lineHeight: Fonts.text_2.lineHeight,
-    marginRight: wp(2),
   },
 });

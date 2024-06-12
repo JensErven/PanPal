@@ -4,6 +4,8 @@ import {
   Text,
   Touchable,
   TouchableOpacity,
+  Button,
+  ToastAndroid,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 
@@ -37,10 +39,15 @@ import SetUpTasteProfileCard from "@/components/home/SetUpTasteProfileCard";
 import { useAuth } from "@/context/authContext";
 import { TastePreferencesType } from "@/models/TastePreferencesType";
 import { dietTypes } from "@/constants/tastePreferences/DietTypes";
+import { recipeService } from "@/services/db/recipe.services";
+import { uuid } from "expo-modules-core";
+import { recipeExampleJsonType } from "@/models/openai/recipeExampleJsonType";
+import { useRecipes } from "@/context/recipesContext";
 
 const Home = () => {
-  const { user, tastePreferences, substractCredits, credits } = useAuth();
-
+  const { user, tastePreferences, substractCredits, credits, logout } =
+    useAuth();
+  const { recipes } = useRecipes();
   const [promptSuggestions, setPromptSuggestions] = useState<string[]>([]);
   const [suggestedRecipes, setSuggestedRecipes] = useState<RecipeType[]>([]);
 
@@ -61,19 +68,17 @@ const Home = () => {
         tastePreferences.dislikedIngredients.length === 0;
 
       if (tastePreferencesEmpty) {
-        console.log("Clearing all suggested recipes");
         handleClearAllSuggestedRecipes();
       } else {
         if (suggestedRecipes.length < 3 && credits.credits > 0) {
-          console.log("Generating recipe suggestion...");
           generateRecipeSuggestion(tastePreferences).then((recipe) => {
             if (recipe) {
+              recipe.id = uuid.v4();
               setSuggestedRecipes((prevRecipes) => [...prevRecipes, recipe]);
               recipeSuggestionService.storeSuggestedRecipe(recipe); // Save the new recipe
             }
           });
         } else {
-          console.log("Suggested recipes already exist");
           return;
         }
       }
@@ -81,18 +86,19 @@ const Home = () => {
   }, [tastePreferences]);
 
   const handleGenerateRecipeSuggestion = async () => {
-    console.log("Generating recipe suggestion...");
-    if (tastePreferences) {
-      const recipe = await generateRecipeSuggestion(tastePreferences);
+    if (!tastePreferences) return;
+    await generateRecipeSuggestion(tastePreferences).then((recipe) => {
       if (recipe) {
+        recipe.id = uuid.v4();
         setSuggestedRecipes((prevRecipes) => [...prevRecipes, recipe]);
         recipeSuggestionService.storeSuggestedRecipe(recipe); // Save the new recipe
       }
-    }
+    });
   };
 
   const generatePromptSuggestions = (preferences: TastePreferencesType) => {
-    const { cuisineTypes, allergyTypes, dislikedIngredients } = preferences;
+    const { cuisineTypes, allergyTypes, dislikedIngredients, dietTypes } =
+      preferences;
 
     const prompts = [
       `What are some ${
@@ -113,7 +119,7 @@ const Home = () => {
 
       `What are some healthy meals for a ${
         dietTypes.length
-          ? `${dietTypes[randomArrayIndex(dietTypes)]} diet`
+          ? `${dietTypes[randomArrayIndex(dislikedIngredients)]} diet`
           : "diet?"
       }?`,
       "What are some quick and easy meals for a busy day?",
@@ -156,7 +162,7 @@ const Home = () => {
 
     try {
       if (credits.credits < 1) {
-        console.log("Not enough credits to generate recipe");
+        console.log("Not  credits to generate recipe");
         return undefined;
       }
       const response = await openaiServices.generateRecipeSuggestion(message);
@@ -164,7 +170,6 @@ const Home = () => {
       if (response && response.content) {
         const recipe = parseRecipeContent(response.content);
 
-        substractCredits(1);
         return recipe;
       } else {
         throw new Error("Invalid response from OpenAI");
@@ -173,6 +178,37 @@ const Home = () => {
       console.error("Error in getting response:", error);
       return undefined;
     }
+  };
+
+  const handleSaveSuggestedRecipe = async (recipe: RecipeType) => {
+    if (!recipe.id) return;
+
+    const formattedRecipe = {
+      ...recipe,
+      uuid: user.userId,
+      isGenerated: true,
+      createdAt: new Date().toISOString(),
+    };
+
+    await recipeService
+      .createRecipe(formattedRecipe)
+      .then((response) => {
+        if (!response.id) return;
+      })
+      .catch((e) => {
+        console.error("Error saving recipe:", e);
+      });
+
+    await recipeSuggestionService.deleteSuggestedRecipe(recipe.id);
+    setSuggestedRecipes(
+      suggestedRecipes.filter(
+        (suggestedRecipe) => suggestedRecipe.id !== recipe.id
+      )
+    );
+    ToastAndroid.show(
+      "Recipe saved successfully to bookmarks!",
+      ToastAndroid.SHORT
+    );
   };
 
   const customHeaderChildren = () => {
@@ -329,12 +365,11 @@ const Home = () => {
                     credits={credits.credits}
                     recipeSuggestions={suggestedRecipes}
                     user={user}
-                    saveRecipe={() => {
-                      setTimeout(() => {
-                        console.log("Recipe saved");
-                      }, 2000);
+                    saveRecipe={(recipe: RecipeType) => {
+                      handleSaveSuggestedRecipe(recipe);
                     }}
                     generateRecipe={() => handleGenerateRecipeSuggestion()}
+                    handleClick={() => {}}
                   />
                 </View>
               ) : (

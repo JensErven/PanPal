@@ -93,7 +93,6 @@ const uploadImageToFirebase = async (image: string) => {
       (snapshot) => {
         const progress =
           (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-        console.log("Upload is " + progress + "% done");
         switch (snapshot.state) {
           case "paused":
             break;
@@ -112,7 +111,6 @@ const uploadImageToFirebase = async (image: string) => {
 
     // Get download URL
     const downloadURL = await getDownloadURL(storageRef);
-    console.log("File available at", downloadURL);
     return downloadURL;
   } catch (error) {
     throw error; // Re-throw the error to be caught by the caller

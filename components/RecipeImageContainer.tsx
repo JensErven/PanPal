@@ -26,18 +26,19 @@ import { openaiServices } from "@/services/api/openai.services";
 import { RecipeType } from "@/models/RecipeType";
 import { AuthContext, UserCreditsType, useAuth } from "@/context/authContext";
 
-const RecipeImageContainer = ({
+type RecipeImageContainerProps = {
+  allowedToEdit?: boolean;
+  img: string;
+  recipe?: RecipeType;
+  handleNewImage: (image: string) => void;
+  setRecipe?: (recipe: RecipeType) => void;
+};
+const RecipeImageContainer: React.FC<RecipeImageContainerProps> = ({
   allowedToEdit = false,
   img,
   recipe,
   handleNewImage,
   setRecipe,
-}: {
-  allowedToEdit: boolean;
-  recipe?: RecipeType;
-  img: string;
-  handleNewImage: (image: string) => void;
-  setRecipe?: (recipe: RecipeType) => void;
 }) => {
   // image string
   const generateImageCreditCost = 10;
@@ -276,7 +277,6 @@ const styles = StyleSheet.create({
 
   modalViewContainer: {
     flex: 1,
-
     paddingHorizontal: wp(4),
   },
   modalBackground: {

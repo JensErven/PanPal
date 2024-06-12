@@ -27,7 +27,8 @@ interface RecipeSuggestionsListProps {
   user?: any;
   credits?: number;
   generateRecipe?: () => void;
-  saveRecipe?: () => void;
+  saveRecipe?: (recipe: RecipeType) => void;
+  handleClick?: (recipe: RecipeType) => void;
 }
 
 const RecipeSuggestionsList: React.FC<RecipeSuggestionsListProps> = ({
@@ -36,6 +37,7 @@ const RecipeSuggestionsList: React.FC<RecipeSuggestionsListProps> = ({
   credits,
   generateRecipe,
   saveRecipe,
+  handleClick,
 }) => {
   const [loading, setLoading] = useState<boolean>(false);
   const [saveRecipeLoading, setSaveRecipeLoading] = useState<boolean>(false);
@@ -70,7 +72,7 @@ const RecipeSuggestionsList: React.FC<RecipeSuggestionsListProps> = ({
 
   const handleSaveRecipe = async () => {
     setSaveRecipeLoading(true);
-    await saveRecipe?.();
+    await saveRecipe?.(recipeSuggestions[currentIndex]);
     setSaveRecipeLoading(false);
   };
 
@@ -105,7 +107,12 @@ const RecipeSuggestionsList: React.FC<RecipeSuggestionsListProps> = ({
               recipe={recipe}
               loading={saveRecipeLoading}
               username={user?.username}
-              saveRecipe={handleSaveRecipe}
+              saveRecipe={(recipe: RecipeType) =>
+                saveRecipe && saveRecipe(recipe)
+              }
+              handleClick={(recipe: RecipeType) =>
+                handleClick && handleClick(recipe)
+              }
             />
           </View>
         ))}

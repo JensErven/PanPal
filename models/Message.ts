@@ -5,4 +5,5 @@ import { tipsExampleJsonType } from "./openai/tipsExampleJsonType";
 export type Message = {
   role: "system" | "user" | "assistant";
   content: string;
+  imageUrl?: string;
 };

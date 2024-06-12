@@ -30,13 +30,10 @@ import RoundButton from "@/components/buttons/RoundButton";
 import CoinCount from "@/components/common/CoinCount";
 
 const ProfileScreen = () => {
-  const { user, logout, storeUserTastePreferencesToFirebase, credits } =
-    useAuth();
+  const { user, logout, credits } = useAuth();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isBusinessModelOn, setIsBusinessModelOn] = useState<boolean>(false);
   const handleLogout = async () => {
-    await storeUserTastePreferencesToFirebase(user.uid);
-    await AsyncStorage.removeItem("userTastePreferences");
     await logout();
   };
 
@@ -109,16 +106,17 @@ const ProfileScreen = () => {
                   <Text style={styles.userEmail}>{user.email}</Text>
                 </View>
               </View>
+              {user.bio && (
+                <View style={styles.titleContainer}>
+                  <View className="flex w-full justify-between flex-row">
+                    <Text style={styles.title}>About Me</Text>
+                  </View>
 
-              <View style={styles.titleContainer}>
-                <View className="flex w-full justify-between flex-row">
-                  <Text style={styles.title}>About Me</Text>
+                  <Text style={styles.text}>
+                    {user.bio ? user.bio : "No bio found."}
+                  </Text>
                 </View>
-
-                <Text style={styles.text}>
-                  {user.bio ? user.bio : "No bio found."}
-                </Text>
-              </View>
+              )}
               <View style={styles.contentItemcontainer}>
                 <LinearGradient
                   style={styles.contentItemGradientContainer}

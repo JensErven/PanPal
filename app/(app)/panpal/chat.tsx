@@ -19,7 +19,7 @@ import ComponentParams from "@/constants/ComponentParams";
 import { Ionicons } from "@expo/vector-icons";
 import Fonts from "@/constants/Fonts";
 import { Message } from "@/models/Message";
-import ChatInputBar from "@/components/ChatInputBar";
+import ChatInputBar, { MessageWithImage } from "@/components/ChatInputBar";
 import { openaiServices } from "@/services/api/openai.services";
 import MessageCard from "@/components/MessageCard";
 import * as Haptics from "expo-haptics";
@@ -51,7 +51,6 @@ const PanPalChatScreen = () => {
   const scrollViewRef = useRef<ScrollView>(null);
 
   useEffect(() => {
-    console.log("Prompt:", prompt);
     if (typeof prompt === "string") {
       const message: Message = {
         role: "user",
@@ -208,7 +207,6 @@ const PanPalChatScreen = () => {
                 title={randomIntro.greeting}
                 text={randomIntro.introText}
                 options={[
-                  "Get some suggestions",
                   "Get a random cooking tip",
                   `Try a "${randomIntro.cuisineType}" recipe`,
                   `Give me a "${randomIntro.mealType}" suggestion`,

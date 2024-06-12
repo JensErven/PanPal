@@ -136,7 +136,7 @@ const RecipeCard = ({
 
           <Text
             style={styles.recipeInfoText}
-            numberOfLines={2}
+            numberOfLines={1}
             ellipsizeMode="tail"
           >
             {recipe.data.cuisineType ? recipe.data.cuisineType + " | " : ""}

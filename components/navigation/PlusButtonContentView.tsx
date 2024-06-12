@@ -85,9 +85,7 @@ const PlusButtonContentView = ({
             <StandardButton
               iconRight={
                 <RoundButton
-                  handlePress={() =>
-                    console.log("Add custom recipe button pressed")
-                  }
+                  handlePress={() => {}}
                   height={ComponentParams.button.height.medium}
                   transparent={true}
                   children={

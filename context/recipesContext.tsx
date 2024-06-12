@@ -48,8 +48,6 @@ export const RecipesProvider = ({
         }
       );
       return () => subscriber();
-    } else {
-      console.log("User is not authenticated");
     }
   }, [user]);
 

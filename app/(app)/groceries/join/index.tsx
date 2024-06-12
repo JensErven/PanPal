@@ -37,12 +37,10 @@ const GroceryListAddScreen = () => {
 
     await joinGroceryList(groceryListSharedCode, user.userId)
       .then((res) => {
-        console.log("Joined GroceryList: ", res);
         ToastAndroid.show(res.message, ToastAndroid.SHORT);
         router.back();
       })
       .catch((err) => {
-        console.log("Error: ", err);
         ToastAndroid.show("Failed to join grocery list", ToastAndroid.SHORT);
       });
   };
@@ -91,37 +89,41 @@ const GroceryListAddScreen = () => {
           <CustomKeyBoardView>
             <View style={styles.content}>
               <View style={{ flexDirection: "column", gap: hp(2) }}>
-                <View style={styles.contentItem}>
-                  <View style={styles.contentItemInputContainer}>
-                    <Ionicons
-                      name="code-outline"
-                      size={hp(2.7)}
-                      color={"#A0B7D6"}
-                    />
-                    <TextInput
-                      value={groceryListSharedCode}
-                      onChangeText={setGroceryListSharedCode}
-                      style={styles.contentItemInput}
-                      placeholder="Enter shared code"
-                      placeholderTextColor={"#A0B7D6"}
-                    />
-                    {groceryListSharedCode.length > 0 && (
-                      <View style={styles.clearButton}>
-                        <RoundButton
-                          height={ComponentParams.button.height.small}
-                          transparent={false}
-                          backgroundColor={Colors.primarySkyBlue}
-                          handlePress={() => setGroceryListSharedCode("")}
-                        >
-                          <Ionicons
-                            name="close"
-                            size={hp(2.7)}
-                            color={Colors.darkGrey}
-                          />
-                        </RoundButton>
-                      </View>
-                    )}
-                  </View>
+                <View style={styles.contentItemInputContainer}>
+                  <LinearGradient
+                    colors={[Colors.primarySkyBlue, Colors.secondaryWhite]}
+                    style={styles.gardientContainer}
+                    start={[0.5, 0]}
+                    end={[0.5, 1]}
+                  />
+                  <Ionicons
+                    name="code-outline"
+                    size={hp(2.7)}
+                    color={"#A0B7D6"}
+                  />
+                  <TextInput
+                    value={groceryListSharedCode}
+                    onChangeText={setGroceryListSharedCode}
+                    style={styles.contentItemInput}
+                    placeholder="Enter shared code"
+                    placeholderTextColor={"#A0B7D6"}
+                  />
+                  {groceryListSharedCode.length > 0 && (
+                    <View style={styles.clearButton}>
+                      <RoundButton
+                        height={ComponentParams.button.height.small}
+                        transparent={false}
+                        backgroundColor={Colors.primarySkyBlue}
+                        handlePress={() => setGroceryListSharedCode("")}
+                      >
+                        <Ionicons
+                          name="close"
+                          size={hp(2.7)}
+                          color={Colors.darkGrey}
+                        />
+                      </RoundButton>
+                    </View>
+                  )}
                 </View>
               </View>
 
@@ -164,6 +166,14 @@ const styles = StyleSheet.create({
   gradientBackground: {
     flex: 1,
   },
+  gardientContainer: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    borderRadius: hp(ComponentParams.button.height.large / 2),
+  },
   container: {
     overflow: "hidden",
     borderTopLeftRadius: hp(ComponentParams.button.height.medium),
@@ -174,7 +184,7 @@ const styles = StyleSheet.create({
   content: {
     flexDirection: "column",
     justifyContent: "space-between",
-    borderTopLeftRadius: hp(ComponentParams.button.height.medium),
+    borderTopLeftRadius: hp(ComponentParams.button.height.large),
     flex: 1,
     padding: wp(4),
     gap: hp(2),
@@ -189,22 +199,37 @@ const styles = StyleSheet.create({
     lineHeight: Fonts.text_2.lineHeight,
   },
   contentItemInputContainer: {
-    backgroundColor: Colors.secondaryWhite,
-    flexDirection: "row",
-    justifyContent: "flex-start",
-    alignItems: "center",
-    height: hp(ComponentParams.button.height.large),
-    borderRadius: hp(ComponentParams.button.height.large),
-    paddingRight: wp(1),
-    paddingLeft: wp(4),
     gap: wp(2),
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingLeft: wp(4),
+    flex: 1,
+    borderRadius: hp(ComponentParams.button.height.large / 2),
+    backgroundColor: Colors.secondaryWhite,
+    fontFamily: Fonts.text_2.fontFamily,
+    fontSize: Fonts.text_2.fontSize,
+    color: Colors.darkGrey,
+    lineHeight: Fonts.text_2.lineHeight,
+    borderBottomColor: Colors.white,
+    borderBottomWidth: 1,
+    borderRightColor: Colors.white,
+    borderRightWidth: 1,
   },
   clearButton: {
     marginRight: wp(2),
   },
   contentItem: {
-    gap: hp(1),
-    borderRadius: hp(2),
+    flex: 1,
+    borderRadius: hp(ComponentParams.button.height.medium / 2),
+    fontFamily: Fonts.text_2.fontFamily,
+    fontSize: Fonts.text_2.fontSize,
+    color: Colors.darkGrey,
+    lineHeight: Fonts.text_2.lineHeight,
+    borderBottomColor: Colors.white,
+    borderBottomWidth: 1,
+    borderRightColor: Colors.white,
+    borderRightWidth: 1,
   },
   inputLabel: {
     textTransform: "capitalize",

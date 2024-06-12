@@ -29,6 +29,7 @@ import EditRecipeCookTime from "@/components/edits/EditRecipeCookTime";
 import EditRecipeMealType from "@/components/edits/EditRecipeMealType";
 import EditRecipePrepTime from "@/components/edits/EditRecipePrepTime";
 import EditRecipeServings from "@/components/edits/EditRecipeServings";
+import EditDietType from "@/components/edits/EditDietType";
 
 const AddCustomRecipeScreen = () => {
   const { user } = useContext<any>(AuthContext);
@@ -49,6 +50,7 @@ const AddCustomRecipeScreen = () => {
     uuid: user.userId,
     mealType: "",
     cuisineType: "",
+    dietType: "",
     createdAt: new Date().toISOString(),
   });
 
@@ -111,11 +113,7 @@ const AddCustomRecipeScreen = () => {
   return (
     <LinearGradient
       style={styles.gradientBackground}
-      colors={[
-        Colors.light.navHeader[0],
-        Colors.light.navHeader[1],
-        Colors.light.navHeader[2],
-      ]}
+      colors={Colors.light.navHeader}
       start={[0, 0]}
       end={[1, 0]}
     >
@@ -129,7 +127,7 @@ const AddCustomRecipeScreen = () => {
       <CustomKeyBoardView>
         <LinearGradient
           style={styles.container}
-          colors={[Colors.white, Colors.white]}
+          colors={[Colors.white, "#DDEBF3"]}
           start={[0.5, 0]}
           end={[0.5, 1]}
         >
@@ -178,6 +176,12 @@ const AddCustomRecipeScreen = () => {
                 </View>
                 <View style={styles.contentItem}>
                   <EditRecipeMealType
+                    recipe={recipe as RecipeType}
+                    setRecipe={setRecipe}
+                  />
+                </View>
+                <View style={styles.contentItem}>
+                  <EditDietType
                     recipe={recipe as RecipeType}
                     setRecipe={setRecipe}
                   />

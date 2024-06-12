@@ -3,14 +3,11 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const storeSuggestedRecipe = async (recipe: RecipeType) => {
   try {
-    // Retrieve current recipes from storage
+    console.log("recipe", recipe);
     const storedRecipes = await AsyncStorage.getItem("suggestedRecipes");
     const parsedRecipes = storedRecipes ? JSON.parse(storedRecipes) : [];
 
-    // Add the new recipe
     const updatedRecipes = [...parsedRecipes, recipe];
-
-    // Save back to storage
     await AsyncStorage.setItem(
       "suggestedRecipes",
       JSON.stringify(updatedRecipes)
@@ -30,6 +27,18 @@ const getSuggestedRecipes = async () => {
   }
 };
 
+const getSuggestedRecipe = async (recipeId: string) => {
+  try {
+    const storedRecipes = await AsyncStorage.getItem("suggestedRecipes");
+    const parsedRecipes = storedRecipes ? JSON.parse(storedRecipes) : [];
+
+    return parsedRecipes.find((recipe: RecipeType) => recipe.id === recipeId);
+  } catch (e) {
+    console.error("Error getting suggested recipe:", e);
+    return null;
+  }
+};
+
 const clearSuggestedRecipes = async () => {
   try {
     await AsyncStorage.removeItem("suggestedRecipes");
@@ -38,8 +47,27 @@ const clearSuggestedRecipes = async () => {
   }
 };
 
+const deleteSuggestedRecipe = async (recipeId: string) => {
+  try {
+    const storedRecipes = await AsyncStorage.getItem("suggestedRecipes");
+    const parsedRecipes = storedRecipes ? JSON.parse(storedRecipes) : [];
+
+    const updatedRecipes = parsedRecipes.filter(
+      (recipe: RecipeType) => recipe.id !== recipeId
+    );
+    await AsyncStorage.setItem(
+      "suggestedRecipes",
+      JSON.stringify(updatedRecipes)
+    );
+  } catch (e) {
+    console.error("Error deleting suggested recipe:", e);
+  }
+};
+
 export const recipeSuggestionService = {
   storeSuggestedRecipe,
   getSuggestedRecipes,
   clearSuggestedRecipes,
+  deleteSuggestedRecipe,
+  getSuggestedRecipe,
 };

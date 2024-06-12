@@ -111,18 +111,25 @@ const EditRecipeIngredientList = ({
           gap: wp(2),
         }}
       >
-        <TextInput
+        <LinearGradient
+          colors={[Colors.primarySkyBlue, Colors.secondaryWhite]}
           style={styles.contentItemInput}
-          value={ingredientTextInput}
-          placeholder="add ingredient"
-          placeholderTextColor={
-            Colors.light.components.inputField.placeholderTextColor
-          }
-          onChangeText={(text: string) => {
-            setIngredientTextInput(text);
-          }}
-          onSubmitEditing={handleAddIngredient}
-        />
+          start={[0.5, 0]}
+          end={[0.5, 1]}
+        >
+          <TextInput
+            style={styles.textInput}
+            value={ingredientTextInput}
+            placeholder="add ingredient"
+            placeholderTextColor={
+              Colors.light.components.inputField.placeholderTextColor
+            }
+            onChangeText={(text: string) => {
+              setIngredientTextInput(text);
+            }}
+            onSubmitEditing={handleAddIngredient}
+          />
+        </LinearGradient>
         <RoundButton
           handlePress={handleAddIngredient}
           transparent={false}
@@ -156,6 +163,12 @@ const EditRecipeIngredientList = ({
         <View style={styles.stepItemList}>
           {recipe?.ingredients.map((ingredient: string, index: number) => (
             <View key={index} style={styles.listItem}>
+              <LinearGradient
+                colors={[Colors.white, Colors.secondaryWhite]}
+                style={styles.gradientContainer}
+                start={[0, 0]}
+                end={[1, 1]}
+              />
               <View
                 style={{
                   width: "100%",
@@ -166,7 +179,7 @@ const EditRecipeIngredientList = ({
               >
                 <LinearGradient
                   style={styles.stepNumber}
-                  colors={[Colors.white, Colors.primarySkyBlue]}
+                  colors={[Colors.white, Colors.secondaryWhite]}
                 >
                   {ingredientImages[index] ? (
                     <Image
@@ -247,7 +260,7 @@ const EditRecipeIngredientList = ({
                       });
                     }}
                     transparent={false}
-                    backgroundColor={Colors.secondaryWhite}
+                    backgroundColor={"transparent"}
                   >
                     <Ionicons name="trash" size={hp(2.7)} color={"#C70000"} />
                   </RoundButton>
@@ -266,10 +279,22 @@ export default EditRecipeIngredientList;
 const styles = StyleSheet.create({
   contentItemInput: {
     flex: 1,
-    height: hp(ComponentParams.button.height.medium),
     borderRadius: hp(ComponentParams.button.height.medium / 2),
     backgroundColor: Colors.secondaryWhite,
     paddingHorizontal: wp(4),
+    fontFamily: Fonts.text_2.fontFamily,
+    fontSize: Fonts.text_2.fontSize,
+    color: Colors.darkGrey,
+    lineHeight: Fonts.text_2.lineHeight,
+    borderBottomColor: Colors.white,
+    borderBottomWidth: 1,
+    borderRightColor: Colors.white,
+    borderRightWidth: 1,
+  },
+  textInput: {
+    textAlignVertical: "center",
+    minHeight: hp(ComponentParams.button.height.medium),
+    flex: 1,
     fontFamily: Fonts.text_2.fontFamily,
     fontSize: Fonts.text_2.fontSize,
     color: Colors.darkGrey,
@@ -286,6 +311,14 @@ const styles = StyleSheet.create({
     fontSize: Fonts.text_2.fontSize,
     color: Colors.darkGrey,
     lineHeight: Fonts.text_2.lineHeight,
+  },
+  gradientContainer: {
+    borderRadius: hp(ComponentParams.button.height.medium / 2),
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
   },
   listItemTextInput: {
     width: "100%",
@@ -321,14 +354,22 @@ const styles = StyleSheet.create({
     textDecorationLine: "underline",
   },
   listItem: {
-    flexDirection: "column",
-    justifyContent: "space-between",
-    alignItems: "flex-start",
+    borderTopColor: Colors.white,
+    borderTopWidth: 1,
+    borderLeftWidth: 1,
+    borderLeftColor: Colors.white,
+    borderRightColor: Colors.white,
+    borderRightWidth: 0.25,
+    flexDirection: "row",
     gap: wp(2),
-    borderColor: Colors.primarySkyBlue,
-    borderWidth: 1,
-    padding: wp(1),
-    borderRadius: hp(ComponentParams.button.height.large / 2),
+
+    minHeight: hp(ComponentParams.button.height.medium),
+    borderRadius: hp(ComponentParams.button.height.medium / 2),
+    alignItems: "center",
+    justifyContent: "center",
+    elevation: 10,
+    shadowColor: Colors.darkBlue,
+    backgroundColor: Colors.white,
   },
   stepNumber: {
     backgroundColor: Colors.secondaryWhite,

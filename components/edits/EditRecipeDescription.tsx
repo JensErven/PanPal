@@ -17,6 +17,7 @@ import { RecipeType } from "@/models/RecipeType";
 import { Ionicons } from "@expo/vector-icons";
 import Fonts from "@/constants/Fonts";
 import RoundButton from "@/components/buttons/RoundButton";
+import { LinearGradient } from "expo-linear-gradient";
 
 const EditRecipeDescription = ({
   recipe,
@@ -43,19 +44,26 @@ const EditRecipeDescription = ({
         </Text>
       </View>
 
-      <TextInput
-        maxLength={maxCharAmount}
-        multiline={true}
+      <LinearGradient
+        colors={[Colors.primarySkyBlue, Colors.secondaryWhite]}
         style={styles.contentItemInput}
-        value={recipe?.description}
-        placeholder="about this recipe"
-        placeholderTextColor={
-          Colors.light.components.inputField.placeholderTextColor
-        }
-        onChangeText={(text: string) => {
-          if (recipe) setRecipe({ ...recipe, description: text });
-        }}
-      />
+        start={[0.5, 0]}
+        end={[0.5, 1]}
+      >
+        <TextInput
+          maxLength={maxCharAmount}
+          multiline={true}
+          style={styles.textInput}
+          value={recipe?.description}
+          placeholder="about this recipe"
+          placeholderTextColor={
+            Colors.light.components.inputField.placeholderTextColor
+          }
+          onChangeText={(text: string) => {
+            if (recipe) setRecipe({ ...recipe, description: text });
+          }}
+        />
+      </LinearGradient>
     </View>
   );
 };
@@ -65,11 +73,24 @@ export default EditRecipeDescription;
 const styles = StyleSheet.create({
   contentItemInput: {
     flex: 1,
-    minHeight: hp(ComponentParams.button.height.medium),
     borderRadius: hp(ComponentParams.button.height.medium / 2),
     backgroundColor: Colors.secondaryWhite,
-    paddingHorizontal: wp(4),
+    fontFamily: Fonts.text_2.fontFamily,
+    fontSize: Fonts.text_2.fontSize,
+    color: Colors.darkGrey,
+    lineHeight: Fonts.text_2.lineHeight,
+    borderBottomColor: Colors.white,
+    borderBottomWidth: 1,
+    borderRightColor: Colors.white,
+    borderRightWidth: 1,
+  },
+  textInput: {
+    width: "100%",
+    minHeight: hp(ComponentParams.button.height.medium),
+    borderRadius: hp(ComponentParams.button.height.medium / 2),
+
     paddingVertical: hp(1),
+    paddingHorizontal: wp(4),
     fontFamily: Fonts.text_2.fontFamily,
     fontSize: Fonts.text_2.fontSize,
     color: Colors.darkGrey,

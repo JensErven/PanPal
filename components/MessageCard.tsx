@@ -1,5 +1,5 @@
-import { View, Text, StyleSheet } from "react-native";
-import React from "react";
+import { View, Text, StyleSheet, Image } from "react-native";
+import React, { useEffect } from "react";
 import { Message } from "@/models/Message";
 import Colors from "@/constants/Colors";
 import Fonts from "@/constants/Fonts";
@@ -67,6 +67,13 @@ const MessageCard = ({
             style={styles.gradientContainer}
           />
           <View style={styles.messageContent}>
+            {message.imageUrl && (
+              <Image
+                style={styles.messageImage}
+                source={{ uri: message.imageUrl }} // Use uri for local file or network image
+                resizeMode="cover" // Adjust resizeMode as per your requirement
+              />
+            )}
             {renderContent(
               message.content,
               handleSelectRecipeOption,
@@ -128,6 +135,14 @@ const styles = StyleSheet.create({
     borderLeftColor: Colors.darkBlue,
     borderLeftWidth: 1,
     alignSelf: "flex-end",
+  },
+  messageImage: {
+    aspectRatio: 1,
+    height: hp(ComponentParams.button.height.large * 2),
+    borderRadius: hp(ComponentParams.button.height.medium / 2),
+    backgroundColor: Colors.secondaryWhite,
+    justifyContent: "center",
+    alignItems: "center",
   },
   assistantMessageContainer: {
     backgroundColor: Colors.white,

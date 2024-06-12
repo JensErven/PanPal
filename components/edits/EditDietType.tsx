@@ -1,43 +1,40 @@
 import {
   View,
-  StyleSheet,
   Text,
-  TouchableOpacity,
+  StyleSheet,
   TextInput,
-  ToastAndroid,
+  TouchableOpacity,
 } from "react-native";
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useMemo, useRef, useState } from "react";
+import { RecipeType } from "@/models/RecipeType";
+import { BottomSheetModal } from "@gorhom/bottom-sheet";
+import { dietTypes as diets } from "@/constants/tastePreferences/DietTypes";
+import Colors from "@/constants/Colors";
+import ComponentParams from "@/constants/ComponentParams";
+import Fonts from "@/constants/Fonts";
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
-import Colors from "@/constants/Colors";
-import ComponentParams from "@/constants/ComponentParams";
-import { RecipeType } from "@/models/RecipeType";
-import { Ionicons } from "@expo/vector-icons";
-import Fonts from "@/constants/Fonts";
-import RoundButton from "@/components/buttons/RoundButton";
 import CustomSheetModal from "../modals/CustomSheetModal";
-import { BottomSheetModal } from "@gorhom/bottom-sheet";
-import StandardButton from "../buttons/StandardButton";
-import { cuisineTypes as cuisines } from "@/constants/tastePreferences/CuisineTypes";
-import OptionTagButton from "../buttons/OptionTagButton";
+import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
-export type CuisineType = {
-  id: number;
-  name: string;
-};
-const EditRecipeCuisineType = ({
-  recipe = {} as RecipeType,
-  setRecipe,
-  title = "Cuisine Type",
-}: {
+import StandardButton from "../buttons/StandardButton";
+import OptionTagButton from "../buttons/OptionTagButton";
+
+type EditDietTypeProps = {
   title?: string;
   recipe: RecipeType;
   setRecipe: (recipe: RecipeType) => void;
+};
+
+const EditDietType: React.FC<EditDietTypeProps> = ({
+  title = "Diet Type",
+  recipe,
+  setRecipe,
 }) => {
   const modalRef = useRef<BottomSheetModal>(null);
-  const [cuisineTypes, setCuisineTypes] = useState<string[]>(cuisines);
+  const [dietTypes, setDietTypes] = useState<string[]>(diets);
   const [searchInputField, setSearchInputField] = useState<string>("");
 
   const handleOpenModal = () => {
@@ -49,9 +46,9 @@ const EditRecipeCuisineType = ({
     setSearchInputField("");
   };
 
-  const filteredCuisines = useMemo(() => {
-    return cuisineTypes.filter((cuisine) =>
-      cuisine.toLowerCase().includes(searchInputField.toLowerCase())
+  const filteredDiets = useMemo(() => {
+    return dietTypes.filter((diet) =>
+      diet.toLowerCase().includes(searchInputField.toLowerCase())
     );
   }, [searchInputField]);
 
@@ -60,7 +57,6 @@ const EditRecipeCuisineType = ({
       setSearchInputField("");
     }
   };
-
   return (
     <View>
       <CustomSheetModal
@@ -69,7 +65,7 @@ const EditRecipeCuisineType = ({
         snapPoints={[hp(100)]}
         headerChildren={
           <>
-            <Text style={styles.modalTitle}>Select Cuisine Type</Text>
+            <Text style={styles.modalTitle}>Select Diet Type</Text>
             <View style={styles.contentItemInputContainer}>
               <Ionicons
                 name="search"
@@ -90,19 +86,18 @@ const EditRecipeCuisineType = ({
         }
         scrollViewChildren={
           <View style={styles.scrollContentContainer}>
-            {filteredCuisines.map((cuisine: string, index: number) => (
+            {filteredDiets.map((diet: string, index: number) => (
               <OptionTagButton
                 key={index}
-                option={cuisine}
-                selected={recipe.cuisineType === cuisine}
-                selectOption={(option: string) => {
-                  if (recipe.cuisineType === option) {
-                    setRecipe({ ...recipe, cuisineType: "" });
-                    return;
+                option={diet}
+                selectOption={() => {
+                  if (recipe.dietType === diet) {
+                    setRecipe({ ...recipe, dietType: "" });
                   } else {
-                    setRecipe({ ...recipe, cuisineType: option });
+                    setRecipe({ ...recipe, dietType: diet });
                   }
                 }}
+                selected={recipe.dietType === diet}
               />
             ))}
           </View>
@@ -137,7 +132,7 @@ const EditRecipeCuisineType = ({
             end={[1, 1]}
           />
           <Text style={styles.text} ellipsizeMode="tail" numberOfLines={1}>
-            {recipe?.cuisineType ? recipe.cuisineType : "Select"}
+            {recipe?.dietType ? recipe.dietType : "Select"}
           </Text>
           <Ionicons name="chevron-down" size={24} color={Colors.darkGrey} />
         </TouchableOpacity>
@@ -146,7 +141,7 @@ const EditRecipeCuisineType = ({
   );
 };
 
-export default EditRecipeCuisineType;
+export default EditDietType;
 
 const styles = StyleSheet.create({
   contentItemInput: {
@@ -155,6 +150,14 @@ const styles = StyleSheet.create({
     fontSize: Fonts.text_2.fontSize,
     color: Colors.darkGrey,
     lineHeight: Fonts.text_2.lineHeight,
+  },
+  gradientContainer: {
+    borderRadius: hp(ComponentParams.button.height.medium / 2),
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
   },
   contentItemInputContainer: {
     flexDirection: "row",
@@ -166,14 +169,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: wp(4),
     paddingVertical: hp(1),
     gap: wp(2),
-  },
-  gradientContainer: {
-    borderRadius: hp(ComponentParams.button.height.medium / 2),
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
   },
   text: {
     textTransform: "capitalize",
@@ -231,7 +226,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: wp(4),
     height: hp(ComponentParams.button.height.small),
     borderRadius: hp(ComponentParams.button.height.small),
-    shadowColor: Colors.cardDropShadow,
+    shadowColor: Colors.darkGrey,
     backgroundColor: Colors.white,
     elevation: 2,
   },

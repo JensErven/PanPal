@@ -5,19 +5,22 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
-import Colors from "@/constants/Colors";
-const RoundButton = ({
-  height = ComponentParams.button.height.medium,
-  transparent = true,
-  backgroundColor,
-  children,
-  handlePress,
-}: {
+
+interface RoundButtonProps {
+  isDisabled?: boolean;
   height?: number;
   transparent?: boolean;
   backgroundColor?: string;
   children: React.ReactNode;
   handlePress: () => void;
+}
+const RoundButton: React.FC<RoundButtonProps> = ({
+  isDisabled = false,
+  height = ComponentParams.button.height.medium,
+  transparent = true,
+  backgroundColor,
+  children,
+  handlePress,
 }) => {
   return (
     <TouchableOpacity
