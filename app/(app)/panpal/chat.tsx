@@ -122,11 +122,7 @@ const PanPalChatScreen = () => {
   }, []);
 
   useEffect(() => {
-    // if new message a assistant message then notify user
-    if (messages[messages.length - 1]?.role !== "assistant") return;
-    // notify user that a new message has been received
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-    // scroll to the end of the chat
     if (scrollViewRef.current) {
       scrollViewRef.current.scrollToEnd({ animated: true });
     }

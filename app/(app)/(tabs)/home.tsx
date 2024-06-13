@@ -169,7 +169,7 @@ const Home = () => {
 
       if (response && response.content) {
         const recipe = parseRecipeContent(response.content);
-
+        substractCredits(1);
         return recipe;
       } else {
         throw new Error("Invalid response from OpenAI");

@@ -22,3 +22,6 @@ export const capitalize = (str: string) =>
   str.charAt(0).toUpperCase() + str.slice(1);
 
 export const trim = (str: string) => str.trim();
+
+// get rid of numbers at the beginning of a string (ex. 1. , 2. , 3. )
+export const removeNumbers = (str: string) => str.replace(/^\d+\.\s/, "");

@@ -62,7 +62,7 @@ const SignUp = () => {
       end={[1, 1]}
     >
       <CustomKeyBoardView>
-        <StatusBar style="dark" />
+        <StatusBar style="light" />
         <View style={styles.content}>
           <View style={styles.logoContainer}>
             <Text style={[{ color: Colors.darkBlue }, styles.logoTitle]}>
