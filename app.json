@@ -4,13 +4,13 @@
     "slug": "PanPal",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/images/panpal-icon-square.png",
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
     "splash": {
-      "image": "./assets/images/splash.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "image": "./assets/images/panpal-splash-screen.png",
+      "resizeMode": "cover",
+      "backgroundColor": "#AC70F6"
     },
     "assetBundlePatterns": ["**/*"],
     "ios": {
@@ -20,8 +20,8 @@
     "android": {
       "package": "com.panpal",
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/splash.png",
-        "backgroundColor": "#ffffff"
+        "foregroundImage": "./assets/images/panpal-splash-screen.png",
+        "backgroundColor": "#AC70F6"
       }
     },
     "web": {
