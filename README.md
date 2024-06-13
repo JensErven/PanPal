@@ -69,7 +69,7 @@ EXPO_PUBLIC_OPENAI_API_KEY=
 3. Start the Android emulator:
 
 ```sh
-expo start --android
+npx expo --android
 ```
 
 #### Running on a Physical Device
@@ -78,7 +78,7 @@ expo start --android
 2. Start the Expo development server:
 
 ```sh
-expo start
+npx expo
 ```
 
 3. Scan the QR code displayed in the terminal or in the Expo Developer Tools using the Expo Go app on your device.
