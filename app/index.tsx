@@ -2,6 +2,7 @@ import { ActivityIndicator, StyleSheet } from "react-native";
 import React from "react";
 import { LinearGradient } from "expo-linear-gradient";
 import Colors from "@/constants/Colors";
+import AnsweringAnimationItem from "@/components/chat/AnsweringAnimationItem";
 
 const StartPage = () => {
   return (
@@ -15,7 +16,7 @@ const StartPage = () => {
       start={[0, 0]}
       end={[1, 1]}
     >
-      <ActivityIndicator size="large" color={Colors.white} />
+      <AnsweringAnimationItem />
     </LinearGradient>
   );
 };
