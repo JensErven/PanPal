@@ -41,7 +41,7 @@ cd panpal
 3. Install the dependencies:
 
 ```sh
-cd panpal
+npm install
 ```
 
 4. Add .env file in the root of the project. Add the correct credentials to connect to firebase and openai api.
