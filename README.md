@@ -4,14 +4,17 @@ PanPal is a React Native application developed using Expo. This guide provides i
 
 ## Table of Contents
 
-- [Prerequisites](#prerequisites)
-- [Installation](#installation)
-- [Running the App](#running-the-app)
-  - [Running on a Simulator](#running-on-a-simulator)
-  - [Running on a Physical Device](#running-on-a-physical-device)
-- [Configuration](#configuration)
-- [Additional Resources](#additional-resources)
-- [License](#license)
+- [PanPal](#panpal)
+  - [Table of Contents](#table-of-contents)
+  - [Prerequisites](#prerequisites)
+  - [Installation](#installation)
+  - [Running the App](#running-the-app)
+    - [Running on a Simulator](#running-on-a-simulator)
+      - [Android Emulator](#android-emulator)
+      - [Running on a Physical Device](#running-on-a-physical-device)
+  - [Configuration](#configuration)
+  - [Additional Resources](#additional-resources)
+  - [License](#license)
 
 ## Prerequisites
 
@@ -69,7 +72,7 @@ EXPO_PUBLIC_OPENAI_API_KEY=
 3. Start the Android emulator:
 
 ```sh
-expo start --android
+npx expo --android
 ```
 
 #### Running on a Physical Device
@@ -78,7 +81,7 @@ expo start --android
 2. Start the Expo development server:
 
 ```sh
-expo start
+npx expo
 ```
 
 3. Scan the QR code displayed in the terminal or in the Expo Developer Tools using the Expo Go app on your device.
