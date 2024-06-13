@@ -51,6 +51,7 @@ const Saved = () => {
   const [selectedMealTypes, setSelectedMealTypes] = useState<string[]>([]);
   const [searchInputValue, setSearchInputValue] = useState<string>("");
   const recipesFilterSheetModal = useRef<BottomSheetModal>(null);
+  const listRef = useRef(null); // Reference for the FlashList
 
   const filteredRecipes = useMemo(() => {
     const joinesRecipesLists = [...initialRecipes];
@@ -141,6 +142,13 @@ const Saved = () => {
   useEffect(() => {
     setInitialRecipes(recipes);
   }, [recipes]);
+
+  useEffect(() => {
+    // unmount component logic reset filter options
+    return () => {
+      handleFilterReset();
+    };
+  }, []);
 
   const searchBarHeaderChildren = () => {
     return (

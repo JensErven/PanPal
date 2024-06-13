@@ -13,6 +13,7 @@ import {
 } from "react-native-responsive-screen";
 
 const CustomSheetModal = ({
+  isVisible = true,
   modalRef,
   headerChildren,
   scrollViewChildren,
@@ -22,6 +23,7 @@ const CustomSheetModal = ({
   hasBackdrop = true,
   enablePanDownToClose = true,
 }: {
+  isVisible?: boolean;
   modalRef: React.RefObject<BottomSheetModal>;
   headerChildren: React.ReactNode;
   scrollViewChildren?: React.ReactNode;
@@ -54,6 +56,11 @@ const CustomSheetModal = ({
       keyboardDidShowListener.remove();
     };
   }, []);
+
+  // Render nothing if isVisible is false
+  if (!isVisible) {
+    return null;
+  }
 
   return (
     <BottomSheetModal

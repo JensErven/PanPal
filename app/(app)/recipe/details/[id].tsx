@@ -47,6 +47,7 @@ const DetailsRecipe = () => {
   // steps progress
   const [progress, setProgress] = useState<number>(0);
   const [selectedSteps, setSelectedSteps] = useState<number[]>([]);
+  const [modalVisible, setModalVisible] = useState<boolean>(false); // State to control modal visibility
 
   useFocusEffect(
     React.useCallback(() => {
@@ -73,9 +74,13 @@ const DetailsRecipe = () => {
               router.back();
             });
         });
+      // Ensure modal is visible when screen gains focus
+      setModalVisible(true);
+
       return () => {
-        // Close the modal when the screen loses focus
-        recipesDetailsTabBarSheetModal.current?.close();
+        // Close the modal and reset state when the screen loses focus
+        recipesDetailsTabBarSheetModal.current?.dismiss();
+        setModalVisible(false);
       };
     }, [id])
   );
@@ -381,6 +386,7 @@ const DetailsRecipe = () => {
         children={CustomHeaderChildren()}
       />
       <CustomSheetModal
+        isVisible={modalVisible}
         hasBackdrop={false}
         enablePanDownToClose={false}
         headerChildren={RecipeDetailsModalHeaderChildren}

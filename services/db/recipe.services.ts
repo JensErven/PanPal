@@ -21,10 +21,12 @@ import {
 } from "firebase/storage";
 import uuid from "react-native-uuid";
 import { compressImage } from "@/utils/file.utils";
-
+import { removeNumbers } from "@/utils/string.utils";
 const collectionName: string = "recipes";
 
 const createRecipe = async (recipeData: RecipeType) => {
+  // Remove numbers from the beginning of the recipe steps
+  recipeData.steps = recipeData.steps.map((step) => removeNumbers(step));
   try {
     const docRef = doc(collection(db, collectionName));
     if (recipeData.image) {
