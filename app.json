@@ -9,7 +9,7 @@
     "userInterfaceStyle": "automatic",
     "splash": {
       "image": "./assets/images/panpal-splash-screen.png",
-      "resizeMode": "cover",
+      "resizeMode": "contain",
       "backgroundColor": "#AC70F6"
     },
     "assetBundlePatterns": ["**/*"],

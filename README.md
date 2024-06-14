@@ -4,14 +4,17 @@ PanPal is a React Native application developed using Expo. This guide provides i
 
 ## Table of Contents
 
-- [Prerequisites](#prerequisites)
-- [Installation](#installation)
-- [Running the App](#running-the-app)
-  - [Running on a Simulator](#running-on-a-simulator)
-  - [Running on a Physical Device](#running-on-a-physical-device)
-- [Configuration](#configuration)
-- [Additional Resources](#additional-resources)
-- [License](#license)
+- [PanPal](#panpal)
+  - [Table of Contents](#table-of-contents)
+  - [Prerequisites](#prerequisites)
+  - [Installation](#installation)
+  - [Running the App](#running-the-app)
+    - [Running on a Simulator](#running-on-a-simulator)
+      - [Android Emulator](#android-emulator)
+      - [Running on a Physical Device](#running-on-a-physical-device)
+  - [Configuration](#configuration)
+  - [Additional Resources](#additional-resources)
+  - [License](#license)
 
 ## Prerequisites
 
